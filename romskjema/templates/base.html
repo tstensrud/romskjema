@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../static/css/apexcharts.css" rel="stylesheet">
+    <link href="../static/css/tooplate-mini-finance.css" rel="stylesheet">
+
+</head>
+<body>
+<script>
+    function autoSubmitForm() {
+        document.getElementById("project_name").submit();
+    }
+</script>
+
+    <header class="navbar sticky-top flex-md-nowrap">
+        <div class="col-md-3 col-lg-3 me-0 px-3 fs-6">
+            <a class="navbar-brand" href="/home">
+                <i class="bi-box"></i>
+                Structor TS Romskjemaer - 
+                {% if user.is_authenticated %}
+                    {% if project %}
+                        {{project.ProjectName}}
+                    {% else %}
+                        Velg prosjekt
+                    {% endif %}
+                {% endif %}
+            </a>
+        </div>
+        <div class="col-md-3 col-lg-3 me-0 px-3 fs-6">
+            <form id ="project_name" action="/change_project" method="POST" onchange="autoSubmitForm()">
+                <select name="project_name">
+                    <option value="none">Bytt prosjekt</option>
+                    {% for name in project_names %}
+                    <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+    </header>
+
+    <div class="container-fluid">
+        <div class="row">
+<!-- SIDE BAR MENU-->
+{% if user.is_authenticated%}
+    {% if project %}
+            <nav id="sidebarMenu" class="col-md-3 col-lg-3 d-md-block sidebar collapse">
+                <div class="position-sticky py-4 px-3 sidebar-sticky">
+                    <ul class="nav flex-column h-100">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/home">
+                                <i class="bi-gear me-2"></i>
+                                Oversikt
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/buildings">
+                                <i class="bi-gear me-2"></i>
+                                Bygg
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/rooms">
+                                <i class="bi-gear me-2"></i>
+                                Rom
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/home">
+                                <i class="bi-gear me-2"></i>
+                                Ventilasjon
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home">
+                                <i class="bi-gear me-2"></i>
+                                Varmeberegninger
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home">
+                                <i class="bi-gear me-2"></i>
+                                Kjøling
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home">
+                                <i class="bi-gear me-2"></i>
+                                Tappevann/SPV
+                            </a>
+                        </li>
+                        <li class="nav-item border-top mt-auto pt-2">
+                            <a class="nav-link" href="/settings">
+                                <i class="bi-gear me-2"></i>
+                                Prosjektinnstillinger
+                            </a>
+                        </li>
+                        <li class="nav-item border-top mt-auto pt-2">
+                            <a class="nav-link" href="/logout">
+                                <i class="bi-box-arrow-left me-2"></i>
+                                Logg ut
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+    {% endif %}
+{% endif %}
+<!-- END SIDE BAR MENY-->
+            <main class="main-wrapper col-md-9 ms-sm-auto py-4 col-lg-9 px-md-4 border-start">
+<!-- START SITE CONTENT -->
+<div class="title-group mb-3">
+    <h1 class="h2 mb-0">{% block pagetitle %}{%endblock%}</h1>
+    <small class="text-muted">
+        {% block page_subtitle %}{%endblock%}
+    </small>
+</div>
+{% block content %}
+
+{% endblock %}
+<!-- END SITE CONTENT -->
+
+<!-- FOOTER-->
+                <footer class="site-footer">
+                    <div class="container">
+                        <div class="row">
+                            
+                            <div class="col-lg-12 col-12">
+                                <p class="copyright-text">Structor Tekniske Systemer romskjema &copy; 2024 
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+<!-- END FOOTER-->
+            </main>
+        </div>
+    </div>
+
+</body>
+    <!-- scripts -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/custom.js"></script>
+</body>
+</html>
