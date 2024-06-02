@@ -22,6 +22,7 @@ def get_project():
     project = models.Project.query.get(project_id)
     return project
 
+
 '''
 Views
 '''

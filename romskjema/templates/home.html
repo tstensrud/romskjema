@@ -3,50 +3,28 @@
 {% block header %}Romskjema{% endblock %}
 
 {%block content %}
-    <h2>{{project.ProjectName}}</h1>
-    <div class="title-group mb-3">    
-        <small class="text-muted">Logget inn som {{user.name}}</small>
-    </div>
-    
-    <div class="row my-4">
-        <div class="col-lg-7 col-12">    
-            <div class="custom-block custom-block-exchange">
-                <h5 class="mb-4">Oppsummering</h5>
-                <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                    <div class="d-flex align-items-center">    
-                        <div>
-                            <p>Prosjektnummer</p>
-                            <h6>{{project.ProjectNumber}}</h6>
-                        </div>
-                    </div>
-                </div>    
-                <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                    <div class="d-flex align-items-center">    
-                        <div>
-                            <p>Prosjektnavn</p>
-                            <h6>{{project.ProjectName}}</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                    <div class="d-flex align-items-center">    
-                        <div>
-                            <p>Størrelse</p>
-                            <h6>10000m2</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                    <div class="d-flex align-items-center">    
-                        <div>
-                            <p>Beskrivelse</p>
-                            <h6>{{project.ProjectDescription}}</h6>
-                        </div>
-                    </div>
-                </div>
+<p>
+    <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
+    <h1 class="app-content-Text">Logget inn som {{user.name}}<h1>
+</p>
 
-                </div>
-            </div>
-        </div>
+<div class="text-div">
+    <h1 class="app-content-subTitleheaderText">Oppsummering</h1>
+        <p class="app-content-Text">
+            Prosjektnummer
+            <h1 class="app-content-Text">{{project.ProjectNumber}}</h1>
+        </p>
+        <p class="app-content-Text">
+            Prosjektnavn
+            <h1 class="app-content-Text">{{project.ProjectName}}</h1>
+        </p>
+        <p class="app-content-Text">
+            Størrelse
+            <h1 class="app-content-Text">10000m2</h1>
+        </p>
+        <p class="app-content-Text">
+            Beskrivelse
+            <h1 class="app-content-Text">{{project.ProjectDescription}}</h1>
+        </p>
     </div>
 {% endblock %}
