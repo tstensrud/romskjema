@@ -10,7 +10,7 @@ Non views methods
 @login_required
 def get_all_project_names():
     project_names = []
-    projects = models.Project.query.all()
+    projects = models.Projects.query.all()
     for project_name in projects:
         project_names.append(project_name.ProjectName)
     return project_names
@@ -19,7 +19,7 @@ def get_all_project_names():
 @login_required
 def get_project():
     project_id = session.get('project_id')
-    project = models.Project.query.get(project_id)
+    project = models.Projects.query.get(project_id)
     return project
 
 
@@ -43,7 +43,7 @@ def home():
                            project=project, 
                            project_names=project_names)
 
-@views.route('/rooms')
+@views.route('/rooms', methods=['GET', 'POST'])
 @login_required
 def rooms():
     project = get_project()
@@ -58,7 +58,7 @@ def rooms():
 def change_project():
     project_name = request.form.get('project_name')
     if project_name:
-        project_object = models.Project.query.filter_by(ProjectName=project_name).first()
+        project_object = models.Projects.query.filter_by(ProjectName=project_name).first()
         project_id = project_object.id
         session['project_id'] = project_id
         print(session['project_name'])
@@ -80,22 +80,22 @@ def projects():
         project_name = request.form.get('project_name')
         project_number = request.form.get('project_number')
         project_description = request.form.get('project_description')
-        project = models.Project.query.filter_by(ProjectNumber = project_number).first()
+        project = models.Projects.query.filter_by(ProjectNumber = project_number).first()
         
         if project:
             flash("Prosjektnummer finnes allerede", category="error")
         elif len(project_name) <= 1:
             flash("Prosjektnavn er for kort")
         
-        new_project = models.Project(ProjectNumber=project_number, ProjectName=project_name, ProjectDescription=project_description)
+        new_project = models.Projects(ProjectNumber=project_number, ProjectName=project_name, ProjectDescription=project_description)
         db.session.add(new_project)
         db.session.commit()
         session['project_name'] = project_name
         flash(f"Prosjekt \"{project_name}\" er opprettet", category="success")
-        return redirect(url_for('views.home'))
+        return redirect(url_for('views.projects'))
         
     elif request.method == "GET":
-        projects = models.Project.query.all()
+        projects = models.Projects.query.all()
         return render_template("projects.html", user=current_user, projects=projects, project=None)
 
 @views.route('/buildings', methods=['POST', 'GET'])
@@ -120,20 +120,6 @@ def buildings():
         db.session.commit()
         flash(f"Bygg {building_name} opprettet", category="success")
         return redirect(url_for('views.buildings'))
-
-
-@views.route('/rooms', methods=['GET', 'POST'])
-@login_required
-def stocks():
-    project = get_project()
-    project_names = get_all_project_names()
-
-    if request.method == "POST":
-        pass
-    return render_template("rooms.html", 
-                           user = current_user,
-                           project = project,
-                           project_names = project_names)
 
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required

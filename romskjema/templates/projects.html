@@ -3,49 +3,32 @@
 {% block header %}Velg prosjekt{% endblock %}
 
 {%block content %}
+<div class="text-div">
 <h1 class="app-content-subTitleheaderText">Prosjekt</h1>
-    <!-- New room form -->
-    <div class="row my-4">
-        <div class="col-lg-7 col-12">
-            <div class="custom-block bg-white">
-                <div class="tab-content" id="myTabContent">
-
-                    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                        <h6 class="mb-4">Velg prosjekt</h6>
-                        <form class="custom-form profile-form" method="POST" role="form">
-                            <p>
-                                <select name="project_id">
-                                    <option value="none">-  Velg prosjekt -</option>
-                                    {% for project in projects %}
-                                    <option value="{{project.id}}">{{project.ProjectName}}</option>
-                                    {% endfor %}
-                                </select>
-                            </p>
-                            <div class="d-flex">
-                                <p>
-                                    <button type="submit" class="form-control ms-2">
-                                        Gå til
-                                    </button>
-                                </p>
-                            </div>
-                        </form>
-                    </div>
+<form class="custom-form profile-form" method="POST" role="form">
+    <p>
+        <select name="project_id">
+            <option value="none">-  Velg prosjekt -</option>
+            {% for project in projects %}
+            <option value="{{project.id}}">{{project.ProjectName}}</option>
+            {% endfor %}
+        </select>
+    </p>
+        <p>
+            <button type="submit" class="form-button">
+                Gå til
+            </button>
+        </p>
+</form>
 <br>
-                    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                        <h6 class="mb-4">Legg til nytt prosjekt</h6>
-                        <form class="custom-form profile-form" method="POST" role="form">
-                            <input class="form-control" type="text" name="project_number" id="project_number" placeholder="Prosjektnummer">
-                            <input class="form-control" type="text" name="project_name" id="project_name" placeholder="Navn på prosjekt">
-                            <input class="form-control" type="text" name="project_description" id="project_description" placeholder="Kort prosjektbeskrivelse">
-                            <div class="d-flex">
-                                <button type="submit" class="form-control ms-2">
-                                    Legg til
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <!-- End new room form -->
+<h1 class="app-content-subTitleheaderText">Legg til nytt prosjekt</h1>
+<form class="custom-form profile-form" method="POST" role="form">
+    <input class="form-control" type="text" name="project_number" id="project_number" placeholder="Prosjektnummer">
+    <input class="form-control" type="text" name="project_name" id="project_name" placeholder="Navn på prosjekt">
+    <input class="form-control" type="text" name="project_description" id="project_description" placeholder="Kort prosjektbeskrivelse">
+        <button type="submit" class="form-button">
+            Legg til
+        </button>
+</form>
+</div>
 {% endblock %}

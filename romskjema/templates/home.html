@@ -3,28 +3,26 @@
 {% block header %}Romskjema{% endblock %}
 
 {%block content %}
-<p>
-    <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
-    <h1 class="app-content-Text">Logget inn som {{user.name}}<h1>
-</p>
-
 <div class="text-div">
-    <h1 class="app-content-subTitleheaderText">Oppsummering</h1>
-        <p class="app-content-Text">
-            Prosjektnummer
-            <h1 class="app-content-Text">{{project.ProjectNumber}}</h1>
-        </p>
-        <p class="app-content-Text">
-            Prosjektnavn
-            <h1 class="app-content-Text">{{project.ProjectName}}</h1>
-        </p>
-        <p class="app-content-Text">
-            Størrelse
-            <h1 class="app-content-Text">10000m2</h1>
-        </p>
-        <p class="app-content-Text">
-            Beskrivelse
-            <h1 class="app-content-Text">{{project.ProjectDescription}}</h1>
-        </p>
-    </div>
+    <p>
+        <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
+        <h1 class="app-content-Text">Logget inn som {{user.name}}</h1>
+    </p>
+    <p class="app-content-Text">
+        <h1 class="app-content-Text">Prosjektnummer</h1>
+        {{project.ProjectNumber}}
+    <p>
+    <p class="app-content-Text">
+        <h1 class="app-content-Text">Prosjektnavn</h1>
+        {{project.ProjectName}}
+    </p>
+    <p class="app-content-Text">
+        <h1 class="app-content-Text">Størrelse</h1>
+        10000m2
+    </p>
+    <p class="app-content-Text">
+        <h1 class="app-content-Text">Beskrivelse</h1>
+        {{project.ProjectDescription}}
+    </p>
+</div>
 {% endblock %}

@@ -3,53 +3,30 @@
 {% block header %}Bygg{% endblock %}
 
 {%block content %}
-<h3>Bygg</h3>
+<div class="text-div">
+    <h3>Bygg</h3>
     <!-- New room form -->
-    <div class="row my-4">
-        <div class="col-lg-7 col-12">
-            <div class="custom-block bg-white">
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                        <h6 class="mb-4">Legg til bygg i prosjekt</h6>
-                        <form class="custom-form profile-form" method="POST" role="form">
-                            <input class="form-control" type="text" name="building_name" id="building_name" placeholder="Navn på bygg">
-                            <div class="d-flex">
-                                <button type="submit" class="form-control ms-2">
-                                    Legg til
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h1  class="app-content-Text">Legg til bygg i prosjekt</h1>
+    <p>
+        <form class="custom-form profile-form" method="POST" role="form">
+            <input type="text" name="building_name" id="building_name" placeholder="Navn på bygg">
+                <button type="submit" class="form-button">
+                    Legg til
+                </button>
+        </form>
+    </p>
     <!-- End new room form -->
 
     <!-- Start room list -->
-    <div class="row my-4">
-        <div class="custom-block custom-block-exchange">
-            <h5 class="mb-4">Prosjektets bygg</h5>
-            {% if not project_buildings %}
-            <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                 
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p>Ingen bygg lagt inn for {{ project.ProjectName }}</p>
-                        <h6></h6>
-                    </div>
-                </div>
 
-                {%else %}
-
-                {% for building in project_buildings %}
-                <div class="d-flex align-items-center">
-                    <div>
-                        <p>{{building.BuildingName}}</p>
-                        <h6>nnn m2</h6>
-                    </div>
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
-        </div>
+    <h1  class="app-content-Text">Prosjektets bygg</h1>
+    {% if not project_buildings %}
+            <p>Ingen bygg lagt inn for {{ project.ProjectName }}</p>
+        {%else %}
+        {% for building in project_buildings %}
+            <p>{{building.BuildingName}}</p>
+            <h6>nnn m2</h6>
+        {% endfor %}
+        {% endif %}
+</div>
 {% endblock %}

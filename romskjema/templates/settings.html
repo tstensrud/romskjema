@@ -3,27 +3,20 @@
 {% block header %}Prosjektinnstillinger{% endblock %}
 
 {%block content %}
-<h3>Instillinger for {{project.ProjectName}}</h3>
-    <!-- New room form -->
-    <div class="row my-4">
-        <div class="col-lg-7 col-12">
-            <div class="custom-block bg-white">
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                        <h6 class="mb-4">Oppdater</h6>
-                        <form class="custom-form profile-form" method="POST" role="form">
-                            <input class="form-control" type="text" name="project_number" id="project_number" value="{{project.ProjectNumber}}" placeholder="Prosjektnummer">
-                            <input class="form-control" type="text" name="project_name" id="project_name" value="{{project.ProjectName}}">
-                            <input class="form-control" type="text" name="project_description" id="project_description" value="{{project.ProjectDescription}}">
-                            <div class="d-flex">
-                                <button type="submit" class="form-control ms-2">
-                                    Oppdater
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <!-- End new room form -->
+<div class="text-div">
+    <h1 class="app-content-subTitleheaderText">Instillinger for {{project.ProjectName}}</h1>
+    <p>
+        <form class="custom-form profile-form" method="POST" role="form">
+            <input type="text" name="project_number" id="project_number" value="{{project.ProjectNumber}}" placeholder="Prosjektnummer">
+            <input type="text" name="project_name" id="project_name" value="{{project.ProjectName}}" placeholder="Prosjektnavn">
+            <input class="input-description" type="text" name="project_description" id="project_description" value="{{project.ProjectDescription}}" placeholder="Prosjektbeskrivelse">
+    </p>
+    
+    <p>
+            <button type="submit" class="form-button">
+                Oppdater
+            </button>
+        </form>
+    </p>
+</div>
 {% endblock %}
