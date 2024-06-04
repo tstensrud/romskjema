@@ -1,4 +1,4 @@
-from flask import Blueprint, session, redirect, url_for, request, render_template, flash
+from flask import Blueprint, session, redirect, url_for, request, render_template, flash, jsonify
 from flask_login import login_required, current_user
 from . import models, db
 
@@ -48,10 +48,56 @@ def home():
 def rooms():
     project = get_project()
     project_names = get_all_project_names()
-    return render_template("rooms.html", 
-                           user=current_user, 
-                           project=project, 
-                           project_names=project_names)
+    project_buildings = db.session.query(models.Buildings).filter(models.Buildings.ProjectId == project.id).all()
+    project_rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).all()
+    
+    if request.method == "POST":
+        building_id = request.form.get("building_id")
+        print(f"Building ID: {building_id}")
+        if not building_id:
+            flash("Feil byggnings-ID", category="error")
+            return redirect(url_for("views.rooms"))
+        building_id = int(building_id)
+        
+        room_type = request.form.get("room_type")
+        floor = request.form.get("room_floor")
+        name = request.form.get("room_name")
+        number = request.form.get("room_number")
+        area = request.form.get("room_area")
+        try:
+            area = float(area)
+        except ValueError:
+            flash("Areal kan kun inneholde tall", category="error")
+        people = request.form.get("room_people")
+        try:
+            people = int(people)
+        except ValueError:
+            flash("Personbelastning kan kun inneholde tall", category="error")
+        if building_id != "none":
+            new_room = models.Rooms(BuildingId = building_id,
+                                    RoomType = room_type,
+                                    Floor = floor,
+                                    RoomNumber = number,
+                                    RoomName = name,
+                                    Area = area,
+                                    RoomPopulation = people)
+            db.session.add(new_room)
+            db.session.commit()
+            print(f"Room {number} added")
+            return redirect(url_for("views.rooms"))
+        
+    elif request.method == "GET":
+        return render_template("rooms.html", 
+                            user=current_user, 
+                            project=project, 
+                            project_names=project_names,
+                            project_buildings = project_buildings,
+                            project_rooms = project_rooms)
+
+@views.route('/update_room', methods=['POST'])
+@login_required
+def update_room():
+    data = request.get_json()
 
 @views.route('/change_project', methods=['GET', 'POST'])
 @login_required
@@ -71,15 +117,14 @@ def projects():
         # Project selected from /projects drop down
         project_id = request.form.get('project_id')
         if project_id:
-            print(project_id)
             session['project_id'] = project_id
-            print(session['project_name'])
             return redirect(url_for('views.home'))
 
         # If creating new project
         project_name = request.form.get('project_name')
         project_number = request.form.get('project_number')
         project_description = request.form.get('project_description')
+        project_spec = request.form.get('project_specification')
         project = models.Projects.query.filter_by(ProjectNumber = project_number).first()
         
         if project:
@@ -87,7 +132,10 @@ def projects():
         elif len(project_name) <= 1:
             flash("Prosjektnavn er for kort")
         
-        new_project = models.Projects(ProjectNumber=project_number, ProjectName=project_name, ProjectDescription=project_description)
+        new_project = models.Projects(ProjectNumber=project_number, 
+                                      ProjectName=project_name, 
+                                      ProjectDescription=project_description, 
+                                      Specification=project_spec)
         db.session.add(new_project)
         db.session.commit()
         session['project_name'] = project_name

@@ -15,6 +15,7 @@ class Projects(db.Model):
     ProjectNumber = db.Column(db.Integer, nullable=False)
     ProjectName = db.Column(db.String(50), nullable=False)
     ProjectDescription = db.Column(db.String(200))
+    Specification = db.Column(db.String(50))
 
     buildings = db.relationship('Buildings', backref='projects', lazy=True)
 
@@ -24,6 +25,9 @@ class Projects(db.Model):
         self.ProjectName = project_name
     def set_project_description(self, description: str) -> None:
         self.ProjectDescription = description
+    
+    def get_specifictaion(self) -> str:
+        return self.Specification
     
 
 class Buildings(db.Model):

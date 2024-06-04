@@ -8,23 +8,33 @@
     <!-- New room form -->
     <p>
       <form  method="POST" role="form">
-        <select name="room_type">
+        <select name="room_type" id="room_type">
           <option>- Romtype -</option>
           <option>Undervisningsrom</option>
           <option>Personalrom</option>
         </select>
-        <select name="Building">
-          <option>- Bygg -</option>
-          <option>1</option>
-          <option>2</option>
+        <select name="building_id" id="building_id">
+          <option value="none">- Bygg -</option>
+          
+          {% for building in project_buildings %}
+          <option value="{{building.id}}">{{ building.BuildingName }}</option>
+          {% endfor %}
+          
         </select>
-        <input type="text" name="room_number" id="room_floor", placeholder="Etasje" required>
+        <input type="text" name="room_floor" id="room_floor", placeholder="Etasje" required>
         <input type="text" name="room_number" id="room_number", placeholder="Romnummer" required>
-        <input type="text" name="room_number" id="room_name", placeholder="Romnavn" required>
-        <input type="text" name="room_number" id="room_area", placeholder="Areal" required>
-        <input type="text" name="room_number" id="room_people", placeholder="Personer" required>
-        <button class="form-button" id="alwaysActive" onclick="addRow()">Legg til</button>
+        <input type="text" name="room_name" id="room_name", placeholder="Romnavn" required>
+        <input type="text" name="room_area" id="room_area", placeholder="Areal" required>
+        <input type="text" name="room_people" id="room_people", placeholder="Personer" required>
+        <button class="form-button" id="alwaysActive" type="submit">Legg til</button>
       </form>
+    </p>
+    <p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {{message}}
+      {% endif %}
+      {% endwith %}
     </p>
     <!-- End new room form -->
 
@@ -76,8 +86,33 @@
     </thead>
 
     <tbody>
-
+      {% for room in project_rooms %}
+      <tr class="products-row">
+        <td class="product-cell status-cell">
+          {{room.Floor}}
+        </td>
+        <td class="product-cell status-cell">
+          {{room.RoomType}}
+        </td>
+        <td class="product-cell status-cell">
+          {{room.RoomNumber}}
+        </td>
+        <td class="product-cell status-cell">
+          {{room.RoomName}}
+        </td>
+        <td class="product-cell status-cell">
+          {{room.Area}} m2
+        </td>
+        <td class="product-cell status-cell">
+          {{room.RoomPopulation}} stk.
+        </td>
+        <td class="product-cell status-cell">
+          Slett
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
+  
   </table>
 
 </div>
