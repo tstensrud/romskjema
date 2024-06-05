@@ -6,26 +6,10 @@
       "m3_prossess": 0,
       "minimum_per_m2": 3.6
     },
-    "luftfordeling": {
-      "omroring": true,
-      "fortrengning": false
-    },
-    "varmegjenvinner": {
-      "roterende": true,
-      "plate": false,
-      "batteri": false
-    },
-    "styring": {
-      "vav": true,
-      "cav": false,
-      "temp": true,
-      "co2": true,
-      "bevegelse": false,
-      "fukt": false,
-      "tid": false
-    },
+    "luftfordeling": "Omrøring",
+    "varmegjenvinner": "R",
+    "styring": "V,T,CO2",
     "presiseringer": "",
-    "aktivitet": "",
     "lydkrav": {
       "teknisk": "28dBA",
       "rw_naborom": "48db",

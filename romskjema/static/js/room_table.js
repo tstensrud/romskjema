@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setFocus();
 
     // Set focus on the element whenever the window or form loses focus
-    document.getElementById("myForm").addEventListener("focusout", setFocus);
+    document.getElementById("new_room").addEventListener("focusout", setFocus);
     window.addEventListener("focus", setFocus);
 });
 

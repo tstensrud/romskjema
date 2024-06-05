@@ -35,7 +35,9 @@ def create_app():
     return app
 
 def create_db(app):
-    if not path.exists('pf/' + DB_NAME):
+    if not path.exists('romskjema/' + DB_NAME):
         with app.app_context():
             db.create_all()
             print("Database created")
+
+    

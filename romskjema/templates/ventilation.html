@@ -1,36 +1,10 @@
 {% extends "base.html" %}
 {%block title%}Romskjema - romliste{% endblock %}
-{% block header %}Romliste{% endblock %}
+{% block header %}Ventilasjon{% endblock %}
 
 {%block content %}
 <div class="text-div">
-<h1 class="app-content-subTitleheaderText">Romliste</h1>
-    <!-- New room form -->
-    <p>
-      <p>Legg til nytt rom</p>
-      <form id="new_room" method="POST" role="form">
-        <select name="room_type" id="room_type">
-          <option>- Romtype -</option>
-          {% for room_type in project_room_types %}
-          <option value = {{room_type.id}}>{{room_type.name}}</option>
-          {% endfor %}
-        </select>
-        <select name="building_id" id="building_id">
-          <option value="none">- Bygg -</option>
-          
-          {% for building in project_buildings %}
-          <option value="{{building.id}}">{{ building.BuildingName }}</option>
-          {% endfor %}
-          
-        </select>
-        <input type="text" name="room_floor" id="room_floor", placeholder="Etasje" required>
-        <input type="text" name="room_number" id="room_number", placeholder="Romnummer" required>
-        <input type="text" name="room_name" id="room_name", placeholder="Romnavn" required>
-        <input type="text" name="room_area" id="room_area", placeholder="Areal" required>
-        <input type="text" name="room_people" id="room_people", placeholder="Personer" required>
-        <button class="form-button" id="alwaysActive" type="submit">Legg til</button>
-      </form>
-    </p>
+<h1 class="app-content-subTitleheaderText">Ventilasjon</h1>
     <p>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -66,53 +40,107 @@
         <th class="product-cell category">
           Romnavn<button class="sort-button">
         </th>
-        
+
         <th class="product-cell category">
-          Areal<button class="sort-button">
-        </th>
-        
-        <th class="product-cell category">
-          Personer<button class="sort-button">
+            m3/pers<button class="sort-button">
         </th>
 
         <th class="product-cell category">
-          Kommentarer
+            Personer summert<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Emisjon<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Emisjon summert<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Prosess<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Dimensjonert<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Tilluft<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Avtrekk<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            Valgt<button class="sort-button">
+        </th>
+
+        <th class="product-cell category">
+            System<button class="sort-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
+            </button>
+        </th>
+        <th class="product-cell category">
+            Kommentarer<button class="sort-button">
         </th>
 
       </tr>
     </thead>
 
     <tbody>
-      {% for room in project_rooms %}
+      {% for data in ventilation_data %}
       <tr class="products-row">
         <td class="product-cell status-cell">
-          {{room.building.BuildingName}}
+          {{data.rooms.building.BuildingName}}
         </td>
         <td class="product-cell status-cell">
-          {{room.Floor}}
+          {{data.rooms.Floor}}
         </td>
         <td class="product-cell status-cell">
-          {{room.RoomNumber}}
+          {{data.rooms.RoomNumber}}
         </td>
         <td class="product-cell status-cell">
-          {{room.RoomName}}
+          {{data.rooms.RoomName}}
         </td>
         <td class="product-cell status-cell">
-          {{room.Area}} m2
+          {{data.AirPerPerson}} m3/pers
         </td>
         <td class="product-cell status-cell">
-          {{room.RoomPopulation}} stk.
+          {{data.AirPersonSum}} m3/h
         </td>
-        <td class="product-cell status-cell table-truncate">
-          {{room.Comments}}
+        <td class="product-cell status-cell">
+          {{data.AirEmission}} m3/m2
+        </td>
+        <td class="product-cell status-cell">
+          {{data.AirEmissionSum}} m3/h
+        </td>
+        <td class="product-cell status-cell">
+            {{data.Process}} m3/h
+        </td>
+        <td class="product-cell status-cell">
+            {{data.AirDemand}} m3/h
+        </td>
+        <td class="product-cell status-cell supplyCell">
+            {{data.AirSupply}} m3/h
+        </td>
+        <td class="product-cell status-cell extractCell">
+            {{data.AirExtract}} m3/h
+        </td>
+        <td class="product-cell status-cell">
+            {{data.Chosen}} m3/m2
+        </td>
+        <td class="product-cell status-cell">
+            {{data.System}}
+        </td>
+        <td class="product-cell status-cell">
+            {{data.Comments}}
         </td>
       </tr>
       {% endfor %}
     </tbody>
-  
   </table>
-
 </div>
 <script src="{{ url_for('static', filename='js/room_table.js') }}"></script>
-<script src="{{ url_for('static', filename='js/input_check.js') }}"></script>
 {% endblock %}
