@@ -18,7 +18,6 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
-                flash("Innlogget", category="success")
                 login_user(user, remember=True)
                 return redirect(url_for("views.projects"))
             else:

@@ -16,17 +16,33 @@
         </form>
     </p>
     <!-- End new room form -->
+    <p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for message in messages %}
+            {{message}}
+          {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-    <!-- Start room list -->
+    </p>
 
     <h1  class="app-content-Text">Prosjektets bygg</h1>
     {% if not project_buildings %}
-            <p>Ingen bygg lagt inn for {{ project.ProjectName }}</p>
-        {%else %}
-        {% for building in project_buildings %}
-            <p>{{building.BuildingName}}</p>
-            <h6>nnn m2</h6>
+        <p>Ingen bygg lagt inn for {{ project.ProjectName }}</p>
+    {%else %}
+        {% for building, area, supply, extract in project_buildings %}
+            <p>{{building.BuildingName}}
+            <br>
+            Areal: {{area}} m2
+            <br>
+            Prosjektert luftmengde:
+            <br>
+            - Tilluft: <span class="supply-text">{{supply}} </span>m3/h
+            <br>
+            - Avtrekk: <span class="extract-text">{{extract}} </span> m3/h
+            </p>
         {% endfor %}
-        {% endif %}
+    {% endif %}
 </div>
 {% endblock %}

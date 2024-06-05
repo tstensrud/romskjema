@@ -122,44 +122,7 @@ class VentilationProperties(db.Model):
         self.AirDemand = 0.0
         self.AirChosen = 0.0
 
-
-    '''
-    Calculate sums and air flow / m2
-    '''
-    def recalculate_air_sums(self, population: int, area: float) -> None:
-        sum_people = self.AirPerPerson * population
-        self.AirPersonSum = round(sum_people, 1)
-        
-        sum_emission = self.AirEmission * area
-        self.AirEmissionSum = round(sum_emission, 1)
-        
-        demand = self.AirPersonSum + self.AirEmissionSum + self.AirProcess
-        self.AirDemand = round(demand, 1)
-    
-    def set_air_chosen(self, area: float) -> None:
-        chosen = self.AirSupply / area
-        self.AirChosen = round(chosen, 1)
-    
-    '''
-    Change air flow values
-    '''
-    def set_air_supply(self, supply: float, area: float) -> None:
-        self.AirSupply = round(supply, 1)
-        self.set_air_chosen(area)
-
-    def set_air_extract(self, extract: float) -> None:
-        self.AirExtract = round(extract, 1)
-    
-    def set_process(self, process: float) -> None:
-        self.AirProcess = round(process, 1)
-        self.set_air_demand()
-
-    def set_system(self, system_number: str) -> None:
-        self.System = system_number
-    def set_comment(self, comment: str) -> None:
-        self.Comments = comment
-
-'''
+''' 
 Specification tables
 '''
 class Specifications(db.Model):

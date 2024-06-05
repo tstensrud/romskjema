@@ -109,7 +109,6 @@ body {
   display: flex;
   overflow: auto;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-
   margin: 0 auto;
 }
 
@@ -483,4 +482,13 @@ body {
   color: var(--app-content-main-color);
   border-radius: 15px;
   padding: 10px;
+}
+
+.supply-text {
+  color: #2ba972;
+  text-align: left;
+}
+
+.extract-text {
+  color: #a92b3c;
 }

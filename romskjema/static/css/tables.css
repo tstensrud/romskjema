@@ -8,28 +8,32 @@
 .tableView .products-header {
   display: flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 4px;  
   background-color: var(--app-content-secondary-color);
   position: sticky;
   top: 0;
 }
+
 .tableView .products-row {
   display: flex;
   align-items: center;
   border-radius: 4px;
+
 }
 .tableView .products-row:hover {
   box-shadow: var(--filter-shadow);
   background-color: var(--app-content-secondary-color);
 }
+
 .tableView .products-row .cell-more-button {
   display: none;
 }
+
 .tableView .product-cell {
   flex: 1;
   padding: 8px 16px;
   color: var(--app-content-main-color);
-  font-size: 14px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -37,6 +41,7 @@
   text-overflow: ellipsis;
   max-width: 200px; /* Adjust this value to fit approximately 20 characters */
 }
+
 .tableView .product-cell img {
   width: 32px;
   height: 32px;
@@ -81,6 +86,7 @@ background-color: #2ba972;
     flex: 0.4;
   }
 }
+
 .tableView .sort-button {
   padding: 0;
   background-color: transparent;
@@ -91,12 +97,15 @@ background-color: #2ba972;
   display: flex;
   align-items: center;
 }
+
 .tableView .sort-button:hover {
   color: var(--action-color);
 }
+
 .tableView .sort-button svg {
   width: 12px;
 }
+
 .tableView .cell-label {
   display: none;
 }

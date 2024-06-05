@@ -2,13 +2,13 @@ from flask import Blueprint, session, redirect, url_for, request, render_templat
 from flask_login import login_required, current_user
 from sqlalchemy import and_
 from . import models, db
+from . import db_operations as dbo
 
 views = Blueprint("views", __name__)
 
 '''
 Non views methods
 '''
-# Get project object of current session variable 'project_id'
 @login_required
 def get_project():
     project_id = session.get('project_id')
@@ -41,6 +41,7 @@ def get_room_type_data(room_type_id: int):
     room_data_object = db.session.query(models.RoomDataVentilation).join(models.RoomTypes).filter(models.RoomTypes.id == room_type_id).first()
     return room_data_object
 
+
 '''
 Views
 '''
@@ -56,10 +57,12 @@ def index():
 def home():
     project = get_project()
     project_names = get_all_project_names()
+    total_area = dbo.summarize_project_area(project.id)
     return render_template("home.html", 
                            user=current_user, 
                            project=project, 
-                           project_names=project_names)
+                           project_names=project_names,
+                           total_area = total_area)
 
 @views.route('/rooms', methods=['GET', 'POST'])
 @login_required
@@ -73,7 +76,7 @@ def rooms():
 
     if request.method == "POST":
         building_id = request.form.get("building_id")
-        print(f"Building ID: {building_id}")
+        
         if not building_id:
             flash("Feil byggnings-ID", category="error")
             return redirect(url_for("views.rooms"))
@@ -99,49 +102,45 @@ def rooms():
             people = int(people)
         except ValueError:
             flash("Personbelastning kan kun inneholde tall", category="error")
-        if building_id != "none":
-            new_room = models.Rooms(BuildingId = building_id,
-                                    RoomType = room_type_id,
-                                    Floor = floor,
-                                    RoomNumber = room_number,
-                                    RoomName = name,
-                                    Area = area,
-                                    RoomPopulation = people)
-            db.session.add(new_room)
-            try:
-                db.session.commit()
-            except Exception as e:
-                return f"Feil ved oppretting av rom: {e}"
-            
-            vent_props = get_room_type_data(room_type_id)
-            room_ventilation_properties = models.VentilationProperties(RoomId = new_room.id,
-                                                                      area = new_room.Area,
-                                                                      AirPerPerson=vent_props.air_per_person,
-                                                                      AirEmission=vent_props.air_emission,
-                                                                      AirProcess=vent_props.air_process,
-                                                                      AirMinimum=vent_props.air_minimum,
-                                                                      AirSupply = 0.0,
-                                                                      AirExtract= 0.0,
-                                                                      VentilationPrinciple=vent_props.ventilation_principle,
-                                                                      HeatExchange=vent_props.heat_exchange,
-                                                                      RoomControl=vent_props.room_control,
-                                                                      Notes=vent_props.notes,
-                                                                      DbTechnical=vent_props.db_technical,
-                                                                      DbNeighbour=vent_props.db_neighbour,
-                                                                      DBCorridor=vent_props.db_corridor,
-                                                                      Comments=vent_props.comments)
-            
-            db.session.add(room_ventilation_properties)
-            try:
-                db.session.commit()
-                room = room_ventilation_properties.rooms
-                room_ventilation_properties.recalculate_air_sums(room.RoomPopulation, room.Area)
-            except Exception as e:
-                return f"Feil ved oppretting av ventilation properties {e}"
-
-            
-
-            return redirect(url_for("views.rooms"))
+    
+        new_room = models.Rooms(BuildingId = building_id,
+                                RoomType = room_type_id,
+                                Floor = floor,
+                                RoomNumber = room_number,
+                                RoomName = name,
+                                Area = area,
+                                RoomPopulation = people)
+        db.session.add(new_room)
+        try:
+            db.session.commit()
+        except Exception as e:
+            return f"Feil ved oppretting av rom: {e}"
+        
+        vent_props = get_room_type_data(room_type_id)
+        room_ventilation_properties = models.VentilationProperties(RoomId = new_room.id,
+                                                                    area = new_room.Area,
+                                                                    AirPerPerson=vent_props.air_per_person,
+                                                                    AirEmission=vent_props.air_emission,
+                                                                    AirProcess=vent_props.air_process,
+                                                                    AirMinimum=vent_props.air_minimum,
+                                                                    AirSupply = 0.0,
+                                                                    AirExtract= 0.0,
+                                                                    VentilationPrinciple=vent_props.ventilation_principle,
+                                                                    HeatExchange=vent_props.heat_exchange,
+                                                                    RoomControl=vent_props.room_control,
+                                                                    Notes=vent_props.notes,
+                                                                    DbTechnical=vent_props.db_technical,
+                                                                    DbNeighbour=vent_props.db_neighbour,
+                                                                    DBCorridor=vent_props.db_corridor,
+                                                                    Comments=vent_props.comments)
+        
+        db.session.add(room_ventilation_properties)
+        try:
+            db.session.commit()
+            dbo.initial_ventilation_calculations(project.id, building_id, new_room.id)
+        except Exception as e:
+            return f"Feil ved oppretting av ventilation properties {e}"
+        return redirect(url_for("views.rooms"))
         
     elif request.method == "GET":
         return render_template("rooms.html", 
@@ -162,21 +161,35 @@ def update_room():
 def update_ventilation():
     data = request.get_json()
 
-@views.route('/ventilation', methods=['GET', 'POST'])
+@views.route('/ventilation', defaults={'building_id': None}, methods=['GET', 'POST'])
+@views.route('/ventilation/<building_id>', methods=['GET', 'POST'])
 @login_required
-def ventilation():
+def ventilation(building_id):
     project = get_project()
     project_names = get_all_project_names()
 
     if request.method == "POST":
-        pass
+        
+        # Showing specific buildings in the table
+        requested_building_id = request.form.get("project_building")
+        if requested_building_id != "none" and requested_building_id != "showall":
+            return redirect(url_for("views.ventilation", building_id = requested_building_id))
+        else:
+            return redirect(url_for("views.ventilation", building_id = "showall"))
+    
     elif request.method == "GET":
-        ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+        if building_id is not None and building_id != "showall":
+            ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project.id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()    
+        else:
+            ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+        
+        project_buildings = db.session.query(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).all()
         return render_template("ventilation.html",
                                user=current_user,
                                project=project,
                                project_names=project_names,
-                               ventilation_data = ventilation_data)
+                               ventilation_data = ventilation_data,
+                               project_buildings = project_buildings)
 
 @views.route('/change_project', methods=['GET', 'POST'])
 @login_required
@@ -232,12 +245,24 @@ def buildings():
    
     if request.method == "GET":
         project_buildings = models.Buildings.query.filter_by(ProjectId = project.id).all()
-        print(project_buildings)
+        
+        building_areas = []
+        building_supply = []
+        building_extract = []
+        for building in project_buildings:
+            building_areas.append(dbo.summarize_building_area(project.id, building.id))
+            building_supply.append(dbo.summarize_supply_air_building(project.id, building.id))
+            building_extract.append(dbo.summarize_extract_air_building(project.id, building.id))
+        
+        
+
+        ziped_building_data = zip(project_buildings, building_areas, building_supply, building_extract)
+
         return render_template("buildings.html", 
                                user=current_user, 
                                project=project, 
                                project_names=project_names, 
-                               project_buildings = project_buildings)
+                               project_buildings = ziped_building_data)
    
     elif request.method == "POST":
         building_name = request.form.get("building_name")

@@ -3,6 +3,11 @@
 {% block header %}Ventilasjon{% endblock %}
 
 {%block content %}
+<script>
+  function autoSubmitForm() {
+      document.getElementById("project_building").submit();
+  }
+</script>
 <div class="text-div">
 <h1 class="app-content-subTitleheaderText">Ventilasjon</h1>
     <p>
@@ -13,6 +18,17 @@
           {% endfor %}
         {% endif %}
       {% endwith %}
+    </p>
+    <p>
+      <form id="project_building" method="POST" onchange="autoSubmitForm()">
+        <select name="project_building">
+          <option value="none">- Velg bygg -</option>
+          <option value="showall">Alle</option>
+          {% for building in project_buildings %}
+          <option value="{{building.id}}">{{building.BuildingName}}</option>
+          {% endfor %}
+        </select>
+      </form>
     </p>
     <!-- End new room form -->
 
@@ -105,7 +121,7 @@
           {{data.rooms.RoomName}}
         </td>
         <td class="product-cell status-cell">
-          {{data.AirPerPerson}} m3/pers
+          {{data.AirPerPerson}} m3
         </td>
         <td class="product-cell status-cell">
           {{data.AirPersonSum}} m3/h
@@ -117,7 +133,7 @@
           {{data.AirEmissionSum}} m3/h
         </td>
         <td class="product-cell status-cell">
-            {{data.Process}} m3/h
+            {{data.AirProcess}} m3/h
         </td>
         <td class="product-cell status-cell">
             {{data.AirDemand}} m3/h
@@ -129,7 +145,7 @@
             {{data.AirExtract}} m3/h
         </td>
         <td class="product-cell status-cell">
-            {{data.Chosen}} m3/m2
+            {{data.AirChosen}} m3/m2
         </td>
         <td class="product-cell status-cell">
             {{data.System}}

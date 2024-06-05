@@ -26,7 +26,7 @@
                 <div class="sidebar-header">
                 <div class="app-icon">
                     <form id ="project_name" action="/change_project" method="POST" onchange="autoSubmitForm()">
-                        <select name="project_name">
+                        <select name="project_name" tabindex="-1">
                             <option value="none">Bytt prosjekt</option>
                             {% for name in project_names %}
                             <option value="{{ name }}">{{ name }}</option>

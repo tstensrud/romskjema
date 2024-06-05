@@ -79,11 +79,7 @@ select{
 button:hover{
     background-color: #036666;
 }
-span{
-    display: flex;
-    justify-content: flex-end;
 
-}
 a{
     text-decoration: none;
     color:#99e2b4;

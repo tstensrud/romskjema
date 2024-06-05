@@ -28,30 +28,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-function removeRow(button) {
-    const row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    const activeElement = document.getElementById("alwaysActive");
-
-    function setFocus() {
-        activeElement.focus();
-    }
-
-    // Initially set the focus
-    setFocus();
-
-    // Set focus on the element whenever the window or form loses focus
-    document.getElementById("new_room").addEventListener("focusout", setFocus);
-    window.addEventListener("focus", setFocus);
-});
-
 /*
 
       document.addEventListener("DOMContentLoaded", function() {
-        const table = document.getElementById("editable-table");
+        const table = document.getElementById("roomsTable");
         const cells = table.getElementsByTagName("td");
 
         for (let cell of cells) {
