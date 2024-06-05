@@ -20,7 +20,7 @@
 
 <div class="app-container">
         <!-- SIDE BAR MENU-->
-        {% if user.is_authenticated%}
+        {% if user.is_authenticated %}
             <div class="sidebar">
                 {% if project %}
                 <div class="sidebar-header">
@@ -108,8 +108,9 @@
         <div class="app-content-header">
             <h1 class="app-content-headerText">
                 
-                    Structor TS Romskjemaer - 
+                    
                     {% if user.is_authenticated %}
+                    Structor TS Romskjemaer - 
                         {% if project %}
                             {{project.ProjectName}}
                         {% else %}

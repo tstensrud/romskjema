@@ -1,20 +1,28 @@
-{% extends "base.html" %}
-{%block title%}Romskjema{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structor Tekniske Systemer AS - Romskjema</title>
+    <link rel="stylesheet" href="/static/css/login_screen.css">
+    <link rel="stylesheet" href="/static/css/form.css">
+</head>
+<body>
+    <div class="login-div">
+        <h1 class="app-content-subTitleheaderText">Structor TS romskjema</h1>
+        <h1 class="app-content-subTitleheaderText">Logg inn</h1>
+        <form class="custom-form profile-form" method="POST" role="form">
+            <input class="form-control" type="email" name="email" id="email" placeholder="e-mail">
+            <input class="form-control" type="password" name="password" id="password" placeholder="passord">
+            <p>
+                <button type="submit" class="form-button">
+                    Logg inn
+                </button>
+            </p>
+        </form>
+    </div> 
+</body>
+</html>
 
-{%block content %}
-<div class="login-div">
-    {% block page_subtitle%}<h1 class="app-content-headerText">Structor Tekniske Systemer AS</h1>{%endblock%}
 
-    <h1 class="app-content-subTitleheaderText">Logg inn</h6>
-    <form class="custom-form profile-form" method="POST" role="form">
-        <input class="form-control" type="email" name="email" id="email" placeholder="e-mail">
-        <input class="form-control" type="password" name="password" id="password" placeholder="passord">
-        <p>
-            <button type="submit" class="form-control ms-2">
-                Logg inn
-            </button>
-        </p>
-    </form>
-</div>
 
-{% endblock %}
