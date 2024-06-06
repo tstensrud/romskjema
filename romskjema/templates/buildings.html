@@ -29,10 +29,10 @@
 
     <h1  class="app-content-Text">Prosjektets bygg</h1>
     {% if not project_buildings %}
-        <p>Ingen bygg lagt inn for {{ project.ProjectName }}</p>
+        <p class="p-description">Ingen bygg lagt inn for {{ project.ProjectName }}</p>
     {%else %}
         {% for building, area, supply, extract in project_buildings %}
-            <p>{{building.BuildingName}}
+            <p class="p-description">{{building.BuildingName}}
             <br>
             Areal: {{area}} m2
             <br>

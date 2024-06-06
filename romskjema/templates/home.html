@@ -4,28 +4,26 @@
 
 {%block content %}
 <div class="text-div">
-    <p>
-        <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
-        <h1 class="app-content-Text">Logget inn som {{user.name}}</h1>
-    </p>
+    <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
+    <h1 class="app-content-Text">Logget inn som {{user.name}}</h1>
+    <br>
+    <h1 class="app-content-Text">Prosjektnummer</h1>
     <p class="app-content-Text">
-        <h1 class="app-content-Text">Prosjektnummer</h1>
         {{project.ProjectNumber}}
-    <p>
-    <p class="app-content-Text">
-        <h1 class="app-content-Text">Prosjektnavn</h1>
-        {{project.ProjectName}}
     </p>
+    <br>
+    <h1 class="app-content-Text">Størrelse</h1>
     <p class="app-content-Text">
-        <h1 class="app-content-Text">Størrelse</h1>
         {{total_area}} m2
     </p>
-    <p class="app-content-Text">
-        <h1 class="app-content-Text">Beskrivelse</h1>
-        {{project.ProjectDescription}}
+    <br>
+    <h1 class="app-content-Text">Beskrivelse - viktig informasjon</h1>
+    <p class="p-description">
+        {{project.ProjectDescription | replace('\n', '<br>') | safe}}
     </p>
+    <br>
+    <h1 class="app-content-Text">Gjellende kravspesifikasjon</h1>
     <p class="app-content-Text">
-        <h1 class="app-content-Text">Gjellende kravspesifikasjon</h1>
         {{project.Specification}}
     </p>
 </div>

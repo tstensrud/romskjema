@@ -266,7 +266,7 @@ body {
 }
 .app-content-Text {
   color: var(--app-content-main-color);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 0px;
   margin: 0;
 }
@@ -491,4 +491,15 @@ body {
 
 .extract-text {
   color: #a92b3c;
+}
+
+.p-description {
+  color: var(--app-content-main-color);
+  font-size: 14px;
+  font-weight: 0px;  
+  max-width: 30%;
+}
+
+.p-menu-item {
+  margin-top: 50px;
 }

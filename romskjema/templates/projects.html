@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {%block title%}Romskjema - velg prosjekt{% endblock %}
-{% block header %}Velg prosjekt{% endblock %}
 
 {%block content %}
 <div class="text-div">
@@ -19,19 +18,6 @@
                 Gå til
             </button>
         </p>
-</form>
-<br>
-<h1 class="app-content-subTitleheaderText">Legg til nytt prosjekt</h1>
-<form class="custom-form profile-form" method="POST" role="form">
-    <input class="form-control" type="text" name="project_number" id="project_number" placeholder="Prosjektnummer">
-    <input class="form-control" type="text" name="project_name" id="project_name" placeholder="Navn på prosjekt">
-    
-        <br>
-
-    <input class="form-control" type="text" name="project_description" id="project_description" placeholder="Kort prosjektbeskrivelse">
-    <button type="submit" class="form-button">
-        Legg til
-    </button>
 </form>
 </div>
 {% endblock %}

@@ -1,16 +1,67 @@
+
+
+function deleteRoom(event) {
+  if (confirm("Vil du slette rom? All data assosisert med rommet blir slettet")) {
+    event.preventDefault();
+    const button = event.target;
+    const row = button.closest("tr")
+    const buildingCell = row.getElementsByTagName("td")[0]
+    const floorCell = row.getElementsByTagName("td")[1]
+    const roomNumberCell = row.getElementsByTagName("td")[2]
+    const buildingCellText = buildingCell.innerText;
+    const floorCellText = floorCell.innerText;
+    const roomNumberCellText = roomNumberCell.innerText;
+    
+    fetch('/update_room', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        building: buildingCellText,
+        floor: floorCellText,
+        room_number: roomNumberCellText,
+      })
+    })
+    .then(response => {
+      console.log('Fetch response:', response);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+  
+      if (data.success) {
+        window.location.href = data.redirect;
+      } else {
+        console.error("Update failed:", data);
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+}
+
+/* Edit table in room list */
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("roomsTable");
     const cells = table.getElementsByTagName("td");
 
     for (let cell of cells) {
         cell.addEventListener("click", function() {
+          const lockedCells = [0,1,7,8]  
+          if (lockedCells.includes(this.cellIndex)) return;
             if (this.querySelector("input")) return;
 
             const originalText = this.innerText;
             const input = document.createElement("input");
             input.type = "text";
             input.value = originalText;
-            input.classList.add("form-control");
+            input.classList.add("table-input");
             this.innerHTML = "";
             this.appendChild(input);
             input.focus();
@@ -27,6 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+
 
 /*
 

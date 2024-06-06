@@ -1,3 +1,5 @@
+import os
+import json
 from flask import Blueprint, session, redirect, url_for, request, render_template, flash, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import and_
@@ -6,41 +8,11 @@ from . import db_operations as dbo
 
 views = Blueprint("views", __name__)
 
-'''
-Non views methods
-'''
 @login_required
 def get_project():
     project_id = session.get('project_id')
     project = models.Projects.query.get(project_id)
     return project
-
-@login_required
-def get_all_project_names():
-    project_names = []
-    projects = models.Projects.query.all()
-    for project_name in projects:
-        project_names.append(project_name.ProjectName)
-    return project_names
-
-@login_required
-def get_specifications():
-    spec_list = []
-    specifications = models.Specifications.query.all()
-    for spec in specifications:
-        spec_list.append(spec)
-    return spec_list
-
-@login_required
-def get_specification_room_types(specification: str):
-    room_types = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification).all()
-    return room_types
-
-@login_required
-def get_room_type_data(room_type_id: int):
-    room_data_object = db.session.query(models.RoomDataVentilation).join(models.RoomTypes).filter(models.RoomTypes.id == room_type_id).first()
-    return room_data_object
-
 
 '''
 Views
@@ -56,23 +28,20 @@ def index():
 @login_required
 def home():
     project = get_project()
-    project_names = get_all_project_names()
     total_area = dbo.summarize_project_area(project.id)
     return render_template("home.html", 
                            user=current_user, 
                            project=project, 
-                           project_names=project_names,
                            total_area = total_area)
 
 @views.route('/rooms', methods=['GET', 'POST'])
 @login_required
 def rooms():
     project = get_project()
-    project_names = get_all_project_names()
     project_buildings = db.session.query(models.Buildings).filter(models.Buildings.ProjectId == project.id).all()
     project_rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
     project_specification: str = project.Specification
-    project_room_types = get_specification_room_types(project_specification)
+    project_room_types = dbo.get_specification_room_types(project_specification)
 
     if request.method == "POST":
         building_id = request.form.get("building_id")
@@ -116,7 +85,7 @@ def rooms():
         except Exception as e:
             return f"Feil ved oppretting av rom: {e}"
         
-        vent_props = get_room_type_data(room_type_id)
+        vent_props = dbo.get_room_type_data(room_type_id, project_specification)
         room_ventilation_properties = models.VentilationProperties(RoomId = new_room.id,
                                                                     area = new_room.Area,
                                                                     AirPerPerson=vent_props.air_per_person,
@@ -145,8 +114,7 @@ def rooms():
     elif request.method == "GET":
         return render_template("rooms.html", 
                             user=current_user, 
-                            project=project, 
-                            project_names=project_names,
+                            project=project,
                             project_buildings = project_buildings,
                             project_rooms = project_rooms,
                             project_room_types = project_room_types)
@@ -154,7 +122,18 @@ def rooms():
 @views.route('/update_room', methods=['POST'])
 @login_required
 def update_room():
-    data = request.get_json()
+    project_id = session.get('project_id')
+    if request.method == "POST":
+        data = request.get_json()
+        building_id = dbo.get_building_id(project_id, data["building"])
+        room_id = dbo.get_room_id(project_id, building_id, data["room_number"])
+        if dbo.delete_room(project_id, building_id, room_id):
+            flash("Rom slettet", category="success")
+            response = {"success": True, "redirect": url_for("views.rooms")}
+        else:
+            flash("Kunne ikke slette rom", category="error")
+            response = {"success": False}
+    return jsonify(response)
 
 @views.route('/update_ventilation', methods=['POST'])
 @login_required
@@ -166,7 +145,6 @@ def update_ventilation():
 @login_required
 def ventilation(building_id):
     project = get_project()
-    project_names = get_all_project_names()
 
     if request.method == "POST":
         
@@ -187,7 +165,6 @@ def ventilation(building_id):
         return render_template("ventilation.html",
                                user=current_user,
                                project=project,
-                               project_names=project_names,
                                ventilation_data = ventilation_data,
                                project_buildings = project_buildings)
 
@@ -199,8 +176,12 @@ def change_project():
         project_object = models.Projects.query.filter_by(ProjectName=project_name).first()
         project_id = project_object.id
         session['project_id'] = project_id
-        print(session['project_name'])
         return redirect(url_for('views.home'))
+
+@views.route('/new_project', methods=['GET', 'POST'])
+@login_required
+def new_project():
+    pass
 
 @views.route('/projects', methods=['GET', 'POST'])
 @login_required
@@ -241,7 +222,6 @@ def projects():
 @login_required
 def buildings():
     project = get_project()
-    project_names = get_all_project_names()
    
     if request.method == "GET":
         project_buildings = models.Buildings.query.filter_by(ProjectId = project.id).all()
@@ -261,7 +241,6 @@ def buildings():
         return render_template("buildings.html", 
                                user=current_user, 
                                project=project, 
-                               project_names=project_names, 
                                project_buildings = ziped_building_data)
    
     elif request.method == "POST":
@@ -276,25 +255,27 @@ def buildings():
 @login_required
 def settings():
     project = get_project()
-    project_names = get_all_project_names()
-    specifications = get_specifications()
+    specifications = dbo.get_specifications()
     if request.method == "GET":
         return render_template("settings.html",
                             user = current_user,
                             project = project,
-                            project_names = project_names,
                             specifications = specifications)
     elif request.method == "POST":
         new_project_number = request.form.get("project_number")
         new_project_name = request.form.get("project_name")
         new_project_description = request.form.get("project_description")
         new_specification_id = request.form.get("project_specification")
-        specification = models.Specifications.query.filter_by(id=new_specification_id).first()
-
+        if new_specification_id == "none":
+            pass
+        else:    
+            specification = models.Specifications.query.filter_by(id=new_specification_id).first()
+            project.Specification = specification.name
+        
         project.ProjectNumber = new_project_number
         project.ProjectName = new_project_name
         project.ProjectDescription = new_project_description
-        project.Specification = specification.name
+        
 
         db.session.commit()
         return redirect(url_for('views.home'))
@@ -320,42 +301,45 @@ def spec_setup():
         db.session.commit()
         return f"{name} created"
     except Exception as e:
-        return f"Could not create {name}, {e}" """
+        return f"Could not create {name}, {e}"
 
-
-""" @views.route("/spec_rooms_setup")
+@views.route("/spec_rooms_setup")
 def spec_rooms_setup():
     spec_name = "skok"
     spec = models.Specifications.query.filter_by(name=spec_name).first()
     
-    room = models.RoomTypes(specification_id=spec.id,
-                                name="Korridor")
-    try:
-        db.session.add(room)
-        db.session.commit()
-    except Exception as e:
-        return f"Failed {e}"  
+    json_file_path = os.path.join(os.path.dirname(__file__), "static", f"specifications\skok.json")
+    with open(json_file_path, encoding="utf-8") as jfile:
+        data = json.load(jfile)
+
     
-    ventprops = models.RoomDataVentilation(room_type_id = room.id,
-                                           air_per_person = 0,
-                                           air_emission = 7.2,
-                                           air_process = 0,
-                                           air_minimum = 3.6,
-                                           ventilation_principle = "Omrøring",
-                                           heat_exchange = "R",
-                                           room_control = "V,T,CO2,B",
-                                           notes = "",
-                                           db_technical = "33dBA",
-                                           db_neighbour = "",
-                                           db_corridor = "",
-                                           comments = "")
-    try:
-        db.session.add(ventprops)
-        db.session.commit()
-    except Exception as e:
-        return f"Failed {e}"
+    for parent_key, nested_dict in data.items():
+        parent_key = parent_key.capitalize()
+        parent_key = parent_key.replace("_", " ")
+        values = []
+        for _, value in nested_dict.items():
+            values.append(value)
+        room = models.RoomTypes(specification_id=spec.id,
+                                name=parent_key,
+                                air_per_person = values[0],
+                                air_emission = values[1],
+                                air_process = values[2],
+                                air_minimum = values[3],
+                                ventilation_principle = values[4],
+                                heat_exchange = values[5],
+                                room_control = values[6],
+                                notes = values[7],
+                                db_technical = values[8],
+                                db_neighbour= values[9],
+                                db_corridor = values[10],
+                                comments = values[11])
+        try:
+            db.session.add(room)
+            db.session.commit()
+        except Exception as e:
+            return f"Failed to create room {e}"
     
-    return f"Created type {room.name} linked to spec: {spec.name} id: {spec.id}. VentproID {ventprops.id}"   """  
+    return f"Rooms created"   """
 
 """ @views.route("/clear")
 def clear():

@@ -78,33 +78,44 @@
         <th class="product-cell category">
           Kommentarer
         </th>
-
+        <th class="product-cell category">
+          Romdata
+        </th>
+        <th class="product-cell category">
+          
+        </th>
       </tr>
     </thead>
 
     <tbody>
       {% for room in project_rooms %}
       <tr class="products-row">
-        <td class="product-cell status-cell">
+        <td id ="buildingName" class="product-cell status-cell table-truncate">
           {{room.building.BuildingName}}
         </td>
-        <td class="product-cell status-cell">
+        <td id="floor" class="product-cell status-cell table-truncate">
           {{room.Floor}}
         </td>
-        <td class="product-cell status-cell">
+        <td id="roomNumber" class="product-cell status-cell table-truncate">
           {{room.RoomNumber}}
         </td>
-        <td class="product-cell status-cell">
+        <td id="roomName" class="product-cell status-cell table-truncate">
           {{room.RoomName}}
         </td>
-        <td class="product-cell status-cell">
+        <td id="roomArea" class="product-cell status-cell table-truncate">
           {{room.Area}} m2
         </td>
-        <td class="product-cell status-cell">
+        <td id="roomPopulation" class="product-cell status-cell table-truncate">
           {{room.RoomPopulation}} stk.
         </td>
-        <td class="product-cell status-cell table-truncate">
+        <td id="comments" class="product-cell status-cell table-truncate">
           {{room.Comments}}
+        </td>
+        <td class="product-cell status-cell table-truncate">
+          Data
+        </td>
+        <td id="delete" class="product-cell status-cell table-truncate">
+          <form><button class="table-button" onclick="deleteRoom(event)">Slett rom</button></form>
         </td>
       </tr>
       {% endfor %}

@@ -20,7 +20,7 @@ class Projects(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ProjectNumber = db.Column(db.Integer, nullable=False)
     ProjectName = db.Column(db.String(50), nullable=False)
-    ProjectDescription = db.Column(db.String(200))
+    ProjectDescription = db.Column(db.Text)
     Specification = db.Column(db.String(50))
 
     buildings = db.relationship('Buildings', backref='project', uselist=False, lazy=True)
@@ -129,19 +129,13 @@ class Specifications(db.Model):
     __tablename__ = "Specifications"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
-    room_types = db.relationship("RoomTypes", backref="Specifications", uselist=False, lazy=True)
+    room_types = db.relationship("RoomTypes", backref="specifications", uselist=False, lazy=True)
 
 class RoomTypes(db.Model):
     __tablename__ = "RoomTypes"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    specification_id = db.Column(db.Integer, db.ForeignKey("Specifications.id"), nullable=False, unique=True)
+    specification_id = db.Column(db.Integer, db.ForeignKey("Specifications.id"), nullable=False)
     name = db.Column(db.String(50), nullable=False)
-    room_data = db.relationship("RoomDataVentilation", uselist=False, lazy=True)
-
-class RoomDataVentilation(db.Model):
-    __tablename__ = "RoomDataVentilation"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    room_type_id = db.Column(db.Integer, db.ForeignKey("RoomTypes.id"), nullable=False, unique=True)
     air_per_person = db.Column(db.Float)
     air_emission = db.Column(db.Float)
     air_process = db.Column(db.Float)
