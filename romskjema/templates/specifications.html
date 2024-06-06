@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - endre prosjektinnstillinger{% endblock %}
+{% block header %}Kravspesifikasjoner{% endblock %}
+{% block pagetitle %}Kravspesifikasjoner {% if specification %}- {{specification}}{%endif%}{%endblock%}
+{%block content %}
+<div class="text-div">
+    {% if specification %}
+    <h1 class="app-content-subTitleheaderText">Romtabell {{specification}}</h1>
+
+    <table id="roomsTable" class="products-area-wrapper tableView">
+        <thead>
+          <tr class="products-header">
+            <th class="product-cell category">
+              Romtype
+            </th>
+            <th class="product-cell category">
+              Luft per person
+            </th>   
+            <th class="product-cell category">
+              Emisjon
+            </th>
+            <th class="product-cell category">
+              Prosess
+            </th>
+            <th class="product-cell category">
+              Luft minimum
+            </th>
+            <th class="product-cell category">
+              Vent. prinsipp
+            </th>
+            <th class="product-cell category">
+              Gjenvinner
+            </th>
+            <th class="product-cell category">
+              Styring
+            </th>
+            <th class="product-cell category">
+              Presiseringer
+            </th>
+            <th class="product-cell category">
+                dB teknisk
+            </th>
+            <th class="product-cell category">
+                dB naborom
+            </th>
+            <th class="product-cell category">
+                dB korridor
+            </th>
+            <th class="product-cell category">
+                Kommentar
+            </th>
+          </tr>
+        </thead>
+    
+        <tbody>
+            {% for data in specification_data %}
+          <tr class="products-row">
+            <td class="product-cell status-cell table-truncate">
+              {{data.name}}
+            </td>
+            <td class="product-cell status-cell table-truncate">
+              {{data.air_per_person}} m3/pers
+            </td>
+            <td class="product-cell status-cell table-truncate">
+              {{data.air_emission}} m3/m2
+            </td>
+            <td class="product-cell status-cell table-truncate">
+              {{data.air_process}} m3/h
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                {{data.air_minimum}} m3/h
+              </td>
+            <td class="product-cell status-cell table-truncate">
+              {{data.ventilation_principle}}
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                <span class="hover-popup" data-popup="R=Roterende\nB=Batteri\nP=Plate">{{data.heat_exchange}}</span>
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                <span class="hover-popup" data-popup="V=VAV\nC=CAV\nT=Temp\nB=Bevegelse\nF=Fukt">{{data.room_control}}</span>
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                <span class="hover-popup" data-popup="{{data.notes}}">{{data.notes}}</span>
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                {{data.db_technical}}
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                {{data.db_neighbour}}
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                {{data.db_corridor}}
+            </td>
+            <td class="product-cell status-cell table-truncate">
+                {{data.comments}}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% else %}
+      <h1 class="app-content-subTitleheaderText">Kravspesifikasjoner</h1>
+      <p>
+        <a href="#">Lag ny kravspesifikasjon</a>
+      </p>
+        <p>
+            Kravspesifikasjoner i databasen:
+            <br>
+            {% for spec in specifications %}
+            - <a href="/specifications/{{spec.name}}">{{spec.name}}</a> <br>
+            {% endfor %}
+        </p>
+    {% endif %}
+</div>
+<script src="{{ url_for('static', filename='js/spec_table.js') }}"></script>
+{% endblock %}

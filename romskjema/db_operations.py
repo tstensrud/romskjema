@@ -13,8 +13,9 @@ def get_all_project_names():
 
 @login_required
 def get_building_id(project_id: int, building_name: str) -> int:
-    building = db.session.query(models.Buildings).filter(models.Buildings.BuildingName == building_name).first()
+    building = db.session.query(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.BuildingName == building_name)).first()
     return building.id
+
 
 '''
 Room list methods
@@ -91,3 +92,8 @@ def get_room_type_data(room_type_id: int, specification: str):
 def get_specification_room_types(specification: str):
     room_types = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification).all()
     return room_types
+
+@login_required
+def get_specification_room_data(specification_name: str):
+    data = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification_name).all()
+    return data

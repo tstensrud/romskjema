@@ -167,26 +167,6 @@ body {
   }
 }
 
-.mode-switch {
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  color: var(--app-content-main-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: auto;
-  margin-right: 8px;
-  cursor: pointer;
-}
-.mode-switch .moon {
-  fill: var(--app-content-main-color);
-}
-
-.mode-switch.active .moon {
-  fill: none;
-}
-
 .account-info {
   display: flex;
   height: 200px;

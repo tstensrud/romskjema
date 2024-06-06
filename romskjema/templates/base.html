@@ -84,15 +84,21 @@
                 {% else %}
 
                 <li class="sidebar-list-item">
-                    <a href="#">
+                    <a href="/projects">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 
                     <span>Prosjekt dashboard</span>
                     </a>
                 </li>
                 <li class="sidebar-list-item">
-                    <a href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> 
+                    <a href="/new_project">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg> 
                     <span>Nytt prosjekt</span>
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/specifications">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> 
+                    <span>Kravspesifikasjoner</span>
                     </a>
                 </li>
 
@@ -114,20 +120,21 @@
     <div class="app-content">         
         <div class="app-content-header">
             <h1 class="app-content-headerText">
-                
+              <p>  
                     
                     {% if user.is_authenticated %}
                         {% if project %}
                             {{project.ProjectName}}
                         {% else %}
-                            Prosjekt - dashboard
+                        {% block pagetitle %}{%endblock%}
                         {% endif %}
                     {% endif %}
+                </p>
             </h1>
         </div>
     
 <!-- START SITE CONTENT -->
-    <h1>{% block pagetitle %}{%endblock%}</h1>
+    
 
         {% block page_subtitle %}{%endblock%}
 

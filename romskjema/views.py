@@ -24,6 +24,24 @@ def index():
                            user=current_user, 
                            project=None)
 
+@views.route('/specifications', defaults={'specification': None}, methods=['GET', 'POST'])
+@views.route('/specifications/<specification>', methods=['GET', 'POST'])
+@login_required
+def specifications(specification):
+    specifications = dbo.get_specifications()
+    if request.method == "GET":
+        if specification is None:
+            return render_template("specifications.html",
+                            user=current_user,
+                            specifications=specifications,
+                            specification=None)
+        else:
+            specification_data = dbo.get_specification_room_data(specification)
+            return render_template("specifications.html",
+                                   user=current_user,
+                                   specification=specification,
+                                   specification_data=specification_data)
+        
 @views.route('/home')
 @login_required
 def home():
@@ -160,7 +178,6 @@ def ventilation(building_id):
             ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project.id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()    
         else:
             ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
-        
         project_buildings = db.session.query(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).all()
         return render_template("ventilation.html",
                                user=current_user,
@@ -181,19 +198,10 @@ def change_project():
 @views.route('/new_project', methods=['GET', 'POST'])
 @login_required
 def new_project():
-    pass
-
-@views.route('/projects', methods=['GET', 'POST'])
-@login_required
-def projects():    
-    if request.method == "POST":
-        # Project selected from /projects drop down
-        project_id = request.form.get('project_id')
-        if project_id:
-            session['project_id'] = project_id
-            return redirect(url_for('views.home'))
-
-        # If creating new project
+    if request.method == "GET":
+        return render_template("new_project.html",
+                               user=current_user)
+    elif request.method == "POST":
         project_name = request.form.get('project_name')
         project_number = request.form.get('project_number')
         project_description = request.form.get('project_description')
@@ -213,10 +221,23 @@ def projects():
         session['project_name'] = project_name
         flash(f"Prosjekt \"{project_name}\" er opprettet", category="success")
         return redirect(url_for('views.projects'))
+
+@views.route('/projects', methods=['GET', 'POST'])
+@login_required
+def projects():    
+    if request.method == "POST":
+        # Project selected from /projects drop down
+        project_id = request.form.get('project_id')
+        if project_id:
+            session['project_id'] = project_id
+            return redirect(url_for('views.home'))
         
     elif request.method == "GET":
         projects = models.Projects.query.all()
-        return render_template("projects.html", user=current_user, projects=projects, project=None)
+        return render_template("projects.html",
+                               user=current_user,
+                               projects=projects,
+                               project=None)
 
 @views.route('/buildings', methods=['POST', 'GET'])
 @login_required
@@ -280,19 +301,12 @@ def settings():
         db.session.commit()
         return redirect(url_for('views.home'))
 
-@views.route("/settings/customspecification", methods=['POST'])
-@login_required
-def custom_specification():
-    pass
-
-
-
 
 '''
 For testing purposes
 '''
 
-""" @views.route("/spec_setup")
+@views.route("/spec_setup")
 def spec_setup():
     name = "skok"
     spec = models.Specifications(name=name)
@@ -339,7 +353,7 @@ def spec_rooms_setup():
         except Exception as e:
             return f"Failed to create room {e}"
     
-    return f"Rooms created"   """
+    return f"Rooms created"
 
 """ @views.route("/clear")
 def clear():
