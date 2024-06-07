@@ -24,8 +24,8 @@ def login():
                 flash("Feil i brukernavn eller passord", category="error")
         else:
             flash("Email finnes ikke", category="error")
-
-    return render_template("login.html", user=current_user)
+    flash("Kunne ikke logge inn", category="error")
+    return render_template("index.html", user=current_user)
 
 
 '''

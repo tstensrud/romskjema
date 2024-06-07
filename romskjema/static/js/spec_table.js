@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const hoverElements = document.querySelectorAll('.hover-popup');
+    const hoverElements = document.querySelectorAll('.notes-popup');
     const minLength = 25;
     const maxLength = 100;
 
@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 popup.className = 'popup';
                 popup.innerHTML = popupText;
                 document.body.appendChild(popup);
-
                 const rect = element.getBoundingClientRect();
                 popup.style.top = `${rect.bottom + window.scrollY}px`;
                 if (popupText.length > maxLength) {
@@ -22,7 +21,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+        element.addEventListener('mouseout', function () {
+            const popup = document.querySelector('.popup');
+            if (popup) {
+                document.body.removeChild(popup);
+            }
+        });
+    });
+});
 
+document.addEventListener('DOMContentLoaded', function () {
+    const hoverElements = document.querySelectorAll('.hover-popup');
+    const minLength = 25;
+
+    hoverElements.forEach(element => {
+        element.addEventListener('mouseover', function () {
+            const popupText = element.getAttribute('data-popup').replace(/\\n/g, '<br>');
+            if (popupText.length > minLength) {
+                const popup = document.createElement('div');
+                popup.className = 'popup';
+                popup.innerHTML = popupText;
+                document.body.appendChild(popup);
+                const rect = element.getBoundingClientRect();
+                popup.style.top = `${rect.bottom + window.scrollY}px`;
+                popup.style.left = `${rect.left + window.scrollX}px`;
+            }
+        });
         element.addEventListener('mouseout', function () {
             const popup = document.querySelector('.popup');
             if (popup) {

@@ -3,6 +3,15 @@ from . import models, db
 from flask_login import login_required
 import math
 
+
+'''
+Project methods
+'''
+@login_required
+def get_all_projects():
+    projects = models.Projects.query.all()
+    return projects
+
 @login_required
 def get_all_project_names():
     project_names = []
@@ -12,39 +21,102 @@ def get_all_project_names():
     return project_names
 
 @login_required
+def get_all_project_rooms(project_id):
+    rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+    return rooms
+
+@login_required
+def get_all_project_buildings(project_id: int):
+    #buildings = db.session.query(models.Buildings).filter(models.Buildings.ProjectId == project_id).all()
+    buildings = db.session.query(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).all()
+    return buildings
+
+@login_required
+def check_for_existing_project_number(project_number: str) -> bool:
+    project = models.Projects.query.filter_by(ProjectNumber = project_number).first()
+    if project:
+        return True
+    else:
+        return False
+
+
+'''
+Building methods
+'''
+@login_required
+def get_all_project_buildings(project_id: int):
+    buildings = models.Buildings.query.filter_by(ProjectId = project_id).all()
+    return buildings
+@login_required
 def get_building_id(project_id: int, building_name: str) -> int:
     building = db.session.query(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.BuildingName == building_name)).first()
     return building.id
 
+'''
+Rooms methods
+'''
 
-'''
-Room list methods
-'''
+@login_required
+def get_room(room_id: int) -> models.Rooms:
+    room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
+    return room
+
 @login_required
 def get_room_id(project_id: int, building_id: int, room_number: str) -> int:
     room = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id, models.Rooms.RoomNumber == room_number)).first()
     return room.id
 
 @login_required
-def delete_room(project_id: int, building_id: int, room_id: int) -> bool:
+def delete_room(room_id: int) -> bool:
     vent_properties = db.session.query(models.VentilationProperties).filter(models.VentilationProperties.RoomId == room_id).first()
     if vent_properties:
-        db.session.delete(vent_properties)
-        db.session.commit()
+        try:
+            db.session.delete(vent_properties)
+            db.session.commit()
+        except Exception:
+            return False
     
-    room = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id, models.Rooms.id == room_id)).first()
+    room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
     if room:
-        db.session.delete(room)
-        db.session.commit()
+        try:
+            db.session.delete(room)
+            db.session.commit()
+            return True
+        except Exception:
+            return False
+    else:
+        return False
+
+@login_required
+def check_if_roomnumber_exists(project_id, building_id, room_number) -> bool:
+    room = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id, models.Rooms.RoomNumber == room_number)).first()
+    if room:
         return True
     else:
+        return False
+
+@login_required
+def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new_area: float, new_pop: int, new_comment: str) -> bool:
+    room = get_room(room_id)
+    room.Area = new_area
+    room.RoomPopulation = new_pop
+    room.RoomNumber = new_room_number
+    room.RoomName = new_room_name
+    room.Comments = new_comment
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(e)
         return False
 
 '''
 Ventilation methods
 '''
+# Get list of all specifications in database
 @login_required
-def get_specifications():
+def get_specifications() -> list:
     spec_list = []
     specifications = models.Specifications.query.all()
     for spec in specifications:
@@ -52,16 +124,21 @@ def get_specifications():
     return spec_list
 
 @login_required
-def initial_ventilation_calculations(project_id: int, building_id: int, room_id: int) -> None:
-    vent_properties_room = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id, models.Rooms.id == room_id)).first()
-    room = vent_properties_room.rooms
+def ventilation_calculations(room_id: int) -> bool:
+    vent_properties_room = db.session.query(models.VentilationProperties).filter(models.VentilationProperties.RoomId == room_id).first()
+    room = get_room(room_id)
+    print(room.RoomPopulation)
     vent_properties_room.AirPersonSum = round((room.RoomPopulation * vent_properties_room.AirPerPerson),1)
     vent_properties_room.AirEmissionSum = round((room.Area * vent_properties_room.AirEmission), 1)
     vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess),1)
     vent_properties_room.AirSupply = round((math.ceil(vent_properties_room.AirDemand / 10) * 10), 1)
     vent_properties_room.AirExtract = vent_properties_room.AirSupply
     vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
-    db.session.commit()
+    try:
+        db.session.commit()
+        return True
+    except Exception:
+        return False
 
 @login_required
 def summarize_building_area(project_id: int, building_id: int) -> float:
@@ -84,15 +161,30 @@ def summarize_extract_air_building(project_id: int, building_id: int) -> float:
     return supply
 
 @login_required
+def get_ventilation_data_rooms_in_building(project_id: int, building_id: int):
+    data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()
+    return data
+
+@login_required
+def get_ventlation_data_all_rooms_project(project_id: int):
+    data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+    return data
+'''
+Specifications
+'''
+# Get data for a specific roomtype in a specification
+@login_required
 def get_room_type_data(room_type_id: int, specification: str):
     room_data_object = db.session.query(models.RoomTypes).join(models.Specifications).filter(and_(models.Specifications.name == specification, models.RoomTypes.id == room_type_id)).first()
     return room_data_object
 
+# Get name of all room types for a specific specification
 @login_required
 def get_specification_room_types(specification: str):
     room_types = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification).all()
     return room_types
 
+# Get all room types and data for a specific specification
 @login_required
 def get_specification_room_data(specification_name: str):
     data = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification_name).all()

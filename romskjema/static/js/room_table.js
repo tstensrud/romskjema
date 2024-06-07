@@ -5,22 +5,16 @@ function deleteRoom(event) {
     event.preventDefault();
     const button = event.target;
     const row = button.closest("tr")
-    const buildingCell = row.getElementsByTagName("td")[0]
-    const floorCell = row.getElementsByTagName("td")[1]
-    const roomNumberCell = row.getElementsByTagName("td")[2]
-    const buildingCellText = buildingCell.innerText;
-    const floorCellText = floorCell.innerText;
-    const roomNumberCellText = roomNumberCell.innerText;
+    const roomIdCell = row.getElementsByTagName("td")[0]
+    const roomId = roomIdCell.querySelector(".hidden-text").textContent;
     
-    fetch('/update_room', {
+    fetch('/delete_room', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        building: buildingCellText,
-        floor: floorCellText,
-        room_number: roomNumberCellText,
+        room_id: roomId,
       })
     })
     .then(response => {
@@ -48,12 +42,85 @@ function deleteRoom(event) {
 
 /* Edit table in room list */
 document.addEventListener("DOMContentLoaded", function() {
+  const table = document.getElementById("roomsTable");
+  const cells = table.getElementsByTagName("td");
+  const lockedCells = [0,1,2,8,9]
+
+  for (let cell of cells) {
+    cell.addEventListener("click", function() {
+      if (lockedCells.includes(this.cellIndex)) return;
+      if (this.querySelector("input")) return;
+
+      const originalText = this.innerText;
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = originalText;
+      input.classList.add("form-control");
+      this.innerHTML = "";
+      this.appendChild(input);
+      input.focus();
+
+      const saveData = () => {
+        const newValue = input.value || originalText;
+        this.innerText = newValue;
+
+        const row = this.parentElement;
+        const rowData = {};
+        const cells = row.getElementsByTagName("td");
+
+        for (let cell of cells) {
+          const columnName = cell.getAttribute("data-column");
+          const hiddenColumnName = cell.getAttribute("hidden-data-column")
+          
+          if (columnName) {
+            rowData[columnName] = cell.innerText;
+          }
+
+          if (hiddenColumnName) {
+            rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
+          }
+        }
+
+        // Send AJAX request to update the database
+        fetch('/update_room', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(rowData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = data.redirect;
+          } else {
+            console.error("Update failed");
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+      };
+
+      input.addEventListener("blur", saveData);
+      input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          saveData();
+          input.blur();
+        }
+      });
+    });
+  }
+});
+
+/* 
+document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("roomsTable");
     const cells = table.getElementsByTagName("td");
 
     for (let cell of cells) {
         cell.addEventListener("click", function() {
-          const lockedCells = [0,1,7,8]  
+          const lockedCells = [0,1,2,8,9]  
           if (lockedCells.includes(this.cellIndex)) return;
             if (this.querySelector("input")) return;
 
@@ -78,67 +145,4 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
-
-/*
-
-      document.addEventListener("DOMContentLoaded", function() {
-        const table = document.getElementById("roomsTable");
-        const cells = table.getElementsByTagName("td");
-
-        for (let cell of cells) {
-          cell.addEventListener("click", function() {
-            if (this.querySelector("input")) return;
-
-            const originalText = this.innerText;
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = originalText;
-            input.classList.add("form-control");
-            this.innerHTML = "";
-            this.appendChild(input);
-            input.focus();
-
-            const saveData = () => {
-              const newValue = input.value || originalText;
-              this.innerText = newValue;
-
-              const roomId = this.parentElement.getAttribute("data-room-id");
-              const columnName = this.getAttribute("data-column");
-
-              // Send AJAX request to update the database
-              fetch('/update_room', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  room_id: roomId,
-                  column_name: columnName,
-                  new_value: newValue
-                })
-              })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                  console.log("Update successful");
-                } else {
-                  console.error("Update failed");
-                }
-              })
-              .catch(error => {
-                console.error("Error:", error);
-              });
-            };
-
-            input.addEventListener("blur", saveData);
-            input.addEventListener("keypress", function(event) {
-              if (event.key === "Enter") {
-                saveData();
-                input.blur();
-              }
-            });
-          });
-        }
-      });
-
 */

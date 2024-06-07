@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("roomsTableVentilation");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,5,6,7,9,12]
+    const lockedCells = [0,1,2,3,4,5,6,7,8,9,10,13]
     for (let cell of cells) {
         cell.addEventListener("click", function() {
             if (lockedCells.includes(this.cellIndex)) return;

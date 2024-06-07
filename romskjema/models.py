@@ -25,15 +25,6 @@ class Projects(db.Model):
 
     buildings = db.relationship('Buildings', backref='project', uselist=False, lazy=True)
 
-    def set_project_number(self, project_number: str) -> None:
-        self.ProjectNumber = project_number
-    def set_project_name(self, project_name: str) -> None:
-        self.ProjectName = project_name
-    def set_project_description(self, description: str) -> None:
-        self.ProjectDescription = description
-    
-    def get_specifictaion(self) -> str:
-        return self.Specification
 
 class Buildings(db.Model):
     __tablename__ = "Buildings"
@@ -43,8 +34,6 @@ class Buildings(db.Model):
 
     rooms = db.relationship('Rooms', backref='building', lazy=True)
 
-    def set_building_name(self, name: str) -> None:
-        self.BuildingName = name
 
 class Rooms(db.Model):
     __tablename__ = "Rooms"
@@ -60,16 +49,6 @@ class Rooms(db.Model):
 
     ventilation_properties = db.relationship('VentilationProperties', backref='rooms', uselist=False, lazy=True)
 
-    def set_room_number(self, room_number: str) -> None:
-        self.RoomNumber = room_number
-    def set_room_name(self, room_name: str) -> None:
-        self.RoomName = room_name
-    def set_area(self, area: float) -> None:
-        self.Area = area
-    def set_population(self, population: int) -> None:
-        self.RoomPopulation = population
-    def set_comment(self, comment: str) -> None:
-        self.Comments = comment
 
 class VentilationProperties(db.Model):
     __tablename__ = "VentilationProperties"

@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from flask import Blueprint, session, redirect, url_for, request, render_template, flash, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import and_
@@ -37,16 +38,22 @@ def specifications(specification):
                             specification=None)
         else:
             specification_data = dbo.get_specification_room_data(specification)
-            return render_template("specifications.html",
-                                   user=current_user,
-                                   specification=specification,
-                                   specification_data=specification_data)
+            if not specification_data:
+                return render_template("specifications.html",
+                        user=current_user,
+                        specifications=specifications,
+                        specification=None)
+            else:
+                return render_template("specifications.html",
+                                    user=current_user,
+                                    specification=specification,
+                                    specification_data=specification_data)
         
 @views.route('/home')
 @login_required
 def home():
     project = get_project()
-    total_area = dbo.summarize_project_area(project.id)
+    total_area: float = dbo.summarize_project_area(project.id)
     return render_template("home.html", 
                            user=current_user, 
                            project=project, 
@@ -56,8 +63,8 @@ def home():
 @login_required
 def rooms():
     project = get_project()
-    project_buildings = db.session.query(models.Buildings).filter(models.Buildings.ProjectId == project.id).all()
-    project_rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+    project_buildings = dbo.get_all_project_buildings(project.id)
+    project_rooms = dbo.get_all_project_rooms(project.id)
     project_specification: str = project.Specification
     project_room_types = dbo.get_specification_room_types(project_specification)
 
@@ -74,8 +81,8 @@ def rooms():
         name = request.form.get("room_name").strip()
         
         room_number = request.form.get("room_number").strip()
-        existing_room_number = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project.id, models.Buildings.id == building_id, models.Rooms.RoomNumber == room_number)).first()
-        if existing_room_number:
+        
+        if dbo.check_if_roomnumber_exists(project.id, building_id, room_number):
             flash(f"Romnummer {room_number} finnes allerede for dette bygget", category="error")
             return redirect(url_for("views.rooms"))
         
@@ -124,7 +131,7 @@ def rooms():
         db.session.add(room_ventilation_properties)
         try:
             db.session.commit()
-            dbo.initial_ventilation_calculations(project.id, building_id, new_room.id)
+            dbo.ventilation_calculations(project.id, building_id, new_room.id)
         except Exception as e:
             return f"Feil ved oppretting av ventilation properties {e}"
         return redirect(url_for("views.rooms"))
@@ -139,13 +146,49 @@ def rooms():
 
 @views.route('/update_room', methods=['POST'])
 @login_required
-def update_room():
-    project_id = session.get('project_id')
+def udpate_room():
     if request.method == "POST":
         data = request.get_json()
-        building_id = dbo.get_building_id(project_id, data["building"])
-        room_id = dbo.get_room_id(project_id, building_id, data["room_number"])
-        if dbo.delete_room(project_id, building_id, room_id):
+        
+        room_id = data["room_id"]
+        room_number = data["room_number"]
+        room_name = data["room_name"]
+        
+        # Extract only numbers from area and population and convert to float and int respectivly
+        pattern = r"\d+"
+        pattern_float = r"\d+(\.\d+)?"
+        area = data["area"]
+        match = re.search(pattern_float, area)
+        if match:
+            area_float = float(match.group())
+        
+        population = data["population"]
+        numbers_from_population = re.findall(pattern, population)
+        population_int = int(''.join(numbers_from_population))
+
+        
+        comments = data["comments"]
+        
+        print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
+        
+        if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
+            if dbo.ventilation_calculations(room_id):
+                flash(f"Romdata oppdatert for {room_number}", category="success")
+                response = {"success": True, "redirect": url_for("views.rooms")}
+        else:
+            flash("Kunne ikke oppdatere romdata", category="error")
+            response = {"success": False}
+    
+    return jsonify(response)
+
+@views.route('/delete_room', methods=['POST'])
+@login_required
+def delete_room():
+    if request.method == "POST":
+        data = request.get_json()
+        room_id = data["room_id"]
+        print(room_id)
+        if dbo.delete_room(room_id):
             flash("Rom slettet", category="success")
             response = {"success": True, "redirect": url_for("views.rooms")}
         else:
@@ -174,11 +217,13 @@ def ventilation(building_id):
             return redirect(url_for("views.ventilation", building_id = "showall"))
     
     elif request.method == "GET":
+        # Show all rooms for building
         if building_id is not None and building_id != "showall":
-            ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project.id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()    
+            ventilation_data = dbo.get_ventilation_data_rooms_in_building(project.id, building_id)
+        # Show all rooms for project
         else:
-            ventilation_data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
-        project_buildings = db.session.query(models.Buildings).join(models.Projects).filter(models.Projects.id == project.id).all()
+            ventilation_data = dbo.get_ventlation_data_all_rooms_project(project.id)
+        project_buildings = dbo.get_all_project_buildings(project.id)
         return render_template("ventilation.html",
                                user=current_user,
                                project=project,
@@ -205,19 +250,22 @@ def new_project():
         project_name = request.form.get('project_name')
         project_number = request.form.get('project_number')
         project_description = request.form.get('project_description')
-        project = models.Projects.query.filter_by(ProjectNumber = project_number).first()
-        
-        if project:
+                
+        if dbo.check_for_existing_project_number(project_number):
             flash("Prosjektnummer finnes allerede", category="error")
-        elif len(project_name) <= 1:
-            flash("Prosjektnavn er for kort")
+            return redirect(url_for("views.project"))
         
         new_project = models.Projects(ProjectNumber=project_number, 
                                       ProjectName=project_name, 
                                       ProjectDescription=project_description, 
                                       Specification=None)
-        db.session.add(new_project)
-        db.session.commit()
+        try:
+            db.session.add(new_project)
+            db.session.commit()
+        except Exception as e:
+            flash(f"Kunne ikke opprette prosjekt: {e}", category="error")
+            return redirect(url_for("views.project"))
+        
         session['project_name'] = project_name
         flash(f"Prosjekt \"{project_name}\" er opprettet", category="success")
         return redirect(url_for('views.projects'))
@@ -233,7 +281,7 @@ def projects():
             return redirect(url_for('views.home'))
         
     elif request.method == "GET":
-        projects = models.Projects.query.all()
+        projects = dbo.get_all_projects()
         return render_template("projects.html",
                                user=current_user,
                                projects=projects,
@@ -245,7 +293,7 @@ def buildings():
     project = get_project()
    
     if request.method == "GET":
-        project_buildings = models.Buildings.query.filter_by(ProjectId = project.id).all()
+        project_buildings = dbo.get_all_project_buildings(project.id)
         
         building_areas = []
         building_supply = []
@@ -254,8 +302,6 @@ def buildings():
             building_areas.append(dbo.summarize_building_area(project.id, building.id))
             building_supply.append(dbo.summarize_supply_air_building(project.id, building.id))
             building_extract.append(dbo.summarize_extract_air_building(project.id, building.id))
-        
-        
 
         ziped_building_data = zip(project_buildings, building_areas, building_supply, building_extract)
 

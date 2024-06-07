@@ -43,6 +43,24 @@
   position: relative;
 }
 
+.tableView .id-cell {
+  flex: 1;
+  padding: 8px 16px;
+  color: var(--app-content-main-color);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10px; /* Adjust this value to fit approximately 20 characters */
+  position: relative;
+}
+
+.hidden-text {
+  display: none;
+}
+
 .tableView .product-cell img {
   width: 32px;
   height: 32px;
