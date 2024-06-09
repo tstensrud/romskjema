@@ -2,9 +2,10 @@
 {%block title%}Romskjema - romliste{% endblock %}
 {% block header %}Romliste{% endblock %}
 
-{%block content %}
-<div class="text-div">
-<h1 class="app-content-subTitleheaderText">Romliste</h1>
+
+
+{%block page_subtitle %}Romliste{% endblock %}
+{%block content %}  
     <!-- New room form -->
     <p>
       <p>Legg til nytt rom</p>
@@ -31,6 +32,7 @@
         <button class="form-button" id="alwaysActive" type="submit" tabindex="6">Legg til</button>
       </form>
     </p>
+
     <p>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -41,88 +43,90 @@
       {% endwith %}
     </p>
     <!-- End new room form -->
-
-  <table id="roomsTable" class="products-area-wrapper tableView">
-    <thead>
-      <tr class="products-header">
-        <th class="id-cell category">
-        </th>
-        <th class="product-cell category">
-          Bygg<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
-        </th>
-        
-        <th class="product-cell category">
-          Etasje<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
-        </th>
-                
-        <th class="product-cell category">
-          Romnr<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
-        </th>
-        
-        <th class="product-cell category">
-          Romnavn<button class="sort-button">
-        </th>
-        
-        <th class="product-cell category">
-          Areal<button class="sort-button">
-        </th>
-        
-        <th class="product-cell category">
-          Personer<button class="sort-button">
-        </th>
-
-        <th class="product-cell category">
-          Kommentarer
-        </th>
-        <th class="product-cell category">
+  <div class="table-header-container">
+    <table id="roomsTable" class="table-wrapper tableView">
+      <thead>
+        <tr class="table-header">
+          <th class="table-id-cell ">
+          </th>
+          <th class="table-cell ">
+            Bygg<button class="sort-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
+            </button>
+          </th>
           
-        </th>
-      </tr>
-    </thead>
+          <th class="table-cell ">
+            Etasje<button class="sort-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
+            </button>
+          </th>
+                  
+          <th class="table-cell ">
+            Romnr<button class="sort-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
+            </button>
+          </th>
+          
+          <th class="table-cell ">
+            Romnavn<button class="sort-button">
+          </th>
+          
+          <th class="table-cell ">
+            Areal<button class="sort-button">
+          </th>
+          
+          <th class="table-cell ">
+            Personer<button class="sort-button">
+          </th>
 
-    <tbody>
-      {% for room in project_rooms %}
-      <tr class="products-row">
-        <td hidden-data-column="room_id" class="id-cell status-cell table-truncate">
-          <span clasS="hidden-text">{{room.id}}</span>
-        </td>
-        <td class="product-cell status-cell table-truncate">
-          {{room.building.BuildingName}}
-        </td>
-        <td class="product-cell status-cell table-truncate">
-          {{room.Floor}}
-        </td>
-        <td data-column="room_number" class="product-cell status-cell table-truncate">
-          {{room.RoomNumber}}
-        </td>
-        <td data-column="room_name" class="product-cell status-cell table-truncate">
-          {{room.RoomName}}
-        </td>
-        <td data-column="area" class="product-cell status-cell table-truncate">
-          {{room.Area}} m2
-        </td>
-        <td data-column="population" class="product-cell status-cell table-truncate">
-          {{room.RoomPopulation}} stk.
-        </td>
-        <td data-column="comments" class="product-cell status-cell table-truncate">
-          {{room.Comments}}
-        </td>
-        <td id="delete" class="product-cell status-cell table-truncate">
-          <form><button class="table-button" onclick="deleteRoom(event)">Slett rom</button></form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  
-  </table>
+          <th class="table-cell table-cell-very-long">
+            Kommentarer
+          </th>
+          <th class="table-cell ">
+            
+          </th>
+        </tr>
+      </thead>
+    </table>
+  </div>
 
-</div>
+  <div class="table-container">
+    <table id="roomsTable" class="table-wrapper">
+      <tbody>
+        {% for room in project_rooms %}
+        <tr class="table-row">
+          <td hidden-data-column="room_id" class="table-id-cell">
+            <span clasS="hidden-text">{{room.id}}</span>
+          </td>
+          <td class="table-cell">
+            {{room.building.BuildingName}}
+          </td>
+          <td class="table-cell">
+            {{room.Floor}}
+          </td>
+          <td data-column="room_number" class="table-cell">
+            {{room.RoomNumber}}
+          </td>
+          <td data-column="room_name" class="table-cell">
+            {{room.RoomName}}
+          </td>
+          <td data-column="area" class="table-cell">
+            {{room.Area}} m2
+          </td>
+          <td data-column="population" class="table-cell">
+            {{room.RoomPopulation}} stk.
+          </td>
+          <td data-column="comments" class="table-cell table-cell-very-long">
+            {{room.Comments}}
+          </td>
+          <td id="delete" class="table-cell">
+            <form><button class="table-button" onclick="deleteRoom(event)">Slett rom</button></form>
+          </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
 <script src="{{ url_for('static', filename='js/room_table.js') }}"></script>
 <script src="{{ url_for('static', filename='js/input_check.js') }}"></script>
 {% endblock %}

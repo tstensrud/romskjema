@@ -2,14 +2,14 @@
 {%block title%}Romskjema - romliste{% endblock %}
 {% block header %}Ventilasjon{% endblock %}
 
-{%block content %}
+
 <script>
   function autoSubmitForm() {
       document.getElementById("project_building").submit();
   }
 </script>
-<div class="text-div">
-<h1 class="app-content-subTitleheaderText">Ventilasjon</h1>
+{%block page_subtitle %}Ventilasjon{% endblock %}
+{%block content %}
     <p>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -19,143 +19,154 @@
         {% endif %}
       {% endwith %}
     </p>
-    <p>
-      <form id="project_building" method="POST" onchange="autoSubmitForm()">
-        <select name="project_building">
-          <option value="none">- Velg bygg -</option>
-          <option value="showall">Alle</option>
-          {% for building in project_buildings %}
-          <option value="{{building.id}}">{{building.BuildingName}}</option>
-          {% endfor %}
-        </select>
-      </form>
-    </p>
+    <div class="ventilation-system-sorting-container">
+      <div class="building-selector-container">
+        <form id="project_building" method="POST" onchange="autoSubmitForm()">
+          <select name="project_building">
+            <option value="none">- Velg bygg -</option>
+            <option value="showall">Alle</option>
+            {% for building in project_buildings %}
+            <option value="{{building.id}}">{{building.BuildingName}}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+      {% for system in systems %}
+      <div class="system-summary">
+        {{system}} <br>
+        Tilluft: <span class="supply-text">12345</span> m3/h <br>
+        Avtrekk: <span class="extract-text">21345</span> m3/h
+      </div>
+      {% endfor %}
+    </div>
     <!-- End new room form -->
-
-  <table id="roomsTableVentilation" class="products-area-wrapper tableView">
+    
+<div class="table-header-container">
+  <table id="roomsTableVentilation" class="table-wrapper tableView">
     <thead>
-      <tr class="products-header">
-        <th class="id-cell category">
+      <tr class="table-header">
+        <th class="table-id-cell">
         </th>
-        <th class="product-cell category">
-          Bygg<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
+        <th class="table-cell table-cell-medium">
+          Bygg
         </th>
         
-        <th class="product-cell category">
+        <th class="table-cell table-cell-small">
           Etasje<button class="sort-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
           </button>
         </th>
                 
-        <th class="product-cell category">
+        <th class="table-cell table-cell-medium">
           Romnr<button class="sort-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
           </button>
         </th>
         
-        <th class="product-cell category">
+        <th class="table-cell">
           Romnavn<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             m3/pers<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Personer summert<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Emisjon<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Emisjon summert<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Prosess<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Dimensjonert<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Tilluft<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Avtrekk<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             Valgt<button class="sort-button">
         </th>
 
-        <th class="product-cell category">
+        <th class="table-cell">
             System<button class="sort-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
             </button>
         </th>
-        <th class="product-cell category">
+        <th class="table-cell table-cell-long">
             Kommentarer<button class="sort-button">
         </th>
 
       </tr>
     </thead>
-
+  </table>
+</div>
+<div class="table-container">
+  <table id="roomsTableVentilation" class="table-wrapper tableView">
     <tbody>
       {% for data in ventilation_data %}
-      <tr class="products-row">
-        <td class="id-cell status-cell">
+      <tr class="table-row">
+        <td class="table-id-cell" hidden-data-column="vent_data_id">
           <span class="hidden-text">{{data.id}}</span>
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell table-cell-medium">
           {{data.rooms.building.BuildingName}}
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell table-cell-small">
           {{data.rooms.Floor}}
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell table-cell-medium">
           {{data.rooms.RoomNumber}}
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
           {{data.rooms.RoomName}}
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
           {{data.AirPerPerson}} m3
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
           {{data.AirPersonSum}} m3/h
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
           {{data.AirEmission}} m3/m2
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
           {{data.AirEmissionSum}} m3/h
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
             {{data.AirProcess}} m3/h
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
             {{data.AirDemand}} m3/h
         </td>
-        <td class="product-cell status-cell supplyCell">
+        <td class="table-cell supplyCell" data-column="supply_air">
             {{data.AirSupply}} m3/h
         </td>
-        <td class="product-cell status-cell extractCell">
+        <td class="table-cell extractCell" data-column="extract_air">
             {{data.AirExtract}} m3/h
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell">
             {{data.AirChosen}} m3/m2
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell" data-column="system">
             {{data.System}}
         </td>
-        <td class="product-cell status-cell">
+        <td class="table-cell table-cell-long" data-column="comment">
             {{data.Comments}}
         </td>
       </tr>

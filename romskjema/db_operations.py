@@ -68,7 +68,7 @@ def get_room_id(project_id: int, building_id: int, room_number: str) -> int:
 
 @login_required
 def delete_room(room_id: int) -> bool:
-    vent_properties = db.session.query(models.VentilationProperties).filter(models.VentilationProperties.RoomId == room_id).first()
+    vent_properties = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.RoomId == room_id).first()
     if vent_properties:
         try:
             db.session.delete(vent_properties)
@@ -124,8 +124,8 @@ def get_specifications() -> list:
     return spec_list
 
 @login_required
-def ventilation_calculations(room_id: int) -> bool:
-    vent_properties_room = db.session.query(models.VentilationProperties).filter(models.VentilationProperties.RoomId == room_id).first()
+def initial_ventilation_calculations(room_id: int) -> bool:
+    vent_properties_room = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.RoomId == room_id).first()
     room = get_room(room_id)
     print(room.RoomPopulation)
     vent_properties_room.AirPersonSum = round((room.RoomPopulation * vent_properties_room.AirPerPerson),1)
@@ -141,6 +141,39 @@ def ventilation_calculations(room_id: int) -> bool:
         return False
 
 @login_required
+def update_ventilation_calculations(room_id: int) -> bool:
+    vent_properties_room = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.RoomId == room_id).first()
+    room = get_room(room_id)
+    vent_properties_room.AirPersonSum = round((room.RoomPopulation * vent_properties_room.AirPerPerson),1)
+    vent_properties_room.AirEmissionSum = round((room.Area * vent_properties_room.AirEmission), 1)
+    vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess),1)
+    vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
+    try:
+        db.session.commit()
+        return True
+    except Exception:
+        db.session.rollback()
+        return False
+
+@login_required
+def update_supply_extract(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
+    vent_properties_room = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.id == vent_prop_id).first()
+    room = vent_properties_room.rooms
+    vent_properties_room.AirSupply = new_supply
+    vent_properties_room.AirExtract = new_extract
+    vent_properties_room.AirChosen = round((new_supply / room.Area), 1)
+    if system is not None:
+        vent_properties_room.System = system
+    if comment is not None:
+        vent_properties_room.Comments = comment
+    try:
+        db.session.commit()
+        return True
+    except Exception:
+        db.session.rollback()
+        return False
+
+@login_required
 def summarize_building_area(project_id: int, building_id: int) -> float:
     total_building_area = db.session.query(func.sum(models.Rooms.Area)).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
     return total_building_area
@@ -152,23 +185,46 @@ def summarize_project_area(project_id: int) -> float:
 
 @login_required
 def summarize_supply_air_building(project_id: int, building_id: int) -> float:
-    supply = db.session.query(func.sum(models.VentilationProperties.AirSupply)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
+    supply = db.session.query(func.sum(models.RoomVentilationProperties.AirSupply)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
     return supply
 
 @login_required
 def summarize_extract_air_building(project_id: int, building_id: int) -> float:
-    supply = db.session.query(func.sum(models.VentilationProperties.AirExtract)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
+    supply = db.session.query(func.sum(models.RoomVentilationProperties.AirExtract)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
     return supply
 
 @login_required
 def get_ventilation_data_rooms_in_building(project_id: int, building_id: int):
-    data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()
+    data = db.session.query(models.RoomVentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).order_by(models.Rooms.Floor).all()
     return data
 
 @login_required
 def get_ventlation_data_all_rooms_project(project_id: int):
-    data = db.session.query(models.VentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+    data = db.session.query(models.RoomVentilationProperties).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
     return data
+
+@login_required
+def get_all_system_names(project_id: int) -> list:
+    system_names = db.session.query(models.RoomVentilationProperties.System).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).distinct().all()
+    return [system[0] for system in system_names]
+
+@login_required
+def get_summary_of_ventilation_system(project_id: int, system_name: str) -> float:
+    supply = db.session.query(func.sum(models.RoomVentilationProperties.AirExtract)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.RoomVentilationProperties.System == system_name)).scalar()
+    return supply
+'''
+Systems
+'''
+@login_required
+def create_system(project_id: int, system_name: str, airflow: float) -> bool:
+    system = models.VentilationSystems(project_id, system_name, airflow, 0.0, 0.0)
+    try:
+        db.session.add(system)
+        db.session.commit()
+        return True
+    except Exception:
+        return False
+    
 '''
 Specifications
 '''

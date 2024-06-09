@@ -19,11 +19,6 @@
             <div class="sidebar">
 
                 {% if project %}
-                <div class="sidebar-header">
-                <div class="app-icon">
-
-                </div>
-                </div>
                 <ul class="sidebar-list">
                 <li class="sidebar-list-item">
                     <a href="/home">
@@ -44,9 +39,15 @@
                     </a>
                 </li>
                 <li class="sidebar-list-item">
-                    <a href="/ventilation">
+                    <a href="/vent_systems">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg> 
-                    <span>Ventilasjon</span>
+                    <span>Ventilasjonsystemer</span>
+                    </a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a href="/ventilation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6" y2="6"></line><line x1="6" y1="18" x2="6" y2="18"></line></svg> 
+                    <span>Luftmengdetabell</span>
                     </a>
                 </li>
                 <li class="sidebar-list-item">
@@ -110,7 +111,7 @@
                     </a>
                 </li>
             </ul>
-                  <div class="account-info">
+                  <div class="sidebar-bottom">
                     Structor Tekniske Systemer <br> Romskjema &copy; 2024
                   </div>
             </div>
@@ -126,7 +127,7 @@
                         {% if project %}
                             {{project.ProjectName}}
                         {% else %}
-                        {% block pagetitle %}{%endblock%}
+                            {% block pagetitle %}{%endblock%}
                         {% endif %}
                     {% endif %}
                 </p>
@@ -135,8 +136,13 @@
     
 <!-- START SITE CONTENT -->
     
-
-        {% block page_subtitle %}{%endblock%}
+<div class="text-div">
+    <div class="subtitle-header-container">
+      <h1 class="app-content-subTitleheaderText">
+        {% block page_subtitle %}
+        {% endblock %}
+    </h1>
+</div>
 
         {% block content %}
 

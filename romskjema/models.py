@@ -24,6 +24,8 @@ class Projects(db.Model):
     Specification = db.Column(db.String(50))
 
     buildings = db.relationship('Buildings', backref='project', uselist=False, lazy=True)
+    systems = db.relationship('VentilationSystems', backref='project', uselist=False, lazy=True)
+    
 
 
 class Buildings(db.Model):
@@ -47,13 +49,24 @@ class Rooms(db.Model):
     RoomPopulation = db.Column(db.Integer, nullable=False)
     Comments = db.Column(db.String(250))
 
-    ventilation_properties = db.relationship('VentilationProperties', backref='rooms', uselist=False, lazy=True)
+    ventilation_properties = db.relationship('RoomVentilationProperties', backref='rooms', uselist=False, lazy=True)
 
+class VentilationSystems(db.Model):
+    __tablename__ = "VentilationSystems"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ProjectId = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False, unique=True)
+    SystemName = db.Column(db.String(30), nullable=False)
+    AirFlow = db.Column(db.Float)
+    AirFlowSupply = db.Column(db.Float)
+    AirFlowExtract = db.Column(db.Float)
 
-class VentilationProperties(db.Model):
-    __tablename__ = "VentilationProperties"
+    room = db.relationship('RoomVentilationProperties', backref="room", lazy=True)
+
+class RoomVentilationProperties(db.Model):
+    __tablename__ = "RoomVentilationProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id'), nullable=False, unique=True)
+    SystemId = db.Column(db.Integer, db.ForeignKey('VentilationSystems.id'), nullable=True, unique=True)
     AirPerPerson = db.Column(db.Float)
     AirPersonSum = db.Column(db.Integer)
     AirEmission = db.Column(db.Float)
@@ -71,7 +84,6 @@ class VentilationProperties(db.Model):
     DbTechnical = db.Column(db.String(50))
     DbNeighbour = db.Column(db.String(50))
     DbCorridor = db.Column(db.String(50))
-    System = db.Column(db.String(50))
     Comments = db.Column(db.String(20))
 
     def __init__(self, RoomId, area=None, AirPerPerson=None, AirEmission=None, 

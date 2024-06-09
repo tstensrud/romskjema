@@ -62,6 +62,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       const saveData = () => {
         const newValue = input.value || originalText;
+        if (newValue === originalText) {
+          this.textContent = originalText;
+          return;
+        } 
+
         this.innerText = newValue;
 
         const row = this.parentElement;

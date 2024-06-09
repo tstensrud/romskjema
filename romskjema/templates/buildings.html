@@ -2,9 +2,10 @@
 {%block title%}Romskjema - oversikt bygg{% endblock %}
 {% block header %}Bygg{% endblock %}
 
+
+
+{%block page_subtitle %}Bygg{% endblock %}
 {%block content %}
-<div class="text-div">
-    <h3>Bygg</h3>
     <!-- New room form -->
     <h1  class="app-content-Text">Legg til bygg i prosjekt</h1>
     <p>
@@ -32,17 +33,20 @@
         <p class="p-description">Ingen bygg lagt inn for {{ project.ProjectName }}</p>
     {%else %}
         {% for building, area, supply, extract in project_buildings %}
-            <p class="p-description">{{building.BuildingName}}
-            <br>
-            Areal: {{area}} m2
-            <br>
-            Prosjektert luftmengde:
-            <br>
-            - Tilluft: <span class="supply-text">{{supply}} </span>m3/h
-            <br>
-            - Avtrekk: <span class="extract-text">{{extract}} </span> m3/h
-            </p>
+        <div class="building-summary">
+            <div class="building-summary-header">{{building.BuildingName}}</div>
+            <div class="building-summary-air-flows">
+            Prosjektert luftmengde
+            </div>
+            <div class="building-summary-supply">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 -5 20 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>  <span class="supply-text">{{supply}} </span>m3/h
+            </div>
+            <div class="building-summary-extract">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 -5 20 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="5" y1="12" x2="19" y2="12"></line></svg> <span class="extract-text">{{extract}} </span> m3/h
+            </div>
+            <div class="building-summary-other">Areal</div>
+            <div class="building-summaru-other-content">{{area}} m2</div>
+        </div>
         {% endfor %}
     {% endif %}
-</div>
 {% endblock %}

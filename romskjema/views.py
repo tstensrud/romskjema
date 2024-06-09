@@ -59,6 +59,37 @@ def home():
                            project=project, 
                            total_area = total_area)
 
+@views.route('/buildings', methods=['POST', 'GET'])
+@login_required
+def buildings():
+    project = get_project()
+   
+    if request.method == "GET":
+        project_buildings = dbo.get_all_project_buildings(project.id)
+        
+        building_areas = []
+        building_supply = []
+        building_extract = []
+        for building in project_buildings:
+            building_areas.append(dbo.summarize_building_area(project.id, building.id))
+            building_supply.append(dbo.summarize_supply_air_building(project.id, building.id))
+            building_extract.append(dbo.summarize_extract_air_building(project.id, building.id))
+
+        ziped_building_data = zip(project_buildings, building_areas, building_supply, building_extract)
+
+        return render_template("buildings.html", 
+                               user=current_user, 
+                               project=project, 
+                               project_buildings = ziped_building_data)
+   
+    elif request.method == "POST":
+        building_name = request.form.get("building_name").strip()
+        new_building = models.Buildings(ProjectId = project.id, BuildingName = building_name)
+        db.session.add(new_building)
+        db.session.commit()
+        flash(f"Bygg {building_name} opprettet", category="success")
+        return redirect(url_for('views.buildings'))
+    
 @views.route('/rooms', methods=['GET', 'POST'])
 @login_required
 def rooms():
@@ -111,7 +142,7 @@ def rooms():
             return f"Feil ved oppretting av rom: {e}"
         
         vent_props = dbo.get_room_type_data(room_type_id, project_specification)
-        room_ventilation_properties = models.VentilationProperties(RoomId = new_room.id,
+        room_ventilation_properties = models.RoomVentilationProperties(RoomId = new_room.id,
                                                                     area = new_room.Area,
                                                                     AirPerPerson=vent_props.air_per_person,
                                                                     AirEmission=vent_props.air_emission,
@@ -131,7 +162,7 @@ def rooms():
         db.session.add(room_ventilation_properties)
         try:
             db.session.commit()
-            dbo.ventilation_calculations(project.id, building_id, new_room.id)
+            dbo.initial_ventilation_calculations(project.id, building_id, new_room.id)
         except Exception as e:
             return f"Feil ved oppretting av ventilation properties {e}"
         return redirect(url_for("views.rooms"))
@@ -151,28 +182,28 @@ def udpate_room():
         data = request.get_json()
         
         room_id = data["room_id"]
-        room_number = data["room_number"]
-        room_name = data["room_name"]
+        room_number = data["room_number"].strip()
+        room_name = data["room_name"].strip()
         
         # Extract only numbers from area and population and convert to float and int respectivly
         pattern = r"\d+"
         pattern_float = r"\d+(\.\d+)?"
-        area = data["area"]
+        area = data["area"].strip()
         match = re.search(pattern_float, area)
         if match:
             area_float = float(match.group())
         
-        population = data["population"]
+        population = data["population"].strip()
         numbers_from_population = re.findall(pattern, population)
         population_int = int(''.join(numbers_from_population))
 
         
-        comments = data["comments"]
+        comments = data["comments"].strip()
         
         print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
         
         if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
-            if dbo.ventilation_calculations(room_id):
+            if dbo.update_ventilation_calculations(room_id):
                 flash(f"Romdata oppdatert for {room_number}", category="success")
                 response = {"success": True, "redirect": url_for("views.rooms")}
         else:
@@ -196,10 +227,54 @@ def delete_room():
             response = {"success": False}
     return jsonify(response)
 
+@views.route('/vent_systems', defaults={'system': None}, methods=['GET', 'POST'])
+@views.route('/vent_systems/<system>', methods=['GET', 'POST'])
+def vent_systems(system):
+    project = get_project()
+    if request.method == "POST":
+        system_number = request.form.get("system_number")
+        airflow = request.form.get("airflow")
+
+        return redirect(url_for('views.vent_systems'))
+    if request.method == "GET":
+        if system is None:
+            return render_template("vent_systems.html", 
+                                user=current_user, 
+                                project=project,
+                                system=None)
+        else:
+            return render_template("vent_systems.html", 
+                    user=current_user, 
+                    project=project,
+                    system=system)
+
 @views.route('/update_ventilation', methods=['POST'])
 @login_required
 def update_ventilation():
     data = request.get_json()
+    id = data["vent_data_id"]
+    supply = data["supply_air"].strip()
+    extract = data["extract_air"].strip()
+    system = data["system"].strip()
+    comment = data["comment"].strip()
+
+    pattern_float = r"\d+(\.\d+)?"
+    match = re.search(pattern_float, supply)
+    if match:
+        new_supply = float(match.group())
+    match = re.search(pattern_float, extract)
+    if match:
+        new_extract = float(match.group())
+
+    #print(f"ID: {id} - System{system}, supply:{new_supply}, extract:{new_extract}, comment:{comment}")
+    if dbo.update_supply_extract(id, new_supply, new_extract, system, comment):
+        flash("Data oppdatert", category="success")
+        response = {"success": True, "redirect": url_for("views.ventilation")}
+    else:
+        flash("Kunne ikke oppdatere verdier.", category="error")
+        response = {"success": False}
+    return jsonify(response)
+
 
 @views.route('/ventilation', defaults={'building_id': None}, methods=['GET', 'POST'])
 @views.route('/ventilation/<building_id>', methods=['GET', 'POST'])
@@ -218,17 +293,24 @@ def ventilation(building_id):
     
     elif request.method == "GET":
         # Show all rooms for building
+        systems = dbo.get_all_system_names(project.id)
+        systems.sort()
+
+        print(systems)
         if building_id is not None and building_id != "showall":
             ventilation_data = dbo.get_ventilation_data_rooms_in_building(project.id, building_id)
         # Show all rooms for project
         else:
             ventilation_data = dbo.get_ventlation_data_all_rooms_project(project.id)
         project_buildings = dbo.get_all_project_buildings(project.id)
+        
+        
         return render_template("ventilation.html",
                                user=current_user,
                                project=project,
                                ventilation_data = ventilation_data,
-                               project_buildings = project_buildings)
+                               project_buildings = project_buildings,
+                               systems=systems)
 
 @views.route('/change_project', methods=['GET', 'POST'])
 @login_required
@@ -247,9 +329,9 @@ def new_project():
         return render_template("new_project.html",
                                user=current_user)
     elif request.method == "POST":
-        project_name = request.form.get('project_name')
-        project_number = request.form.get('project_number')
-        project_description = request.form.get('project_description')
+        project_name = request.form.get('project_name').strip()
+        project_number = request.form.get('project_number').strip()
+        project_description = request.form.get('project_description').strip()
                 
         if dbo.check_for_existing_project_number(project_number):
             flash("Prosjektnummer finnes allerede", category="error")
@@ -287,36 +369,7 @@ def projects():
                                projects=projects,
                                project=None)
 
-@views.route('/buildings', methods=['POST', 'GET'])
-@login_required
-def buildings():
-    project = get_project()
-   
-    if request.method == "GET":
-        project_buildings = dbo.get_all_project_buildings(project.id)
-        
-        building_areas = []
-        building_supply = []
-        building_extract = []
-        for building in project_buildings:
-            building_areas.append(dbo.summarize_building_area(project.id, building.id))
-            building_supply.append(dbo.summarize_supply_air_building(project.id, building.id))
-            building_extract.append(dbo.summarize_extract_air_building(project.id, building.id))
 
-        ziped_building_data = zip(project_buildings, building_areas, building_supply, building_extract)
-
-        return render_template("buildings.html", 
-                               user=current_user, 
-                               project=project, 
-                               project_buildings = ziped_building_data)
-   
-    elif request.method == "POST":
-        building_name = request.form.get("building_name")
-        new_building = models.Buildings(ProjectId = project.id, BuildingName = building_name)
-        db.session.add(new_building)
-        db.session.commit()
-        flash(f"Bygg {building_name} opprettet", category="success")
-        return redirect(url_for('views.buildings'))
 
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -329,8 +382,8 @@ def settings():
                             project = project,
                             specifications = specifications)
     elif request.method == "POST":
-        new_project_number = request.form.get("project_number")
-        new_project_name = request.form.get("project_name")
+        new_project_number = request.form.get("project_number").strip()
+        new_project_name = request.form.get("project_name").strip()
         new_project_description = request.form.get("project_description")
         new_specification_id = request.form.get("project_specification")
         if new_specification_id == "none":

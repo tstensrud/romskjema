@@ -1,37 +1,47 @@
-.products-area-wrapper {
+.table-wrapper {
   width: 100%;
   max-height: 100%;
   overflow: auto;
   padding: 0 4px;
 }
 
-.tableView .products-header {
+.table-header-container {
   display: flex;
   align-items: center;
   border-radius: 4px;  
   background-color: var(--app-content-secondary-color);
-  position: sticky;
+
   top: 0;
 }
 
-.tableView .products-row {
+.table-container {
+  overflow-y: auto;
+  max-height: 1024px;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;  
+  background-color: var(--app-content-secondary-color);
+  top: 0;
+}
+
+.table-row {
   display: flex;
   align-items: center;
   border-radius: 4px;
 
 }
-.tableView .products-row:hover {
+.table-row:hover {
   box-shadow: var(--filter-shadow);
   background-color: var(--app-content-secondary-color);
 }
 
-.tableView .products-row .cell-more-button {
-  display: none;
-}
-
-.tableView .product-cell {
+.table-cell {
+  max-width: 150px;
   flex: 1;
-  padding: 8px 16px;
+  padding: 4px 8px;
   color: var(--app-content-main-color);
   font-size: 12px;
   display: flex;
@@ -39,13 +49,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px; /* Adjust this value to fit approximately 20 characters */
   position: relative;
 }
 
-.tableView .id-cell {
+
+.table-id-cell {
   flex: 1;
-  padding: 8px 16px;
   color: var(--app-content-main-color);
   font-size: 12px;
   display: flex;
@@ -57,15 +66,24 @@
   position: relative;
 }
 
-.hidden-text {
-  display: none;
+.table-cell-small {
+  max-width: 50px;
 }
 
-.tableView .product-cell img {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  margin-right: 6px;
+.table-cell-medium {
+  max-width: 100px;
+}
+
+.table-cell-long {
+  max-width: 250px;
+}
+
+.table-cell-very-long {
+  max-width: 500px;
+}
+
+.hidden-text {
+  display: none;
 }
 
 .tableView-spec-cell {
@@ -81,43 +99,14 @@
   position: relative;
 }
 
-.tableView .supplyCell {
+.supplyCell {
 background-color: #2ba972;
 }
 
-.tableView .extractCell {
+.extractCell {
   background-color: #a92b3c;
 }
-@media screen and (max-width: 780px) {
-  .tableView .product-cell {
-    font-size: 12px;
-  }
-  .tableView .product-cell.image span {
-    display: none;
-  }
-  .tableView .product-cell.image {
-    flex: 0.2;
-  }
-}
-@media screen and (max-width: 520px) {
-  .tableView .product-cell.category, .tableView .product-cell.sales {
-    display: none;
-  }
-  .tableView .product-cell.status-cell {
-    flex: 0.4;
-  }
-  .tableView .product-cell.stock, .tableView .product-cell.price {
-    flex: 0.2;
-  }
-}
-@media screen and (max-width: 480px) {
-  .tableView .product-cell.stock {
-    display: none;
-  }
-  .tableView .product-cell.price {
-    flex: 0.4;
-  }
-}
+
 
 .tableView .sort-button {
   padding: 0;
@@ -136,10 +125,6 @@ background-color: #2ba972;
 
 .tableView .sort-button svg {
   width: 12px;
-}
-
-.tableView .cell-label {
-  display: none;
 }
 
 .popup {

@@ -2,19 +2,19 @@
 {%block title%}Romskjema{% endblock %}
 {% block header %}Romskjema{% endblock %}
 
+{%block page_subtitle %}{{project.ProjectName}}{% endblock %}
 {%block content %}
-<div class="text-div">
-    <h1 class="app-content-subTitleheaderText">{{project.ProjectName}}</h1>
+    
     <h1 class="app-content-Text">Logget inn som {{user.name}}</h1>
     <br>
     <h1 class="app-content-Text">Prosjektnummer</h1>
     <p class="app-content-Text">
-        {{project.ProjectNumber}}
+        <span class="status disabled">{{project.ProjectNumber}}</span>
     </p>
     <br>
     <h1 class="app-content-Text">Størrelse</h1>
     <p class="app-content-Text">
-        {{total_area}} m2
+        <span class="status disabled">{{total_area}} m2</span>
     </p>
     <br>
     <h1 class="app-content-Text">Beskrivelse - viktig informasjon</h1>
@@ -24,7 +24,6 @@
     <br>
     <h1 class="app-content-Text">Gjellende kravspesifikasjon</h1>
     <p class="app-content-Text">
-        <a href="/specifications/{{project.Specification}}">{{project.Specification}}</a>
+        <button onclick=window.location.href='/specifications/{{project.Specification}}' class="app-content-headerButton">{{project.Specification}}</button></a>
     </p>
-</div>
 {% endblock %}

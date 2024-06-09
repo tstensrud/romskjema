@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - oversikt bygg{% endblock %}
+{% block header %}Bygg{% endblock %}
+
+
+
+{%block page_subtitle %}Ventilasjonsystemer{% endblock %}
+{%block content %}
+    {% if system %}
+    Systeminformasjon {{system}}
+    {% else %}
+    <h1  class="app-content-Text">Legg til system</h1>
+    <p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for message in messages %}
+                {{message}}
+              {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </p>
+    <!-- New system form -->
+        <p>
+        <form class="custom-form profile-form" method="POST" role="form">
+            Systemnummer <br>
+            <input type="text" name="system_number" id="system_number" placeholder="Systemnummer">
+            <br>
+            <br>
+            Luftmengde tatt ut <br>
+            <input type="text" name="airflow" id="airflow" placeholder="Luftmengde">
+            <br>
+            <button type="submit" class="form-button">Legg til</button>
+        </form>
+    </p>
+    <!-- End new system form -->
+
+
+    <h1  class="app-content-Text">Systemer</h1>
+        <div class="building-summary">
+            SYSTEM
+        </div>
+    {% endif %}
+{% endblock %}
