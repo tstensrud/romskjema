@@ -44,39 +44,37 @@
     </p>
     <!-- End new room form -->
   <div class="table-header-container">
-    <table id="roomsTable" class="table-wrapper tableView">
+    <table class="table-wrapper tableView">
       <thead>
         <tr class="table-header">
           <th class="table-id-cell ">
           </th>
           <th class="table-cell ">
-            Bygg<button class="sort-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-            </button>
+            Bygg
           </th>
           
           <th class="table-cell ">
-            Etasje<button class="sort-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-            </button>
+            Etasje
           </th>
                   
           <th class="table-cell ">
-            Romnr<button class="sort-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-            </button>
+            Romnr
+          </th>
+
+          <th class="table-cell ">
+            Romtype
           </th>
           
           <th class="table-cell ">
-            Romnavn<button class="sort-button">
+            Romnavn
           </th>
           
           <th class="table-cell ">
-            Areal<button class="sort-button">
+            Areal
           </th>
           
           <th class="table-cell ">
-            Personer<button class="sort-button">
+            Personer
           </th>
 
           <th class="table-cell table-cell-very-long">
@@ -108,6 +106,9 @@
             {{room.RoomNumber}}
           </td>
           <td data-column="room_name" class="table-cell">
+            {{room.RoomType}}
+          </td>
+          <td data-column="room_name" class="table-cell">
             {{room.RoomName}}
           </td>
           <td data-column="area" class="table-cell">
@@ -127,6 +128,6 @@
         </tbody>
       </table>
   </div>
-<script src="{{ url_for('static', filename='js/room_table.js') }}"></script>
-<script src="{{ url_for('static', filename='js/input_check.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/room_table.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/input_check.js') }}"></script>
 {% endblock %}

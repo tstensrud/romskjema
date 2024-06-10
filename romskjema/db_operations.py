@@ -1,5 +1,5 @@
 from sqlalchemy import func, and_
-from . import models, db
+from . import models, db, logger
 from flask_login import login_required
 import math
 
@@ -27,7 +27,6 @@ def get_all_project_rooms(project_id):
 
 @login_required
 def get_all_project_buildings(project_id: int):
-    #buildings = db.session.query(models.Buildings).filter(models.Buildings.ProjectId == project_id).all()
     buildings = db.session.query(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).all()
     return buildings
 
@@ -73,7 +72,9 @@ def delete_room(room_id: int) -> bool:
         try:
             db.session.delete(vent_properties)
             db.session.commit()
-        except Exception:
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"delete_room() first try/except block: {e}")
             return False
     
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -82,7 +83,9 @@ def delete_room(room_id: int) -> bool:
             db.session.delete(room)
             db.session.commit()
             return True
-        except Exception:
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"delete_room() second try/except block: {e}")
             return False
     else:
         return False
@@ -108,20 +111,16 @@ def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new
         return True
     except Exception as e:
         db.session.rollback()
-        print(e)
+        logger.error(f"update_room_data(): {e}")
         return False
 
 '''
 Ventilation methods
 '''
-# Get list of all specifications in database
 @login_required
-def get_specifications() -> list:
-    spec_list = []
-    specifications = models.Specifications.query.all()
-    for spec in specifications:
-        spec_list.append(spec)
-    return spec_list
+def get_room_vent_prop(vent_prop_id: int) -> models.RoomVentilationProperties:
+    vent_prop = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.id == vent_prop_id).first()
+    return vent_prop
 
 @login_required
 def initial_ventilation_calculations(room_id: int) -> bool:
@@ -137,7 +136,9 @@ def initial_ventilation_calculations(room_id: int) -> bool:
     try:
         db.session.commit()
         return True
-    except Exception:
+    except Exception as e:
+        logger.error(f"initial_ventilation_calculations: {e}")
+        db.session.rollback()
         return False
 
 @login_required
@@ -151,13 +152,14 @@ def update_ventilation_calculations(room_id: int) -> bool:
     try:
         db.session.commit()
         return True
-    except Exception:
+    except Exception as e:
+        logger.error(f"update_ventilation_calculations: {e}")
         db.session.rollback()
         return False
 
 @login_required
-def update_supply_extract(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
-    vent_properties_room = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.id == vent_prop_id).first()
+def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
+    vent_properties_room = get_room_vent_prop(vent_prop_id)
     room = vent_properties_room.rooms
     vent_properties_room.AirSupply = new_supply
     vent_properties_room.AirExtract = new_extract
@@ -166,11 +168,29 @@ def update_supply_extract(vent_prop_id: int, new_supply: float, new_extract: flo
         vent_properties_room.System = system
     if comment is not None:
         vent_properties_room.Comments = comment
+    
+    try:
+        db.session.commit()
+        update_system_airflows(vent_properties_room.SystemId)
+        return True
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"update_ventilation_table: {e}")
+        return False
+        
+
+@login_required
+def set_system_for_room_vent_prop(room_vent_prop_id: int, system_id: int) -> bool:
+    vent_prop = get_room_vent_prop(room_vent_prop_id)
+    vent_prop.SystemId = system_id
+
     try:
         db.session.commit()
         return True
-    except Exception:
+    except Exception as e:
         db.session.rollback()
+        logger.error(f"set_system_for_room_vent_prop: {e}")
         return False
 
 @login_required
@@ -204,35 +224,136 @@ def get_ventlation_data_all_rooms_project(project_id: int):
     return data
 
 @login_required
-def get_all_system_names(project_id: int) -> list:
-    system_names = db.session.query(models.RoomVentilationProperties.System).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).distinct().all()
-    return [system[0] for system in system_names]
-
-@login_required
 def get_summary_of_ventilation_system(project_id: int, system_name: str) -> float:
     supply = db.session.query(func.sum(models.RoomVentilationProperties.AirExtract)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.RoomVentilationProperties.System == system_name)).scalar()
     return supply
+
 '''
 Systems
 '''
 @login_required
-def create_system(project_id: int, system_name: str, airflow: float) -> bool:
-    system = models.VentilationSystems(project_id, system_name, airflow, 0.0, 0.0)
+def new_ventilation_system(project_id: int, system_number: str, placement: str, service_area: str, heat_ex: str, airflow: float, special: str) -> bool:
+    system = models.VentilationSystems(ProjectId=project_id, 
+                                       SystemName=system_number, 
+                                       Location=placement, 
+                                       ServiceArea=service_area, 
+                                       HeatExchange=heat_ex, 
+                                       AirFlow=airflow, 
+                                       AirFlowSupply=0.0, 
+                                       AirFlowExtract=0.0,
+                                       SpecialSystem=special)
     try:
         db.session.add(system)
         db.session.commit()
         return True
-    except Exception:
+    except Exception as e:
+        logger.error(f"new_ventilation_system: {e}")
+        db.session.rollback()
         return False
+    
+@login_required
+def get_all_systems(project_id: int) -> list:
+    systems = db.session.query(models.VentilationSystems).join(models.Projects).filter(models.Projects.id == project_id).all()
+    return systems
+
+@login_required
+def get_system(system_id: int) -> models.VentilationSystems:
+    system = db.session.query(models.VentilationSystems).filter(models.VentilationSystems.id == system_id).first()
+    return system
+
+@login_required
+def check_if_system_number_exists(project_id: int, system_number: str) -> bool:
+    system = db.session.query(models.VentilationSystems).join(models.Projects).filter(models.Projects.id == project_id, models.VentilationSystems.SystemName == system_number).first()
+    if system:
+        return True
+    else:
+        return False
+    
+@login_required
+def get_system_names(project_id: int) -> list:
+    system_names = db.session.query(models.VentilationSystems.SystemName).join(models.Projects).filter(models.Projects.id == project_id).all()
+    return [system_name[0] for system_name in system_names]
+
+@login_required
+def summarize_system_supply(system_id) -> float:
+    supply = db.session.query(func.sum(models.RoomVentilationProperties.AirSupply)).join(models.VentilationSystems).filter(models.VentilationSystems.id == system_id).scalar()
+    return supply
+
+@login_required
+def summarize_system_extract(system_id) -> float:
+    extract = db.session.query(func.sum(models.RoomVentilationProperties.AirExtract)).join(models.VentilationSystems).filter(models.VentilationSystems.id == system_id).scalar()
+    return extract
+
+@login_required
+def update_system_airflows(system_id: int) -> bool:
+    system = get_system(system_id)
+    system.AirFlowSupply = summarize_system_supply(system_id)
+    system.AirFlowExtract = summarize_system_extract(system_id)
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        logger.error(f"update_system_air_flows: {e}")
+        db.session.rollback()
+        return False
+
+@login_required
+def update_airflow_changed_system(system_id_new: int, system_id_old: int) -> bool:
+    new_system = get_system(system_id_new)
+    old_system = get_system(system_id_old)
+    new_system.AirFlowSupply = summarize_system_supply(system_id_new)
+    new_system.AirFlowExtract = summarize_system_extract(system_id_new)
+    old_system.AirFlowSupply = summarize_system_supply(system_id_old)
+    old_system.AirFlowExtract = summarize_system_extract(system_id_old)
+
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        logger.error(f"update_airflow_changed_system: {e}")
+        db.session.rollback()
+        return False
+
+@login_required
+def update_system_info(system_id: int, system_number: str, system_location: str, service_area: str, airflow: float, heat_ex: str) -> bool:
+    system = get_system(system_id)
+    system.SystemName = system_number
+    system.Location = system_location
+    system.ServiceArea = service_area
+    system.AirFlow = airflow
+    system.HeatExchange = heat_ex
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"update_system_info: {e}")
+        return False
+
+    
     
 '''
 Specifications
 '''
+# Get list of all specifications in database
+@login_required
+def get_specifications() -> list:
+    spec_list = []
+    specifications = models.Specifications.query.all()
+    for spec in specifications:
+        spec_list.append(spec)
+    return spec_list
+
 # Get data for a specific roomtype in a specification
 @login_required
 def get_room_type_data(room_type_id: int, specification: str):
     room_data_object = db.session.query(models.RoomTypes).join(models.Specifications).filter(and_(models.Specifications.name == specification, models.RoomTypes.id == room_type_id)).first()
     return room_data_object
+
+@login_required
+def get_room_type_name(specification: str, room_id: int) -> str:
+    room_type_name = db.session.query(models.RoomTypes.name).join(models.Specifications).filter(models.Specifications.name == specification, models.RoomTypes.id == room_id).first()
+    return room_type_name
 
 # Get name of all room types for a specific specification
 @login_required

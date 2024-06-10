@@ -2,10 +2,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+import logging
 
 
 db = SQLAlchemy()
 DB_NAME = "projects.db"
+logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +16,12 @@ def create_app():
     
     db.init_app(app)
 
+    logging.basicConfig(
+        filename='log.log',
+        level=logging.DEBUG,
+        format = '%(asctime)s - %(levelname)s - %(message)s'
+    )
+    
     
     from .views import views
     from .auth import auth
@@ -38,6 +46,5 @@ def create_db(app):
     if not path.exists('romskjema/' + DB_NAME):
         with app.app_context():
             db.create_all()
-            print("Database created")
 
     

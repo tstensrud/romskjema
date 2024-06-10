@@ -3,12 +3,7 @@
 {% block header %}Ventilasjon{% endblock %}
 
 
-<script>
-  function autoSubmitForm() {
-      document.getElementById("project_building").submit();
-  }
-</script>
-{%block page_subtitle %}Ventilasjon{% endblock %}
+{%block page_subtitle %}Luftmengdetabell{% endblock %}
 {%block content %}
     <p>
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,8 +16,8 @@
     </p>
     <div class="ventilation-system-sorting-container">
       <div class="building-selector-container">
-        <form id="project_building" method="POST" onchange="autoSubmitForm()">
-          <select name="project_building">
+        <form id="project_building" method="POST">
+          <select name="project_building" onchange="showBuildings()">
             <option value="none">- Velg bygg -</option>
             <option value="showall">Alle</option>
             {% for building in project_buildings %}
@@ -42,7 +37,7 @@
     <!-- End new room form -->
     
 <div class="table-header-container">
-  <table id="roomsTableVentilation" class="table-wrapper tableView">
+  <table class="table-wrapper tableView">
     <thead>
       <tr class="table-header">
         <th class="table-id-cell">
@@ -52,64 +47,58 @@
         </th>
         
         <th class="table-cell table-cell-small">
-          Etasje<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
+          Etasje
         </th>
                 
         <th class="table-cell table-cell-medium">
-          Romnr<button class="sort-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-          </button>
+          Romnr
         </th>
         
         <th class="table-cell">
-          Romnavn<button class="sort-button">
+          Romnavn
         </th>
 
         <th class="table-cell">
-            m3/pers<button class="sort-button">
+            m3/pers
         </th>
 
         <th class="table-cell">
-            Personer summert<button class="sort-button">
+            Personer summert
         </th>
 
         <th class="table-cell">
-            Emisjon<button class="sort-button">
+            Emisjon
         </th>
 
         <th class="table-cell">
-            Emisjon summert<button class="sort-button">
+            Emisjon summert
         </th>
 
         <th class="table-cell">
-            Prosess<button class="sort-button">
+            Prosess
         </th>
 
         <th class="table-cell">
-            Dimensjonert<button class="sort-button">
+            Dimensjonert
         </th>
 
         <th class="table-cell">
-            Tilluft<button class="sort-button">
+            Tilluft
         </th>
 
         <th class="table-cell">
-            Avtrekk<button class="sort-button">
+            Avtrekk
         </th>
 
         <th class="table-cell">
-            Valgt<button class="sort-button">
+            Valgt
         </th>
 
         <th class="table-cell">
-            System<button class="sort-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z"/></svg>
-            </button>
+            System
         </th>
         <th class="table-cell table-cell-long">
-            Kommentarer<button class="sort-button">
+            Kommentarer
         </th>
 
       </tr>
@@ -163,8 +152,23 @@
         <td class="table-cell">
             {{data.AirChosen}} m3/m2
         </td>
-        <td class="table-cell" data-column="system">
-            {{data.System}}
+        <td class="table-cell" data-column="system_id">         
+          <form id="system" method="POST">
+            <select class="table-select" name="system_id" id="system_id">
+              {% if not data.room.SystemName %}
+                <option value="none">- System -</option>
+              {% else %}
+                <option value="{{data.SystemId}}">- {{data.room.SystemName}} -</option>
+              {% endif %}
+              
+              {% for system in system_names %}
+                {% if system.SystemName != data.room.SystemName %}
+                  <option value="{{system.id}}">{{system.SystemName}}</option>
+                {% endif %}
+              {% endfor %}
+              
+            </select>
+          </form>
         </td>
         <td class="table-cell table-cell-long" data-column="comment">
             {{data.Comments}}

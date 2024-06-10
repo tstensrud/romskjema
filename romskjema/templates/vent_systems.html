@@ -23,21 +23,112 @@
         <p>
         <form class="custom-form profile-form" method="POST" role="form">
             Systemnummer <br>
-            <input type="text" name="system_number" id="system_number" placeholder="Systemnummer">
+            <input type="text" name="system_number" id="system_number" placeholder="Systemnummer" tabindex="1" required>
+            <br>
+            <br>
+            Aggregatplassering <br>
+            <input type="text" name="system_placement" id="system_placement" placeholder="Plassering" tabindex="2" required>
+            <br>
+            <br>
+            Betjeningsområde <br>
+            <input type="text" name="system_service" id="system_service" placeholder="Betjeningsområde" tabindex="3">
             <br>
             <br>
             Luftmengde tatt ut <br>
-            <input type="text" name="airflow" id="airflow" placeholder="Luftmengde">
+            <input type="text" name="airflow" id="airflow" placeholder="Luftmengde" tabindex="4">
             <br>
-            <button type="submit" class="form-button">Legg til</button>
+            <br>
+            Type gjenvinner <br>
+            <input type="text" name="heat_exchange" id="heat_exchange" placeholder="Roterende/kryss" tabindex="5">
+            <br>
+            <br>
+            <label>Spesialsystem<br>
+                <input type="checkbox" id="special_system" name="special_system" tabindex="6"></label>
+            <br>
+
+            <button type="submit" class="form-button" tabindex="7">Legg til</button>
         </form>
     </p>
     <!-- End new system form -->
 
+    <div class="table-header-container">
+        <table class="table-wrapper tableView">
+          <thead>
+            <tr class="table-header">
+              <th class="table-id-cell">
+              </th>
+              <th class="table-cell ">
+                Systemnr
+              </th>
+              <th class="table-cell table-cell-long">
+                Plassering
+              </th>   
+              <th class="table-cell table-cell-very-long">
+                Betjeningsområde
+              </th>
+              <th class="table-cell ">
+                Viftekapasitet
+              </th>
+              <th class="table-cell ">
+                Gjenvinner
+              </th>
+              <th class="table-cell ">
+                Tilluft
+              </th>
+              <th class="table-cell ">
+                Avtrekk
+              </th>
+              <th class="table-cell">
+                Spesialsystem
+              </th>
+              <th class="table-cell ">
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    
+      <div class="table-container">
+        <table id="systemsTableVentilation" class="table-wrapper">
+          <tbody>
+            {% for system in systems %}
+            <tr class="table-row">
+              <td hidden-data-column="system_id" class="table-id-cell">
+                <span class="hidden-text">{{system.id}}</span>
+              </td>
+              <td class="table-cell" data-column="system_number">
+                {{system.SystemName}}
+              </td>
+              <td class="table-cell table-cell-long" data-column="system_location">
+                {{system.Location}}
+              </td>
+              <td class="table-cell table-cell-very-long" data-column="service_area">
+                {{system.ServiceArea}}
+              </td>
+              <td class="table-cell" data-column="airflow">
+                {{system.AirFlow}} m3/h
+              </td>
+              <td class="table-cell" data-column="system_hx">
+                {{system.HeatExchange}}
+              </td>
+              <td class="table-cell">
+                {{system.AirFlowSupply}} m3/h
+              </td>
+              <td class="table-cell">
+                {{system.AirFlowExtract}} m3/h
+              </td>
+              <td class="table-cell">
+                {{system.SpecialSystem}}
+              </td>
+              <td id="delete" class="table-cell">
+                <form><button class="table-button" onclick="">Slett system</button></form>
+              </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      </div>    
 
-    <h1  class="app-content-Text">Systemer</h1>
-        <div class="building-summary">
-            SYSTEM
-        </div>
     {% endif %}
+    <script src="{{ url_for('static', filename='js/system_table.js') }}"></script>
 {% endblock %}

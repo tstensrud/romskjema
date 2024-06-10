@@ -54,19 +54,23 @@ class Rooms(db.Model):
 class VentilationSystems(db.Model):
     __tablename__ = "VentilationSystems"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ProjectId = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False, unique=True)
+    ProjectId = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False)
     SystemName = db.Column(db.String(30), nullable=False)
+    Location = db.Column(db.String(100))
+    ServiceArea = db.Column(db.String(250))
+    HeatExchange = db.Column(db.String(30))
     AirFlow = db.Column(db.Float)
     AirFlowSupply = db.Column(db.Float)
     AirFlowExtract = db.Column(db.Float)
+    SpecialSystem = db.Column(db.String)
 
     room = db.relationship('RoomVentilationProperties', backref="room", lazy=True)
 
 class RoomVentilationProperties(db.Model):
     __tablename__ = "RoomVentilationProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id'), nullable=False, unique=True)
-    SystemId = db.Column(db.Integer, db.ForeignKey('VentilationSystems.id'), nullable=True, unique=True)
+    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id'), nullable=False, unique=True) # add ondelete="SET NULL"
+    SystemId = db.Column(db.Integer, db.ForeignKey('VentilationSystems.id'), nullable=True) # add ondelete="SET NULL"
     AirPerPerson = db.Column(db.Float)
     AirPersonSum = db.Column(db.Integer)
     AirEmission = db.Column(db.Float)
@@ -85,33 +89,6 @@ class RoomVentilationProperties(db.Model):
     DbNeighbour = db.Column(db.String(50))
     DbCorridor = db.Column(db.String(50))
     Comments = db.Column(db.String(20))
-
-    def __init__(self, RoomId, area=None, AirPerPerson=None, AirEmission=None, 
-                 AirProcess=None, AirMinimum=None, AirSupply=None, AirExtract=None, 
-                 VentilationPrinciple=None, HeatExchange=None, RoomControl=None, 
-                 Notes=None, DbTechnical=None, DbNeighbour=None, DBCorridor=None, System=None, 
-                 Comments=None):
-        self.RoomId = RoomId
-        self.area = area
-        self.AirPerPerson = AirPerPerson
-        self.AirEmission = AirEmission
-        self.AirProcess = AirProcess
-        self.AirMinimum = AirMinimum
-        self.AirSupply = AirSupply
-        self.AirExtract = AirExtract  
-        self.VentilationPrinciple = VentilationPrinciple
-        self.HeatExchange = HeatExchange
-        self.RoomControl = RoomControl
-        self.Notes = Notes
-        self.DbTechnical = DbTechnical
-        self.DbNeighbour = DbNeighbour
-        self.DbCorridor = DBCorridor
-        self.System = System
-        self.Comments = Comments
-        self.AirPersonSum = 0.0
-        self.AirEmissionSum = 0.0
-        self.AirDemand = 0.0
-        self.AirChosen = 0.0
 
 ''' 
 Specification tables

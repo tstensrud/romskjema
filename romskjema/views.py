@@ -1,13 +1,23 @@
 import os
 import json
 import re
-from flask import Blueprint, session, redirect, url_for, request, render_template, flash, jsonify
+from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
 from flask_login import login_required, current_user
-from sqlalchemy import and_
 from . import models, db
 from . import db_operations as dbo
 
 views = Blueprint("views", __name__)
+
+def pattern_float(input) -> float:
+    pattern = r"\d+(\.\d+)?"
+    match = re.search(pattern, input)
+    if match:
+        return float(match.group())
+
+def pattern_int(input) -> int:
+    pattern = r"\d+"
+    output = re.findall(pattern, input)
+    return int(''.join(output))
 
 @login_required
 def get_project():
@@ -108,6 +118,7 @@ def rooms():
         building_id = int(building_id)
         
         room_type_id = request.form.get("room_type")
+        room_type = dbo.get_room_type_name(project.Specification, room_type_id)
         floor = request.form.get("room_floor").strip()
         name = request.form.get("room_name").strip()
         
@@ -143,7 +154,6 @@ def rooms():
         
         vent_props = dbo.get_room_type_data(room_type_id, project_specification)
         room_ventilation_properties = models.RoomVentilationProperties(RoomId = new_room.id,
-                                                                    area = new_room.Area,
                                                                     AirPerPerson=vent_props.air_per_person,
                                                                     AirEmission=vent_props.air_emission,
                                                                     AirProcess=vent_props.air_process,
@@ -156,13 +166,13 @@ def rooms():
                                                                     Notes=vent_props.notes,
                                                                     DbTechnical=vent_props.db_technical,
                                                                     DbNeighbour=vent_props.db_neighbour,
-                                                                    DBCorridor=vent_props.db_corridor,
+                                                                    DbCorridor=vent_props.db_corridor,
                                                                     Comments=vent_props.comments)
         
         db.session.add(room_ventilation_properties)
         try:
             db.session.commit()
-            dbo.initial_ventilation_calculations(project.id, building_id, new_room.id)
+            dbo.initial_ventilation_calculations(new_room.id)
         except Exception as e:
             return f"Feil ved oppretting av ventilation properties {e}"
         return redirect(url_for("views.rooms"))
@@ -180,23 +190,16 @@ def rooms():
 def udpate_room():
     if request.method == "POST":
         data = request.get_json()
-        
+
         room_id = data["room_id"]
         room_number = data["room_number"].strip()
         room_name = data["room_name"].strip()
-        
-        # Extract only numbers from area and population and convert to float and int respectivly
-        pattern = r"\d+"
-        pattern_float = r"\d+(\.\d+)?"
+               
         area = data["area"].strip()
-        match = re.search(pattern_float, area)
-        if match:
-            area_float = float(match.group())
+        area_float = pattern_float(area)
         
         population = data["population"].strip()
-        numbers_from_population = re.findall(pattern, population)
-        population_int = int(''.join(numbers_from_population))
-
+        population_int = pattern_int(population)
         
         comments = data["comments"].strip()
         
@@ -227,52 +230,59 @@ def delete_room():
             response = {"success": False}
     return jsonify(response)
 
-@views.route('/vent_systems', defaults={'system': None}, methods=['GET', 'POST'])
-@views.route('/vent_systems/<system>', methods=['GET', 'POST'])
-def vent_systems(system):
+@login_required
+@views.route('/vent_systems', methods=['GET', 'POST'])
+def vent_systems():
     project = get_project()
     if request.method == "POST":
-        system_number = request.form.get("system_number")
-        airflow = request.form.get("airflow")
-
-        return redirect(url_for('views.vent_systems'))
-    if request.method == "GET":
-        if system is None:
-            return render_template("vent_systems.html", 
-                                user=current_user, 
-                                project=project,
-                                system=None)
+        system_number = request.form.get("system_number").strip()
+        if dbo.check_if_system_number_exists(project.id, system_number):
+            flash("Systemnummer finnes allerede", category="success")
+            return redirect(url_for('views.vent_systems'))
+        
+        airflow = float(request.form.get("airflow").strip())
+        service_area = request.form.get("system_service").strip()
+        placement = request.form.get("system_placement").strip()
+        system_type = request.form.get("special_system")
+        if system_type == None:
+            system_type = "Nei"
         else:
-            return render_template("vent_systems.html", 
-                    user=current_user, 
-                    project=project,
-                    system=system)
+            system_type = "Ja"
+        system_h_ex = request.form.get("heat_exchange").strip()
 
-@views.route('/update_ventilation', methods=['POST'])
+        if dbo.new_ventilation_system(project.id, system_number, placement, service_area, system_h_ex, airflow, system_type):
+            flash("System opprettet", category="success")
+            return redirect(url_for('views.vent_systems'))
+        else:
+            flash("Kunne ikke opprette system.", category="error")
+            return redirect(url_for('views.vent_systems'))
+    
+    if request.method == "GET":
+        systems = dbo.get_all_systems(project.id)
+        return render_template("vent_systems.html", 
+                            user=current_user, 
+                            project=project,
+                            systems=systems)
+
 @login_required
-def update_ventilation():
+@views.route('/update_system', methods=['POST'])
+def update_system():
     data = request.get_json()
-    id = data["vent_data_id"]
-    supply = data["supply_air"].strip()
-    extract = data["extract_air"].strip()
-    system = data["system"].strip()
-    comment = data["comment"].strip()
-
-    pattern_float = r"\d+(\.\d+)?"
-    match = re.search(pattern_float, supply)
-    if match:
-        new_supply = float(match.group())
-    match = re.search(pattern_float, extract)
-    if match:
-        new_extract = float(match.group())
-
-    #print(f"ID: {id} - System{system}, supply:{new_supply}, extract:{new_extract}, comment:{comment}")
-    if dbo.update_supply_extract(id, new_supply, new_extract, system, comment):
-        flash("Data oppdatert", category="success")
-        response = {"success": True, "redirect": url_for("views.ventilation")}
+    system_id = data["system_id"]
+    system_number = data["system_number"].strip()   
+    system_location = data["system_location"].strip()
+    service_area = data["service_area"].strip()
+    airflow = data["airflow"].strip()
+    airflow_float = pattern_float(airflow)
+    heat_ex = data["system_hx"].strip()
+    
+    if dbo.update_system_info(system_id, system_number, system_location, service_area, airflow_float, heat_ex):
+        flash("System-data oppdatert", category="success")
+        response = {"success": True, "redirect": url_for("views.vent_systems")}
     else:
-        flash("Kunne ikke oppdatere verdier.", category="error")
-        response = {"success": False}
+        flash("Kunne ikke oppdatere system-data", category="error")
+        response = {"success": False, "redirect": url_for("views.vent_systems")}
+    
     return jsonify(response)
 
 
@@ -282,8 +292,7 @@ def update_ventilation():
 def ventilation(building_id):
     project = get_project()
 
-    if request.method == "POST":
-        
+    if request.method == "POST":       
         # Showing specific buildings in the table
         requested_building_id = request.form.get("project_building")
         if requested_building_id != "none" and requested_building_id != "showall":
@@ -293,24 +302,71 @@ def ventilation(building_id):
     
     elif request.method == "GET":
         # Show all rooms for building
-        systems = dbo.get_all_system_names(project.id)
-        systems.sort()
-
-        print(systems)
         if building_id is not None and building_id != "showall":
             ventilation_data = dbo.get_ventilation_data_rooms_in_building(project.id, building_id)
         # Show all rooms for project
         else:
             ventilation_data = dbo.get_ventlation_data_all_rooms_project(project.id)
         project_buildings = dbo.get_all_project_buildings(project.id)
-        
+        systems = dbo.get_all_systems(project.id)
         
         return render_template("ventilation.html",
                                user=current_user,
                                project=project,
                                ventilation_data = ventilation_data,
                                project_buildings = project_buildings,
-                               systems=systems)
+                               system_names = systems)
+
+@views.route('/update_ventilation', methods=['POST'])
+@login_required
+def update_ventilation():    
+    data = request.get_json()
+
+    # If system is updated
+    if data["system_update"] == True:
+        old_system_id = data["old_system_id"]
+        system_id = data["system_id"]
+        vent_prop_id = data["row_id"]
+        
+        if old_system_id == "none":
+            response = {"success": True, "redirect": url_for("views.ventilation")}
+
+        if old_system_id == system_id:
+            if dbo.update_system_airflows(system_id):
+                flash("System oppdatert", category="success")
+                response = {"success": True, "redirect": url_for("views.ventilation")}
+            else:
+                flash("Kunne ikke oppdatere luftmengde dbo.update_system_airflows", category="error")
+                response = {"success": False, "redirect": url_for("views.ventilation")}
+        else:
+            dbo.set_system_for_room_vent_prop(vent_prop_id, system_id)
+            if dbo.update_airflow_changed_system(system_id, old_system_id):
+                flash("System oppdatert", category="success")
+                response = {"success": True, "redirect": url_for("views.ventilation")}
+            else:
+                flash("Kunne ikke oppdatere luftmengder: update_airflow_changed_system", category="error")
+                response = {"success": False, "redirect": url_for("views.ventilation")}
+        return jsonify(response)
+
+
+
+
+    
+    vent_prop_id = data["vent_data_id"]
+    supply = data["supply_air"].strip()
+    new_supply = pattern_float(supply)
+    extract = data["extract_air"].strip()
+    new_extract = pattern_float(extract)
+    comment = data["comment"].strip()
+
+    if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, None, comment):
+        flash("Data oppdatert", category="success")
+        response = {"success": True, "redirect": url_for("views.ventilation")}
+    else:
+        flash("Kunne ikke oppdatere verdier.", category="error")
+        response = {"success": False, "redirect": url_for("views.ventilation")}
+    return jsonify(response)
+
 
 @views.route('/change_project', methods=['GET', 'POST'])
 @login_required
@@ -369,8 +425,6 @@ def projects():
                                projects=projects,
                                project=None)
 
-
-
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
@@ -405,19 +459,17 @@ def settings():
 For testing purposes
 '''
 
-@views.route("/spec_setup")
-def spec_setup():
+@views.route("/spec_rooms_setup")
+def spec_rooms_setup():
+
     name = "skok"
     spec = models.Specifications(name=name)
     db.session.add(spec)
     try:
         db.session.commit()
-        return f"{name} created"
     except Exception as e:
         return f"Could not create {name}, {e}"
 
-@views.route("/spec_rooms_setup")
-def spec_rooms_setup():
     spec_name = "skok"
     spec = models.Specifications.query.filter_by(name=spec_name).first()
     
@@ -453,11 +505,5 @@ def spec_rooms_setup():
             return f"Failed to create room {e}"
     
     return f"Rooms created"
-
-""" @views.route("/clear")
-def clear():
-    db.session.query(models.RoomTypes).delete()
-    db.session.commit()
-    return f"Deleted all entries" """
 
 

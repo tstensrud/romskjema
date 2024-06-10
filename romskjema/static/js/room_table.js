@@ -44,7 +44,7 @@ function deleteRoom(event) {
 document.addEventListener("DOMContentLoaded", function() {
   const table = document.getElementById("roomsTable");
   const cells = table.getElementsByTagName("td");
-  const lockedCells = [0,1,2,8,9]
+  const lockedCells = [0,1,2,4,9]
 
   for (let cell of cells) {
     cell.addEventListener("click", function() {
