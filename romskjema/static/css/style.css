@@ -446,3 +446,12 @@ body {
 .p-menu-item {
   margin-top: 50px;
 }
+
+.split-container-left {
+  float: left;
+  width: 10%;
+}
+.split-container-right {
+  float: left;
+  width: 90%;
+}

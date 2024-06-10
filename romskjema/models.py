@@ -69,8 +69,8 @@ class VentilationSystems(db.Model):
 class RoomVentilationProperties(db.Model):
     __tablename__ = "RoomVentilationProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id'), nullable=False, unique=True) # add ondelete="SET NULL"
-    SystemId = db.Column(db.Integer, db.ForeignKey('VentilationSystems.id'), nullable=True) # add ondelete="SET NULL"
+    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
+    SystemId = db.Column(db.Integer, db.ForeignKey('VentilationSystems.id', ondelete="SET NULL"), nullable=True)
     AirPerPerson = db.Column(db.Float)
     AirPersonSum = db.Column(db.Integer)
     AirEmission = db.Column(db.Float)

@@ -8,7 +8,7 @@ function deleteRoom(event) {
     const roomIdCell = row.getElementsByTagName("td")[0]
     const roomId = roomIdCell.querySelector(".hidden-text").textContent;
     
-    fetch('/delete_room', {
+    fetch('/rooms/delete_room', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Send AJAX request to update the database
-        fetch('/update_room', {
+        fetch('/rooms/update_room', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -117,37 +117,3 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 });
-
-/* 
-document.addEventListener("DOMContentLoaded", function() {
-    const table = document.getElementById("roomsTable");
-    const cells = table.getElementsByTagName("td");
-
-    for (let cell of cells) {
-        cell.addEventListener("click", function() {
-          const lockedCells = [0,1,2,8,9]  
-          if (lockedCells.includes(this.cellIndex)) return;
-            if (this.querySelector("input")) return;
-
-            const originalText = this.innerText;
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = originalText;
-            input.classList.add("table-input");
-            this.innerHTML = "";
-            this.appendChild(input);
-            input.focus();
-
-            input.addEventListener("blur", function() {
-                cell.innerText = this.value || originalText;
-            });
-
-            input.addEventListener("keypress", function(event) {
-                if (event.key === "Enter") {
-                    this.blur();
-                }
-            });
-        });
-    }
-});
-*/

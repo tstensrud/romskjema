@@ -1,9 +1,11 @@
 from sqlalchemy import func, and_
-from . import models, db, logger
+from . import models, db
 from flask_login import login_required
 import math
 
-
+def log(entry):
+    with open(f"errors.txt", "a") as file:
+        file.writelines(f"{entry}\n")
 '''
 Project methods
 '''
@@ -46,6 +48,7 @@ Building methods
 def get_all_project_buildings(project_id: int):
     buildings = models.Buildings.query.filter_by(ProjectId = project_id).all()
     return buildings
+
 @login_required
 def get_building_id(project_id: int, building_name: str) -> int:
     building = db.session.query(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.BuildingName == building_name)).first()
@@ -54,7 +57,6 @@ def get_building_id(project_id: int, building_name: str) -> int:
 '''
 Rooms methods
 '''
-
 @login_required
 def get_room(room_id: int) -> models.Rooms:
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -74,7 +76,7 @@ def delete_room(room_id: int) -> bool:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            logger.error(f"delete_room() first try/except block: {e}")
+            log(f"delete_room() first try/except block: {e}")
             return False
     
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -85,7 +87,7 @@ def delete_room(room_id: int) -> bool:
             return True
         except Exception as e:
             db.session.rollback()
-            logger.error(f"delete_room() second try/except block: {e}")
+            log(f"delete_room() second try/except block: {e}")
             return False
     else:
         return False
@@ -111,7 +113,7 @@ def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new
         return True
     except Exception as e:
         db.session.rollback()
-        logger.error(f"update_room_data(): {e}")
+        log(f"update_room_data(): {e}")
         return False
 
 '''
@@ -137,7 +139,7 @@ def initial_ventilation_calculations(room_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        logger.error(f"initial_ventilation_calculations: {e}")
+        log(f"initial_ventilation_calculations: {e}")
         db.session.rollback()
         return False
 
@@ -153,7 +155,7 @@ def update_ventilation_calculations(room_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        logger.error(f"update_ventilation_calculations: {e}")
+        log(f"update_ventilation_calculations: {e}")
         db.session.rollback()
         return False
 
@@ -176,7 +178,7 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
     
     except Exception as e:
         db.session.rollback()
-        logger.error(f"update_ventilation_table: {e}")
+        log(f"update_ventilation_table: {e}")
         return False
         
 
@@ -190,7 +192,7 @@ def set_system_for_room_vent_prop(room_vent_prop_id: int, system_id: int) -> boo
         return True
     except Exception as e:
         db.session.rollback()
-        logger.error(f"set_system_for_room_vent_prop: {e}")
+        log(f"set_system_for_room_vent_prop: {e}")
         return False
 
 @login_required
@@ -247,8 +249,19 @@ def new_ventilation_system(project_id: int, system_number: str, placement: str, 
         db.session.commit()
         return True
     except Exception as e:
-        logger.error(f"new_ventilation_system: {e}")
+        log(f"new_ventilation_system: {e}")
         db.session.rollback()
+        return False
+
+@login_required
+def delete_system(system_id: int) -> bool:
+    db.session.query(models.VentilationSystems).filter(models.VentilationSystems.id == system_id).delete()
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        log(f"delete system: {e}")
         return False
     
 @login_required
@@ -293,7 +306,7 @@ def update_system_airflows(system_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        logger.error(f"update_system_air_flows: {e}")
+        log(f"update_system_air_flows: {e}")
         db.session.rollback()
         return False
 
@@ -310,7 +323,7 @@ def update_airflow_changed_system(system_id_new: int, system_id_old: int) -> boo
         db.session.commit()
         return True
     except Exception as e:
-        logger.error(f"update_airflow_changed_system: {e}")
+        log(f"update_airflow_changed_system: {e}")
         db.session.rollback()
         return False
 
@@ -327,7 +340,7 @@ def update_system_info(system_id: int, system_number: str, system_location: str,
         return True
     except Exception as e:
         db.session.rollback()
-        logger.error(f"update_system_info: {e}")
+        log(f"update_system_info: {e}")
         return False
 
     

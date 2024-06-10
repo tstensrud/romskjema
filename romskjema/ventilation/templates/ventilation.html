@@ -40,7 +40,8 @@
   <table class="table-wrapper tableView">
     <thead>
       <tr class="table-header">
-        <th class="table-id-cell">
+        <th class="table-id-cell table-cell-small">
+          id
         </th>
         <th class="table-cell table-cell-medium">
           Bygg
@@ -110,8 +111,8 @@
     <tbody>
       {% for data in ventilation_data %}
       <tr class="table-row">
-        <td class="table-id-cell" hidden-data-column="vent_data_id">
-          <span class="hidden-text">{{data.id}}</span>
+        <td class="table-cell table-cell-small" data-column="vent_data_id">
+          {{data.id}}
         </td>
         <td class="table-cell table-cell-medium">
           {{data.rooms.building.BuildingName}}
@@ -178,5 +179,5 @@
     </tbody>
   </table>
 </div>
-<script src="{{ url_for('static', filename='js/ventilation_table.js') }}"></script>
+<script src="{{ url_for('ventilation.static', filename='ventilation_table.js') }}"></script>
 {% endblock %}

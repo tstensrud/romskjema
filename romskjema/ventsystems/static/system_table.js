@@ -1,8 +1,47 @@
-/* Edit table in room list - ventilation */
+function deleteSystem(event) {
+  if (confirm("Vil du slette system? All data assosisert med dette systemet blir slettet")) {
+    event.preventDefault();
+    const button = event.target;
+    const row = button.closest("tr")
+    const roomIdCell = row.getElementsByTagName("td")[0]
+    const systemId = roomIdCell.querySelector(".hidden-text").textContent;
+    
+    fetch('/ventsystems/delete_system', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        system_id: systemId,
+      })
+    })
+    .then(response => {
+      console.log('Fetch response:', response);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Response data:', data);
+  
+      if (data.success) {
+        window.location.href = data.redirect;
+      } else {
+        console.error("Update failed:", data);
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-    const table = document.getElementById("roomsTableVentilation");
+    const table = document.getElementById("systemsTableVentilation");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,5,6,7,8,9,10,13,14]
+    const lockedCells = [0,6,7,8,9,10]
   
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -41,11 +80,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if (hiddenColumnName) {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
-            rowData["system_update"] = false
           }
   
           // Send AJAX request to update the database
-          fetch('/update_ventilation', {
+          fetch('/ventsystems/update_system', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -75,63 +113,3 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   });
-
-
-  document.addEventListener('DOMContentLoaded', (event) => {
-    document.querySelectorAll('select').forEach((selectElement) => {
-      let currentSystemId;
-  
-      selectElement.addEventListener('click', () => {
-        currentSystemId = selectElement.value;
-      });
-  
-      selectElement.addEventListener('change', () => {
-        autoSubmitSystemForm(selectElement, currentSystemId);
-      });
-    });
-  });
-
-
-  async function autoSubmitSystemForm(selectElement, currentSystemId) {
-    const row = selectElement.closest('tr');
-    const row_id = row.cells[0].querySelector(".hidden-text").textContent;
-    const system_id = selectElement.value;
-
-    
-    if (system_id != "none") {
-      try {
-        const response = await fetch('/update_ventilation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            system_update: true,
-            old_system_id: currentSystemId,
-            row_id: row_id,
-            system_id: system_id
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        console.log('Success:', result);
-        window.location.reload();
-      } catch (error) {
-        console.error('Error:', error);
-        window.location.reload();
-      }
-    }
-  }
-
-        
-
-      
-
-
-  function showBuildings() {
-    document.getElementById("project_building").submit();
-}

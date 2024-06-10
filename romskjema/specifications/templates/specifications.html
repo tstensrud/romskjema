@@ -126,10 +126,11 @@
         Kravspesifikasjoner i databasen:
         <br>
         {% for spec in specifications %}
-        - <a href="/specifications/{{spec.name}}">{{spec.name}}</a> <br>
+        - <a href="{{ url_for('specifications.specifications', specification=spec.name)}}">{{spec.name}}</a> <br>
+        
         {% endfor %}
     </p>
       
   {% endif %}
-<script src="{{ url_for('static', filename='js/spec_table.js') }}"></script>
+<script src="{{ url_for('specifications.static', filename='spec_table.js') }}"></script>
 {% endblock %}

@@ -9,7 +9,6 @@
     {% if system %}
     Systeminformasjon {{system}}
     {% else %}
-    <h1  class="app-content-Text">Legg til system</h1>
     <p>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -20,37 +19,40 @@
         {% endwith %}
     </p>
     <!-- New system form -->
-        <p>
-        <form class="custom-form profile-form" method="POST" role="form">
-            Systemnummer <br>
-            <input type="text" name="system_number" id="system_number" placeholder="Systemnummer" tabindex="1" required>
-            <br>
-            <br>
-            Aggregatplassering <br>
-            <input type="text" name="system_placement" id="system_placement" placeholder="Plassering" tabindex="2" required>
-            <br>
-            <br>
-            Betjeningsområde <br>
-            <input type="text" name="system_service" id="system_service" placeholder="Betjeningsområde" tabindex="3">
-            <br>
-            <br>
-            Luftmengde tatt ut <br>
-            <input type="text" name="airflow" id="airflow" placeholder="Luftmengde" tabindex="4">
-            <br>
-            <br>
-            Type gjenvinner <br>
-            <input type="text" name="heat_exchange" id="heat_exchange" placeholder="Roterende/kryss" tabindex="5">
-            <br>
-            <br>
-            <label>Spesialsystem<br>
-                <input type="checkbox" id="special_system" name="special_system" tabindex="6"></label>
-            <br>
+    <div class="split-container-left">
+      <p>
+        Legg til system <br>
+          <form class="custom-form profile-form" method="POST" role="form">
+              Systemnummer <br>
+              <input type="text" name="system_number" id="system_number" placeholder="Systemnummer" tabindex="1" required>
+              <br>
+              <br>
+              Aggregatplassering <br>
+              <input type="text" name="system_placement" id="system_placement" placeholder="Plassering" tabindex="2" required>
+              <br>
+              <br>
+              Betjeningsområde <br>
+              <input type="text" name="system_service" id="system_service" placeholder="Betjeningsområde" tabindex="3">
+              <br>
+              <br>
+              Luftmengde tatt ut <br>
+              <input type="text" name="airflow" id="airflow" placeholder="Luftmengde" tabindex="4">
+              <br>
+              <br>
+              Type gjenvinner <br>
+              <input type="text" name="heat_exchange" id="heat_exchange" placeholder="Roterende/kryss" tabindex="5">
+              <br>
+              <br>
+              <label>Spesialsystem<br>
+                  <input type="checkbox" id="special_system" name="special_system" tabindex="6"></label>
+              <br>
+  
+              <button type="submit" class="form-button" tabindex="7">Legg til</button>
+          </form>
+      </p>
+    </div>
 
-            <button type="submit" class="form-button" tabindex="7">Legg til</button>
-        </form>
-    </p>
-    <!-- End new system form -->
-
+  <div class="split-container-right">
     <div class="table-header-container">
         <table class="table-wrapper tableView">
           <thead>
@@ -88,6 +90,7 @@
         </table>
       </div>
     
+
       <div class="table-container">
         <table id="systemsTableVentilation" class="table-wrapper">
           <tbody>
@@ -121,14 +124,16 @@
                 {{system.SpecialSystem}}
               </td>
               <td id="delete" class="table-cell">
-                <form><button class="table-button" onclick="">Slett system</button></form>
+                <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
               </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
-      </div>    
+      </div>
+    </div>
 
+    <!-- End new system form -->
     {% endif %}
-    <script src="{{ url_for('static', filename='js/system_table.js') }}"></script>
+    <script src="{{ url_for('ventsystems.static', filename='system_table.js') }}"></script>
 {% endblock %}

@@ -2,12 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-import logging
-
 
 db = SQLAlchemy()
 DB_NAME = "projects.db"
-logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
@@ -16,18 +13,27 @@ def create_app():
     
     db.init_app(app)
 
-    logging.basicConfig(
-        filename='log.log',
-        level=logging.DEBUG,
-        format = '%(asctime)s - %(levelname)s - %(message)s'
-    )
     
     
     from .views import views
     from .auth import auth
+    from .admin import admin
+    from .rooms import rooms
+    from .ventilation import ventilation
+    from .projects import projects
+    from .ventsystems import ventsystems
+    from .buildings import buildings
+    from .specifications import specifications
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(admin.admin_bp, url_prefix='/admin')
+    app.register_blueprint(rooms.rooms_bp, url_prefix='/rooms')
+    app.register_blueprint(ventilation.ventilation_bp, url_prefix='/ventilation')
+    app.register_blueprint(projects.projects_bp, url_prefix='/projects')
+    app.register_blueprint(ventsystems.ventsystems_bp, url_prefix='/ventsystems')
+    app.register_blueprint(buildings.buildings_bp, url_prefix='/buildings')
+    app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
 
     from .models import User
     create_db(app)

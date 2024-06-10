@@ -19,7 +19,7 @@ def login():
         if user:
             if check_password_hash(user.password, password):
                 login_user(user, remember=True)
-                return redirect(url_for("views.projects"))
+                return redirect(url_for("projects.projects_dashboard"))
             else:
                 flash("Feil i brukernavn eller passord", category="error")
         else:
@@ -64,5 +64,5 @@ def signup():
             login_user(new_user, remember=True)
             flash("Account created", category="success")
     
-            return redirect(url_for('views.projects'))
+            return redirect(url_for('projects.projects'))
     return render_template("sign_up.html", user=current_user)

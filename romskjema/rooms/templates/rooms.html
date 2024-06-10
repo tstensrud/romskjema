@@ -7,6 +7,7 @@
 {%block page_subtitle %}Romliste{% endblock %}
 {%block content %}  
     <!-- New room form -->
+
     <p>
       <p>Legg til nytt rom</p>
       <form id="new_room" method="POST" role="form">
@@ -22,13 +23,19 @@
           {% for building in project_buildings %}
           <option value="{{building.id}}">{{ building.BuildingName }}</option>
           {% endfor %}
-          
         </select>
+
+
         <input type="text" name="room_floor" id="room_floor", placeholder="Etasje" tabindex="1" required>
+
         <input type="text" name="room_number" id="room_number", placeholder="Romnummer" tabindex="2" required>
+
         <input type="text" name="room_name" id="room_name", placeholder="Romnavn" tabindex="3" required>
+
         <input type="text" name="room_area" id="room_area", placeholder="Areal" tabindex="4" required>
+
         <input type="text" name="room_people" id="room_people", placeholder="Personer" tabindex="5" required>
+
         <button class="form-button" id="alwaysActive" type="submit" tabindex="6">Legg til</button>
       </form>
     </p>
@@ -43,6 +50,7 @@
       {% endwith %}
     </p>
     <!-- End new room form -->
+
   <div class="table-header-container">
     <table class="table-wrapper tableView">
       <thead>
@@ -128,6 +136,7 @@
         </tbody>
       </table>
   </div>
-  <script src="{{ url_for('static', filename='js/room_table.js') }}"></script>
+
+  <script src="{{ url_for('rooms.static', filename='room_table.js') }}"></script>
   <script src="{{ url_for('static', filename='js/input_check.js') }}"></script>
 {% endblock %}

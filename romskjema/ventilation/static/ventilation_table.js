@@ -1,7 +1,8 @@
+/* Edit table in room list - ventilation */
 document.addEventListener("DOMContentLoaded", function() {
-    const table = document.getElementById("systemsTableVentilation");
+    const table = document.getElementById("roomsTableVentilation");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,6,7,8,9,10]
+    const lockedCells = [0,1,2,3,4,5,6,7,8,9,10,13,14]
   
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -40,10 +41,11 @@ document.addEventListener("DOMContentLoaded", function() {
             if (hiddenColumnName) {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
+            rowData["system_update"] = false
           }
   
           // Send AJAX request to update the database
-          fetch('/update_system', {
+          fetch('/ventilation/update_ventilation', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -73,3 +75,60 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   });
+
+  /* Updating the ventilation system */
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let currentSystemId = 0;
+    document.querySelectorAll('select').forEach((selectElement) => {
+      selectElement.addEventListener('click', () => {
+        currentSystemId = selectElement.value;
+        console.log(currentSystemId);
+      });
+  
+      selectElement.addEventListener('change', async () => {
+        await autoSubmitSystemForm(selectElement, currentSystemId);
+      });
+    });
+  });
+  
+  async function autoSubmitSystemForm(selectElement, currentSystemId) {
+    const row = selectElement.closest('tr');
+    const row_id = row.cells[0].innerText;
+    const system_id = selectElement.value;
+  
+    if (system_id != "none") {
+      try {
+        const response = await fetch('/ventilation/update_ventilation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            system_update: true,
+            old_system_id: currentSystemId,
+            row_id: row_id,
+            system_id: system_id
+          })
+        });
+  
+        if (!response.ok) {
+          const errorDetail = await response.text(); // Get detailed error message from response
+          console.error(`Network response was not ok: ${response.status} ${response.statusText}. Details: ${errorDetail}`);
+          throw new Error('Network response was not ok');
+        }
+  
+        const result = await response.json();
+        console.log('Success:', result);
+        window.location.reload();
+      } catch (error) {
+        console.error('Error:', error.message);
+        window.location.reload();
+      }
+    }
+  }
+
+  /* Auto submit on the building selector */
+  function showBuildings() {
+    document.getElementById("project_building").submit();
+}

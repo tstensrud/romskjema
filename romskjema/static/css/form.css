@@ -20,6 +20,7 @@ select{
     background-repeat: no-repeat;
     background-position: left 10px center;
     transition: 0.2s;
+    max-width: 190px;
 }
 
 .table-select{
@@ -130,7 +131,7 @@ input {
     background-color: var(--app-content-secondary-color);
     border: 1px solid #06d6a0;
     color: var(--app-content-main-color);
-    font-size: 18px;
+    font-size: 14px;
     line-height: 24px;
     border-radius: 7px;
     padding: 0px 10px 0px 5px;

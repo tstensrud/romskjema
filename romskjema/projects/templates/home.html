@@ -24,6 +24,6 @@
     <br>
     <h1 class="app-content-Text">Gjellende kravspesifikasjon</h1>
     <p class="app-content-Text">
-        <button onclick=window.location.href='/specifications/{{project.Specification}}' class="app-content-headerButton">{{project.Specification}}</button></a>
+        <form action="{{ url_for('specifications.specifications', specification=project.Specification) }}"><button class="app-content-headerButton" type="submit">{{project.Specification}}</button></form>
     </p>
 {% endblock %}
