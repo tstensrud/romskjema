@@ -3,6 +3,7 @@ from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, login_user, logout_user, current_user
+from markupsafe import escape
 
 auth = Blueprint("auth", __name__)
 
@@ -12,8 +13,8 @@ Log in
 @auth.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password =  request.form.get('password')
+        email = escape(request.form.get('email'))
+        password =  escape(request.form.get('password'))
 
         user = User.query.filter_by(email=email).first()
         if user:
@@ -38,7 +39,7 @@ def logout():
     return redirect(url_for("views.index"))
 
 '''
-Sign up
+Sign up for testing
 '''
 @auth.route('/sign_up', methods=['GET', 'POST'])
 def signup():
@@ -64,5 +65,5 @@ def signup():
             login_user(new_user, remember=True)
             flash("Account created", category="success")
     
-            return redirect(url_for('projects.projects'))
+            return redirect(url_for('projects.projects_dashboard'))
     return render_template("sign_up.html", user=current_user)

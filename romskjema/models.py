@@ -23,8 +23,8 @@ class Projects(db.Model):
     ProjectDescription = db.Column(db.Text)
     Specification = db.Column(db.String(50))
 
-    buildings = db.relationship('Buildings', backref='project', uselist=False, lazy=True)
-    systems = db.relationship('VentilationSystems', backref='project', uselist=False, lazy=True)
+    buildings = db.relationship('Buildings', backref='project_buildings', uselist=False, lazy=True)
+    ventilation_systems = db.relationship('VentilationSystems', backref='project_ventilation_systems', uselist=False, lazy=True)
     
 
 
@@ -35,6 +35,7 @@ class Buildings(db.Model):
     BuildingName = db.Column(db.String(100), nullable=False)
 
     rooms = db.relationship('Rooms', backref='building', lazy=True)
+    heating_properties = db.relationship('BuildingHeatingSettings', backref='heating', uselist=False, lazy=True)
 
 
 class Rooms(db.Model):
@@ -49,7 +50,8 @@ class Rooms(db.Model):
     RoomPopulation = db.Column(db.Integer, nullable=False)
     Comments = db.Column(db.String(250))
 
-    ventilation_properties = db.relationship('RoomVentilationProperties', backref='rooms', uselist=False, lazy=True)
+    ventilation_properties = db.relationship('RoomVentilationProperties', backref='room_ventilation', uselist=False, lazy=True)
+    heating_properties = db.relationship('RoomHeatingProperties', backref="room_heating", uselist=False, lazy=True)
 
 class VentilationSystems(db.Model):
     __tablename__ = "VentilationSystems"
@@ -89,6 +91,48 @@ class RoomVentilationProperties(db.Model):
     DbNeighbour = db.Column(db.String(50))
     DbCorridor = db.Column(db.String(50))
     Comments = db.Column(db.String(20))
+
+class BuildingHeatingSettings(db.Model):
+    __tablename__ = "BuildingHeatingSettings"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ProjectId = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False)
+    BuildingID = db.Column(db.Integer, db.ForeignKey('Buildings.id', ondelete="SET NULL"), nullable=False)
+    InsideTemp = db.Column(db.Float)
+    VentTemp = db.Column(db.Float)
+    Infiltration = db.Column(db.Float)
+    UvalueOuterWall = db.Column(db.Float)
+    UvalueWindowDoor = db.Column(db.Float)
+    UvalueFloorGround = db.Column(db.Float)
+    UvalueFloorAir = db.Column(db.Float)
+    UvalueRoof = db.Column(db.Float)
+    ColdBridge = db.Column(db.Float)
+    YearMidTemp = db.Column(db.Float)
+    TempFloorAir = db.Column(db.Float)
+    Safety = db.Column(db.Integer)
+
+
+class RoomHeatingProperties(db.Model):
+    __tablename__ = "RoomHeatingProperties"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
+    ProjectHeatingSettings = db.Column(db.Integer, db.ForeignKey('BuildingHeatingSettings.id', ondelete="SET NULL"), nullable=False, unique=True)
+    OuterWallArea = db.Column(db.Float)
+    RoomHeight = db.Column(db.Float)
+    InnerWallArea = db.Column(db.Float)
+    RoofArea = db.Column(db.Float)
+    FloorGroundArea = db.Column(db.Float)
+    FloorAirArea = db.Column(db.Float)
+    RoomVolume = db.Column(db.Float)
+    HeatLossColdBridge = db.Column(db.Float)
+    HeatLossTransmission = db.Column(db.Float)
+    HeatLossInfiltration = db.Column(db.Float)
+    HeatLossVentilation = db.Column(db.Float)
+    HeatLossSum = db.Column(db.Float)
+    ChosenHeating = db.Column(db.Float)
+    HeatSource = db.Column(db.String(50))
+    Comment = db.Column(db.String(250))
+
+
 
 ''' 
 Specification tables

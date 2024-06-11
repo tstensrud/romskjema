@@ -143,6 +143,62 @@ input {
     transition: 0.2s;
   }
 
+.spec-button{
+    color: var(--app-content-main-color);
+    width:fit-content;
+    line-height: 20px;
+    padding:3px 8px;
+    outline: none;
+    border: 1px solid #06d6a0;
+    border-radius:0px;
+    background-color: var(--app-content-secondary-color);
+    font-size: 14px;
+    cursor: pointer;
+    transition-duration: 0.25s;
+}
+
+.input-spec {
+    background-color: var(--app-content-secondary-color);
+    border: 1px solid #06d6a0;
+    color: var(--app-content-main-color);
+    font-size: 14px;
+    line-height: 24px;
+    padding: 0px 10px 0px 5px;
+    height: 28px;
+    border-radius: 0px;
+    max-width: 150px;
+    transition: 0.2s;
+  }
+
+.input-heating {
+    background-color: var(--app-content-secondary-color);
+    border: 1px solid #06d6a0;
+    color: var(--app-content-main-color);
+    font-size: 14px;
+    line-height: 24px;
+    height: 24px;
+    border-radius: 0px;
+    max-width: 70px;
+    transition: 0.2s;
+  }
+
+.spec-select{
+    padding:1px 10px;
+    background-color: var(--app-content-secondary-color);
+    border: 1px solid #06d6a0;
+    color: var(--app-content-main-color);
+    font-size: 12px;
+    line-height: 20px;
+    border-radius: 7px;
+    padding: 0px 10px 0px 5px;
+    height: 20px;
+    background-size: 16px;
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    transition: 0.2s;
+}
+
+
 input:placeholder {
 color: var(--app-content-main-color);
 font-size: 14px;

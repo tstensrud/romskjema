@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, url_for, render_template, flash, jsonify,
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from ..globals import get_project, pattern_float
+from markupsafe import escape
 
 ventilation_bp = Blueprint('ventilation', __name__, static_folder='static', template_folder='templates')
 
@@ -13,7 +14,7 @@ def ventilation(building_id):
 
     if request.method == "POST":       
         # Showing specific buildings in the table
-        requested_building_id = request.form.get("project_building")
+        requested_building_id = escape(request.form.get("project_building"))
         if requested_building_id != "none" and requested_building_id != "showall":
             return redirect(url_for("ventilation.ventilation", building_id = requested_building_id))
         else:
@@ -43,11 +44,10 @@ def update_ventilation():
 
     # If system is updated
     if data["system_update"] == True:
-        old_system_id = data["old_system_id"]
-        print(old_system_id)
-        system_id = data["system_id"]
-        vent_prop_id = data["row_id"]
-        print(f"OLD SYSTEM ID {old_system_id}")
+        old_system_id = escape(data["old_system_id"])
+        system_id = escape(data["system_id"])
+        vent_prop_id = escape(data["row_id"])
+        
         if old_system_id == "none":
             if dbo.set_system_for_room_vent_prop(vent_prop_id, system_id):
                 dbo.update_system_airflows(system_id)
@@ -79,15 +79,24 @@ def update_ventilation():
 
 
     
-    vent_prop_id = data["vent_data_id"]
-    supply = data["supply_air"].strip()
+    vent_prop_id = escape(data["vent_data_id"])
+    supply = escape(data["supply_air"].strip())
+    
     new_supply = pattern_float(supply)
-    extract = data["extract_air"].strip()
+    if new_supply is False:
+        flash("Tilluft kan kun inneholde tall.", category="error")
+        response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+    extract = escape(data["extract_air"].strip())
+    
     new_extract = pattern_float(extract)
-    comment = data["comment"].strip()
+    if new_extract is False:
+        flash("Avtrekk kan kun inneholde tall.", category="error")
+        response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+    
+    comment = escape(data["comment"].strip())
 
     if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, None, comment):
-        flash("Data oppdatert", category="success")
+        flash('Data oppdatert', category="success")
         response = {"success": True, "redirect": url_for("ventilation.ventilation")}
     else:
         flash("Kunne ikke oppdatere verdier.", category="error")

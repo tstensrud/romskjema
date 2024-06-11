@@ -41,7 +41,7 @@
     </p>
 
     <p>
-      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for message in messages %}
             {{message}}
@@ -120,7 +120,7 @@
             {{room.RoomName}}
           </td>
           <td data-column="area" class="table-cell">
-            {{room.Area}} m2
+            {{room.Area}} m<sup>2</sup>
           </td>
           <td data-column="population" class="table-cell">
             {{room.RoomPopulation}} stk.

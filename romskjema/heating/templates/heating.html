@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - Varmetapsberegninger{% endblock %}
+{% block header %}Ventilasjon{% endblock %}
+
+
+{%block page_subtitle %}Varmetapsberegninger{% endblock %}
+{%block content %}
+    <p>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            {{message}}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </p>
+    <div class="ventilation-system-sorting-container">
+      <div class="building-selector-container">
+        <form id="project_building" method="POST">
+          <select name="project_building" onchange="showBuildings()">
+            <option value="none">- Velg bygg -</option>
+            <option value="showall">Alle</option>
+            {% for building in project_buildings %}
+            <option value="{{building.id}}">{{building.BuildingName}}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+    </div>
+    <div class="ventilation-system-sorting-container">
+      <div class="heating-settings">
+        Innetempertaur (C&#176;) <br> <input placeholder="{{heating.InsideTemp}}" class="input-heating" value="{{heating.InsideTemp}}">
+        <br>
+        DUT (C&#176;) <br><input placeholder="-20" class="input-heating" value="{{heating.VentTemp}}">
+        <br>
+        Temp ventilasjon (C&#176;) <br> <input placeholder="21" class="input-heating" value="{{heating.VentTemp}}">
+      </div>
+      <div class="heating-settings">
+        Luftveksling infilt. (1/h) <br> <input placeholder="0,15" class="input-heating" value="{{heating.Infiltration}}">
+        <br>
+        U-verdi yttervegg (W/m<sup>2</sup>K)<br><input placeholder="0,22" class="input-heating" value="{{heating.UvalueOuterWall}}">
+        <br>
+        U-verdi vindu/dør (W/m<sup>2</sup>K)<br> <input placeholder="0,1,2" class="input-heating" value="{{heating.UvalueWindowDoor}}">
+      </div>
+      <div class="heating-settings">
+        U-verdi gulv grunn (W/m<sup>2</sup>K)<br> <input placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorGround}}">
+        <br>
+        U-verdi gulv luft (W/m<sup>2</sup>K) <br><input placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorAir}}">
+        <br>
+        U-verdi tak (W/m<sup>2</sup>K) <br> <input placeholder="0,18" class="input-heating" value="{{heating.UvalueRoof}}">
+      </div>
+      <div class="heating-settings">
+        Kuldebroveri (W/m<sup>2</sup>K) <br> <input placeholder="0,06" class="input-heating" value="{{heating.ColdBridge}}">
+        <br>
+        Årsmiddeltemp. (C&#176;)<br><input placeholder="5" class="input-heating" value="{{heating.YearMidTemp}}">
+        <br>
+        Temp gulv mot luft (C&#176;)<br> <input placeholder="-20" class="input-heating" value="{{heating.TempFloorAir}}">
+      </div>
+      <div class="heating-settings">
+        Tillegg (%)<br> <input placeholder="10" class="input-heating" value="{{heating.Safety}}">
+        <br>
+        <p>
+          <form method="POST" action="{{ url_for('heating.update_building_settings')}}">
+          <button class="table-button">Oppdater</button>
+          </form>
+        </p>
+        
+      </div>
+    </div>
+    
+<div class="table-header-container">
+  <table class="table-wrapper tableView">
+    <thead>
+      <tr class="table-header">
+        <th class="table-id-cell table-cell-small">
+          id
+        </th>
+        <th class="table-cell table-cell-medium">
+          Bygg
+        </th>
+        
+        <th class="table-cell table-cell-small">
+          Etasje
+        </th>
+                
+        <th class="table-cell table-cell-medium">
+          Romnr
+        </th>
+        
+        <th class="table-cell">
+          Romnavn
+        </th>
+
+        <th class="table-cell">
+            Yttervegger m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Innervegger m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Vindu/dør m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Tak m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Gulv grunn m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+          Gulv luft m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Luftmengde m<sup>3</sup>/h
+        </th>
+
+        <th class="table-cell">
+            Totalt varmetap W
+        </th>
+
+        <th class="table-cell">
+            Varmetap W
+        </th>
+
+        <th class="table-cell">
+            Varmekilde
+        </th>
+        <th class="table-cell">
+          Valgt varme
+      </th>
+        <th class="table-cell table-cell-long">
+            Kommentarer
+        </th>
+      </tr>
+    </thead>
+  </table>
+</div>
+
+<div class="table-container">
+  <table id="roomsTableVentilation" class="table-wrapper tableView">
+    <tbody>
+      
+      <tr class="table-row">
+        <td class="table-cell table-cell-small" data-column="vent_data_id">
+          id
+        </td>
+        <td class="table-cell table-cell-medium">
+          bygg
+        </td>
+        <td class="table-cell table-cell-small">
+          etasje
+        </td>
+        <td class="table-cell table-cell-medium">
+          romnummer
+        </td>
+        <td class="table-cell">
+          romnavn
+        </td>
+        <td class="table-cell">
+          100m2
+        </td>
+        <td class="table-cell">
+          100 m2
+        </td>
+        <td class="table-cell">
+          100 m2
+        </td>
+        <td class="table-cell">
+          100 m2
+        </td>
+        <td class="table-cell">
+          1
+        </td>
+        <td class="table-cell">
+          1
+        </td>
+        <td class="table-cell" data-column="supply_air">
+          1
+        </td>
+        <td class="table-cell" data-column="extract_air">
+          1
+        </td>
+        <td class="table-cell">
+          1
+        </td>
+        <td class="table-cell" data-column="system_id">         
+          Radiator
+        </td>
+        <td class="table-cell" data-column="system_id">         
+          100W
+        </td>
+        <td class="table-cell table-cell-long" data-column="comment">
+            asdf
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+<script src="{{ url_for('ventilation.static', filename='ventilation_table.js') }}"></script>
+{% endblock %}

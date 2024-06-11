@@ -16,7 +16,7 @@
 
 .table-container {
   overflow-y: auto;
-  max-height: 1024px;
+  max-height: 85%;
 }
 
 .table-header {

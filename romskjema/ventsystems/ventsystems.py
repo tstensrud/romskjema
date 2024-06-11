@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, url_for, render_template, flash, jsonify,
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from ..globals import get_project, pattern_int, pattern_float
+from markupsafe import escape
 
 ventsystems_bp = Blueprint('ventsystems', __name__, static_folder='static', template_folder='templates')
 
@@ -12,20 +13,20 @@ def ventsystems():
     project = get_project()
     
     if request.method == "POST":
-        system_number = request.form.get("system_number").strip()
+        system_number = escape(request.form.get("system_number").strip())
         if dbo.check_if_system_number_exists(project.id, system_number):
             flash("Systemnummer finnes allerede", category="error")
             return redirect(url_for('ventsystems.ventsystems'))
         
-        airflow = float(request.form.get("airflow").strip())
-        service_area = request.form.get("system_service").strip()
-        placement = request.form.get("system_placement").strip()
-        system_type = request.form.get("special_system")
+        airflow = float(escape(request.form.get("airflow").strip()))
+        service_area = escape(request.form.get("system_service").strip())
+        placement = escape(request.form.get("system_placement").strip())
+        system_type = escape(request.form.get("special_system"))
         if system_type == None:
             system_type = "Nei"
         else:
             system_type = "Ja"
-        system_h_ex = request.form.get("heat_exchange").strip()
+        system_h_ex = escape(request.form.get("heat_exchange").strip())
 
         if dbo.new_ventilation_system(project.id, system_number, placement, service_area, system_h_ex, airflow, system_type):
             flash("System opprettet", category="success")
@@ -46,13 +47,13 @@ def ventsystems():
 @ventsystems_bp.route('/update_system', methods=['POST'])
 def update_system():
     data = request.get_json()
-    system_id = data["system_id"]
-    system_number = data["system_number"].strip()   
-    system_location = data["system_location"].strip()
-    service_area = data["service_area"].strip()
-    airflow = data["airflow"].strip()
+    system_id = escape(data["system_id"])
+    system_number = escape(data["system_number"].strip())
+    system_location = escape(data["system_location"].strip())
+    service_area = escape(data["service_area"].strip())
+    airflow = escape(data["airflow"].strip())
     airflow_float = pattern_float(airflow)
-    heat_ex = data["system_hx"].strip()
+    heat_ex = escape(data["system_hx"].strip())
     
     if dbo.update_system_info(system_id, system_number, system_location, service_area, airflow_float, heat_ex):
         flash("System-data oppdatert", category="success")
@@ -68,7 +69,7 @@ def update_system():
 def delete_system():
     if request.method == "POST":
         data = request.get_json()
-        system_id = data["system_id"]
+        system_id = escape(data["system_id"])
         if dbo.delete_system(system_id):
             flash("System slettet", category="success")
             response = {"success": True, "redirect": url_for("ventsystems.ventsystems")}

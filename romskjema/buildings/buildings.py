@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from .. import models, db
 from ..globals import get_project
+from markupsafe import escape
 
 buildings_bp = Blueprint('buildings', __name__, static_folder='static', template_folder='templates')
 
@@ -31,9 +32,10 @@ def buildings():
                                project_buildings = ziped_building_data)
    
     elif request.method == "POST":
-        building_name = request.form.get("building_name").strip()
-        new_building = models.Buildings(ProjectId = project.id, BuildingName = building_name)
-        db.session.add(new_building)
-        db.session.commit()
-        flash(f"Bygg {building_name} opprettet", category="success")
-        return redirect(url_for('buildings.buildings'))
+        building_name = escape(request.form.get("building_name").strip())
+        if dbo.new_building(project.id, building_name):
+            flash(f"Bygg {building_name} opprettet", category="success")
+            return redirect(url_for('buildings.buildings'))
+        else:
+            flash(f"Kunne ikke opprette bygg", category="error")
+            return redirect(url_for('buildings.buildings'))

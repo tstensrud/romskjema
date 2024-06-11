@@ -24,6 +24,7 @@ def create_app():
     from .ventsystems import ventsystems
     from .buildings import buildings
     from .specifications import specifications
+    from .heating import heating
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(ventsystems.ventsystems_bp, url_prefix='/ventsystems')
     app.register_blueprint(buildings.buildings_bp, url_prefix='/buildings')
     app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
+    app.register_blueprint(heating.heating_bp, url_prefix='/heating')
 
     from .models import User
     create_db(app)

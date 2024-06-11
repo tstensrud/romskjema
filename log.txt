@@ -1,0 +1,6 @@
+update_ventilation_table: 'NoneType' object has no attribute 'AirFlowSupply'
+update_ventilation_table: 'NoneType' object has no attribute 'AirFlowSupply'
+set up heating settings building: (sqlite3.OperationalError) table BuildingHeatingSettings has no column named Safety
+[SQL: INSERT INTO "BuildingHeatingSettings" ("ProjectId", "BuildingID", "InsideTemp", "VentTemp", "Infiltration", "UvalueOuterWall", "UvalueWindowDoor", "UvalueFloorGround", "UvalueFloorAir", "UvalueRoof", "ColdBridge", "YearMidTemp", "TempFloorAir", "Safety") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (1, 4, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

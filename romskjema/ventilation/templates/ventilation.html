@@ -6,7 +6,7 @@
 {%block page_subtitle %}Luftmengdetabell{% endblock %}
 {%block content %}
     <p>
-      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for message in messages %}
             {{message}}
@@ -26,13 +26,6 @@
           </select>
         </form>
       </div>
-      {% for system in systems %}
-      <div class="system-summary">
-        {{system}} <br>
-        Tilluft: <span class="supply-text">12345</span> m3/h <br>
-        Avtrekk: <span class="extract-text">21345</span> m3/h
-      </div>
-      {% endfor %}
     </div>
     <!-- End new room form -->
     
@@ -80,6 +73,10 @@
         </th>
 
         <th class="table-cell">
+          Minimum
+        </th>
+
+        <th class="table-cell">
             Dimensjonert
         </th>
 
@@ -115,16 +112,16 @@
           {{data.id}}
         </td>
         <td class="table-cell table-cell-medium">
-          {{data.rooms.building.BuildingName}}
+          {{data.room_ventilation.building.BuildingName}}
         </td>
         <td class="table-cell table-cell-small">
-          {{data.rooms.Floor}}
+          {{data.room_ventilation.Floor}}
         </td>
         <td class="table-cell table-cell-medium">
-          {{data.rooms.RoomNumber}}
+          {{data.room_ventilation.RoomNumber}}
         </td>
         <td class="table-cell">
-          {{data.rooms.RoomName}}
+          {{data.room_ventilation.RoomName}}
         </td>
         <td class="table-cell">
           {{data.AirPerPerson}} m3
@@ -142,6 +139,9 @@
             {{data.AirProcess}} m3/h
         </td>
         <td class="table-cell">
+          {{data.AirMinimum}} m3/h
+        </td>
+        <td class="table-cell">
             {{data.AirDemand}} m3/h
         </td>
         <td class="table-cell supplyCell" data-column="supply_air">
@@ -155,6 +155,7 @@
         </td>
         <td class="table-cell" data-column="system_id">         
           <form id="system" method="POST">
+            
             <select class="table-select" name="system_id" id="system_id">
               {% if not data.room.SystemName %}
                 <option value="none">- System -</option>

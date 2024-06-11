@@ -1,11 +1,10 @@
 from sqlalchemy import func, and_
 from . import models, db
+from . import db_ops_heating as dboh
 from flask_login import login_required
 import math
+from . import globals
 
-def log(entry):
-    with open(f"errors.txt", "a") as file:
-        file.writelines(f"{entry}\n")
 '''
 Project methods
 '''
@@ -45,6 +44,19 @@ def check_for_existing_project_number(project_number: str) -> bool:
 Building methods
 '''
 @login_required
+def new_building(project_id: int, building_name: str) -> bool:
+    new_building = models.Buildings(ProjectId = project_id, BuildingName = building_name)
+    try:
+        db.session.add(new_building)
+        db.session.commit()
+        dboh.set_up_heating_settings_building(project_id, new_building.id)
+        return True
+    except Exception as e:
+        globals.log(f"new building: {e}")
+        db.session.rollback()
+        return False
+    
+@login_required
 def get_all_project_buildings(project_id: int):
     buildings = models.Buildings.query.filter_by(ProjectId = project_id).all()
     return buildings
@@ -57,6 +69,7 @@ def get_building_id(project_id: int, building_name: str) -> int:
 '''
 Rooms methods
 '''
+        
 @login_required
 def get_room(room_id: int) -> models.Rooms:
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -76,7 +89,7 @@ def delete_room(room_id: int) -> bool:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            log(f"delete_room() first try/except block: {e}")
+            globals.log(f"delete_room() first try/except block: {e}")
             return False
     
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -87,7 +100,7 @@ def delete_room(room_id: int) -> bool:
             return True
         except Exception as e:
             db.session.rollback()
-            log(f"delete_room() second try/except block: {e}")
+            globals.log(f"delete_room() second try/except block: {e}")
             return False
     else:
         return False
@@ -113,12 +126,12 @@ def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new
         return True
     except Exception as e:
         db.session.rollback()
-        log(f"update_room_data(): {e}")
+        globals.log(f"update_room_data(): {e}")
         return False
 
 '''
 Ventilation methods
-'''
+'''  
 @login_required
 def get_room_vent_prop(vent_prop_id: int) -> models.RoomVentilationProperties:
     vent_prop = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.id == vent_prop_id).first()
@@ -139,7 +152,7 @@ def initial_ventilation_calculations(room_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        log(f"initial_ventilation_calculations: {e}")
+        globals.log(f"initial_ventilation_calculations: {e}")
         db.session.rollback()
         return False
 
@@ -155,14 +168,14 @@ def update_ventilation_calculations(room_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        log(f"update_ventilation_calculations: {e}")
+        globals.log(f"update_ventilation_calculations: {e}")
         db.session.rollback()
         return False
 
 @login_required
 def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
     vent_properties_room = get_room_vent_prop(vent_prop_id)
-    room = vent_properties_room.rooms
+    room = vent_properties_room.room_ventilation
     vent_properties_room.AirSupply = new_supply
     vent_properties_room.AirExtract = new_extract
     vent_properties_room.AirChosen = round((new_supply / room.Area), 1)
@@ -178,7 +191,7 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
     
     except Exception as e:
         db.session.rollback()
-        log(f"update_ventilation_table: {e}")
+        globals.log(f"update_ventilation_table: {e}")
         return False
         
 
@@ -192,7 +205,7 @@ def set_system_for_room_vent_prop(room_vent_prop_id: int, system_id: int) -> boo
         return True
     except Exception as e:
         db.session.rollback()
-        log(f"set_system_for_room_vent_prop: {e}")
+        globals.log(f"set_system_for_room_vent_prop: {e}")
         return False
 
 @login_required
@@ -231,7 +244,7 @@ def get_summary_of_ventilation_system(project_id: int, system_name: str) -> floa
     return supply
 
 '''
-Systems
+Ventilation systems
 '''
 @login_required
 def new_ventilation_system(project_id: int, system_number: str, placement: str, service_area: str, heat_ex: str, airflow: float, special: str) -> bool:
@@ -249,7 +262,7 @@ def new_ventilation_system(project_id: int, system_number: str, placement: str, 
         db.session.commit()
         return True
     except Exception as e:
-        log(f"new_ventilation_system: {e}")
+        globals.log(f"new_ventilation_system: {e}")
         db.session.rollback()
         return False
 
@@ -261,7 +274,7 @@ def delete_system(system_id: int) -> bool:
         return True
     except Exception as e:
         db.session.rollback()
-        log(f"delete system: {e}")
+        globals.log(f"delete system: {e}")
         return False
     
 @login_required
@@ -306,7 +319,7 @@ def update_system_airflows(system_id: int) -> bool:
         db.session.commit()
         return True
     except Exception as e:
-        log(f"update_system_air_flows: {e}")
+        globals.log(f"update_system_air_flows: {e}")
         db.session.rollback()
         return False
 
@@ -323,7 +336,7 @@ def update_airflow_changed_system(system_id_new: int, system_id_old: int) -> boo
         db.session.commit()
         return True
     except Exception as e:
-        log(f"update_airflow_changed_system: {e}")
+        globals.log(f"update_airflow_changed_system: {e}")
         db.session.rollback()
         return False
 
@@ -340,14 +353,30 @@ def update_system_info(system_id: int, system_number: str, system_location: str,
         return True
     except Exception as e:
         db.session.rollback()
-        log(f"update_system_info: {e}")
+        globals.log(f"update_system_info: {e}")
         return False
 
-    
-    
+
 '''
 Specifications
 '''
+@login_required
+def new_specifitaion(name: str) -> bool:
+    specification = models.Specifications(name=name)
+    try:
+        db.session.add(specification)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"new specification: {e}")
+        db.session.rollback()
+        return False
+
+@login_required
+def get_specification_by_name(name: str) -> models.Specifications:
+    spec = db.session.query(models.Specifications).filter(models.Specifications.name == name).first()
+    return spec
+
 # Get list of all specifications in database
 @login_required
 def get_specifications() -> list:
@@ -357,6 +386,14 @@ def get_specifications() -> list:
         spec_list.append(spec)
     return spec_list
 
+@login_required
+def find_specification_name(name: str) -> bool:
+    name = db.session.query(models.Specifications.name).filter(models.Specifications.name == name).first()
+    if name:
+        return True
+    else:
+        return False
+    
 # Get data for a specific roomtype in a specification
 @login_required
 def get_room_type_data(room_type_id: int, specification: str):
@@ -379,3 +416,30 @@ def get_specification_room_types(specification: str):
 def get_specification_room_data(specification_name: str):
     data = db.session.query(models.RoomTypes).join(models.Specifications).filter(models.Specifications.name == specification_name).all()
     return data
+
+@login_required
+def new_specification_room_type(specification_id: int, name: str, air_per_person: float, air_emission: float, air_process: float,
+                 air_minimum: float, vent_principle: str, heat_ex: str, room_control: str, notes: str,
+                 dbt: str, dbn: str, dbc: str, comments: str) -> bool:
+    room = models.RoomTypes(specification_id=specification_id,
+                            name=name,
+                            air_per_person=air_per_person,
+                            air_emission=air_emission,
+                            air_process=air_process,
+                            air_minimum=air_minimum,
+                            ventilation_principle=vent_principle,
+                            heat_exchange=heat_ex,
+                            room_control=room_control,
+                            notes=notes,
+                            db_technical=dbt,
+                            db_neighbour=dbn,
+                            db_corridor=dbc,
+                            comments=comments)
+    try:
+        db.session.add(room)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"create new room type {e}")
+        db.session.rollback()
+        return False

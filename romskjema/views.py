@@ -1,10 +1,9 @@
 import os
 import json
-from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template
+from flask_login import current_user
 from . import models, db
 from . import db_operations as dbo
-from .globals import get_project, pattern_int, pattern_float
 
 views = Blueprint("views", __name__)
 
@@ -16,16 +15,6 @@ def index():
     return render_template("index.html", 
                            user=current_user, 
                            project=None)
-
-
-        
-
-
-
-
-
-
-
 
 
 '''

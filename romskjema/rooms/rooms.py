@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from .. import models, db
 from .. import db_operations as dbo
 from ..globals import get_project, pattern_float, pattern_int
+from markupsafe import escape
 
 rooms_bp = Blueprint('rooms', __name__, static_folder='static', template_folder='templates')
 
@@ -23,27 +24,30 @@ def rooms():
             return redirect(url_for("rooms.rooms"))
         building_id = int(building_id)
         
-        room_type_id = request.form.get("room_type")
+        room_type_id = escape(request.form.get("room_type"))
         room_type = dbo.get_room_type_name(project.Specification, room_type_id)
-        floor = request.form.get("room_floor").strip()
-        name = request.form.get("room_name").strip()
+        floor = escape(request.form.get("room_floor").strip())
+        name = escape(request.form.get("room_name").strip())
         
-        room_number = request.form.get("room_number").strip()
+        room_number = escape(request.form.get("room_number").strip())
         
         if dbo.check_if_roomnumber_exists(project.id, building_id, room_number):
             flash(f"Romnummer {room_number} finnes allerede for dette bygget", category="error")
             return redirect(url_for("rooms.rooms"))
         
-        area = request.form.get("room_area").strip()
+        area = escape(request.form.get("room_area").strip())
         try:
             area = float(area)
         except ValueError:
             flash("Areal kan kun inneholde tall", category="error")
-        people = request.form.get("room_people").strip()
+            return redirect(url_for("rooms.rooms"))
+            
+        people = escape(request.form.get("room_people").strip())
         try:
             people = int(people)
         except ValueError:
             flash("Personbelastning kan kun inneholde tall", category="error")
+            return redirect(url_for("rooms.rooms"))
     
         new_room = models.Rooms(BuildingId = building_id,
                                 RoomType = room_type_id,
@@ -97,17 +101,17 @@ def udpate_room():
     if request.method == "POST":
         data = request.get_json()
 
-        room_id = data["room_id"]
-        room_number = data["room_number"].strip()
-        room_name = data["room_name"].strip()
+        room_id = escape(data["room_id"])
+        room_number = escape(data["room_number"].strip())
+        room_name = escape(data["room_name"].strip())
                
-        area = data["area"].strip()
+        area = escape(data["area"].strip())
         area_float = pattern_float(area)
         
-        population = data["population"].strip()
+        population = escape(data["population"].strip())
         population_int = pattern_int(population)
         
-        comments = data["comments"].strip()
+        comments = escape(data["comments"].strip())
         
         print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
         
@@ -126,7 +130,7 @@ def udpate_room():
 def delete_room():
     if request.method == "POST":
         data = request.get_json()
-        room_id = data["room_id"]
+        room_id = escape(data["room_id"])
         print(room_id)
         if dbo.delete_room(room_id):
             flash("Rom slettet", category="success")
