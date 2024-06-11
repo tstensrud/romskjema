@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, url_for, render_template, flash, jsonify,
 from flask_login import login_required, current_user
 from .. import models, db
 from .. import db_operations as dbo
+from .. import db_ops_heating as dboh
 from ..globals import get_project, pattern_float, pattern_int
 from markupsafe import escape
 
@@ -49,43 +50,27 @@ def rooms():
             flash("Personbelastning kan kun inneholde tall", category="error")
             return redirect(url_for("rooms.rooms"))
     
-        new_room = models.Rooms(BuildingId = building_id,
-                                RoomType = room_type_id,
-                                Floor = floor,
-                                RoomNumber = room_number,
-                                RoomName = name,
-                                Area = area,
-                                RoomPopulation = people)
-        db.session.add(new_room)
-        try:
-            db.session.commit()
-        except Exception as e:
-            return f"Feil ved oppretting av rom: {e}"
-        
-        vent_props = dbo.get_room_type_data(room_type_id, project_specification)
-        room_ventilation_properties = models.RoomVentilationProperties(RoomId = new_room.id,
-                                                                    AirPerPerson=vent_props.air_per_person,
-                                                                    AirEmission=vent_props.air_emission,
-                                                                    AirProcess=vent_props.air_process,
-                                                                    AirMinimum=vent_props.air_minimum,
-                                                                    AirSupply = 0.0,
-                                                                    AirExtract= 0.0,
-                                                                    VentilationPrinciple=vent_props.ventilation_principle,
-                                                                    HeatExchange=vent_props.heat_exchange,
-                                                                    RoomControl=vent_props.room_control,
-                                                                    Notes=vent_props.notes,
-                                                                    DbTechnical=vent_props.db_technical,
-                                                                    DbNeighbour=vent_props.db_neighbour,
-                                                                    DbCorridor=vent_props.db_corridor,
-                                                                    Comments=vent_props.comments)
-        
-        db.session.add(room_ventilation_properties)
-        try:
-            db.session.commit()
-            dbo.initial_ventilation_calculations(new_room.id)
-        except Exception as e:
-            return f"Feil ved oppretting av ventilation properties {e}"
-        return redirect(url_for("rooms.rooms"))
+        new_room_id = dbo.new_room(building_id, room_type_id, floor, room_number, name, area, people)
+
+        # Check if creating room was OK
+        if new_room_id is not False:
+            vent_props = dbo.get_room_type_data(room_type_id, project_specification)
+
+            # Create row for room vent props
+            if dbo.new_vent_prop_room(new_room_id, vent_props.air_per_person, vent_props.air_emission,
+                                   vent_props.air_process, vent_props.air_minimum,
+                                   vent_props.ventilation_principle, vent_props.heat_exchange,
+                                   vent_props.room_control, vent_props.notes, vent_props.db_technical,
+                                   vent_props.db_neighbour, vent_props.db_corridor, vent_props.comments):
+                dbo.initial_ventilation_calculations(new_room_id)
+
+                # Create row for room heating props
+                if dboh.new_room_heating_props(project.buildings.heating_properties.id, new_room_id):
+                    flash("Rom opprettet", category="success")
+                    return redirect(url_for("rooms.rooms"))
+                else:
+                    flash("Feil ved oppretting av rom", category="error")
+                    return redirect(url_for("rooms.rooms"))
         
     elif request.method == "GET":
         return render_template("rooms.html", 

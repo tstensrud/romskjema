@@ -18,10 +18,15 @@
       <div class="building-selector-container">
         <form id="project_building" method="POST">
           <select name="project_building" onchange="showBuildings()">
-            <option value="none">- Velg bygg -</option>
-            <option value="showall">Alle</option>
-            {% for building in project_buildings %}
-            <option value="{{building.id}}">{{building.BuildingName}}</option>
+            {% if building %}
+              <option value="none">{{building.BuildingName}}</option>
+            {% else %}
+              <option value="none">- Velg bygg -</option>
+            {% endif %}
+            {% for project_building in project_buildings %}
+              {% if project_building.BuildingName != building.BuildingName %}
+              <option value="{{project_building.id}}">{{project_building.BuildingName}}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </form>
@@ -144,63 +149,65 @@
 <div class="table-container">
   <table id="roomsTableVentilation" class="table-wrapper tableView">
     <tbody>
-      
+      {% for room in rooms %}
       <tr class="table-row">
         <td class="table-cell table-cell-small" data-column="vent_data_id">
-          id
+          {{room.id}}
         </td>
         <td class="table-cell table-cell-medium">
-          bygg
+          {{room.building.BuildingName}}
         </td>
         <td class="table-cell table-cell-small">
-          etasje
+          {{room.Floor}}
         </td>
         <td class="table-cell table-cell-medium">
-          romnummer
+          {{room.RoomNumber}}
         </td>
         <td class="table-cell">
-          romnavn
+          {{room.RoomName}}
         </td>
         <td class="table-cell">
-          100m2
+          {{room.heating_properties.OuterWallArea}}
         </td>
         <td class="table-cell">
-          100 m2
+          {{room.heating_properties.InnerWallArea}}
         </td>
         <td class="table-cell">
-          100 m2
+          {{room.heating_properties.WindowDoorArea}}
         </td>
         <td class="table-cell">
-          100 m2
+          {{room.heating_properties.FloorGroundArea}}
         </td>
         <td class="table-cell">
-          1
+          {{room.heating_properties.FloorAirArea}}
         </td>
         <td class="table-cell">
-          1
+          Luftmengde
         </td>
         <td class="table-cell" data-column="supply_air">
-          1
+          {{room.heating_properties.HeatLossSum}}
         </td>
         <td class="table-cell" data-column="extract_air">
-          1
+          {{room.heating_properties.HeatSource}}
         </td>
         <td class="table-cell">
-          1
+          {{room.heating_properties.ChosenHeating}}
         </td>
         <td class="table-cell" data-column="system_id">         
-          Radiator
+          {{room.heating_properties.HeatSource}}
         </td>
         <td class="table-cell" data-column="system_id">         
           100W
         </td>
         <td class="table-cell table-cell-long" data-column="comment">
-            asdf
+          {{room.heating_properties.Comment}}
         </td>
       </tr>
-      
+      {% endfor %}  
     </tbody>
   </table>
 </div>
-<script src="{{ url_for('ventilation.static', filename='ventilation_table.js') }}"></script>
+
+
+<script src="{{ url_for('heating.static', filename='heating_table.js') }}"></script>
 {% endblock %}

@@ -44,6 +44,11 @@ def check_for_existing_project_number(project_number: str) -> bool:
 Building methods
 '''
 @login_required
+def get_building(building_id: int) -> models.Buildings:
+    building = db.session.query(models.Buildings).filter(models.Buildings.id == building_id).first()
+    return building
+
+@login_required
 def new_building(project_id: int, building_name: str) -> bool:
     new_building = models.Buildings(ProjectId = project_id, BuildingName = building_name)
     try:
@@ -69,7 +74,19 @@ def get_building_id(project_id: int, building_name: str) -> int:
 '''
 Rooms methods
 '''
-        
+@login_required
+def new_room(building_id: int, room_type_id: int, floor: str, room_number: str, room_name: str, area: float, room_pop: int):
+    new_room = models.Rooms(BuildingId = building_id, RoomType = room_type_id, Floor = floor, RoomNumber = room_number,
+                                RoomName = room_name, Area = area, RoomPopulation = room_pop)
+    try:
+        db.session.add(new_room)
+        db.session.commit()
+        return new_room.id
+    except Exception as e:
+        globals.log(e)
+        db.session.rollback()
+        return False
+    
 @login_required
 def get_room(room_id: int) -> models.Rooms:
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
@@ -131,7 +148,35 @@ def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new
 
 '''
 Ventilation methods
-'''  
+'''
+@login_required
+def new_vent_prop_room(room_id: int, air_per_person: float, air_emission: float, air_process: float,
+                       air_minimum: float, ventilation_principle: str, heat_exchange: str, room_control: str,
+                       notes: str, db_technical: str, db_neighbour: str, db_corridor: str, comments: str) -> bool:
+    room_ventilation_properties = models.RoomVentilationProperties(RoomId = room_id,
+                                                                        AirPerPerson=air_per_person,
+                                                                        AirEmission=air_emission,
+                                                                        AirProcess=air_process,
+                                                                        AirMinimum=air_minimum,
+                                                                        AirSupply = 0.0,
+                                                                        AirExtract= 0.0,
+                                                                        VentilationPrinciple=ventilation_principle,
+                                                                        HeatExchange=heat_exchange,
+                                                                        RoomControl=room_control,
+                                                                        Notes=notes,
+                                                                        DbTechnical=db_technical,
+                                                                        DbNeighbour=db_neighbour,
+                                                                        DbCorridor=db_corridor,
+                                                                        Comments=comments)
+    try:
+        db.session.add(room_ventilation_properties)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"new vent prop room: {e}")
+        db.session.rollback()
+        return False
+    
 @login_required
 def get_room_vent_prop(vent_prop_id: int) -> models.RoomVentilationProperties:
     vent_prop = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.id == vent_prop_id).first()

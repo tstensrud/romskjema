@@ -31,6 +31,41 @@ def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
         return False
 
 @login_required
+def new_room_heating_props(project_heating_settings_id: int, room_id: int) -> bool:
+    val = 0.1
+    new_room = models.RoomHeatingProperties(RoomId=room_id,
+                                            ProjectHeatingSettings=project_heating_settings_id,
+                                            OuterWallArea = val,
+                                            RoomHeight=val,
+                                            WindowDoorArea=val,
+                                            InnerWallArea=val,
+                                            RoofArea=val,
+                                            FloorGroundArea=val,
+                                            FloorAirArea=val,
+                                            RoomVolume=val,
+                                            HeatLossColdBridge=val,
+                                            HeatLossTransmission=val,
+                                            HeatLossInfiltration=val,
+                                            HeatLossVentilation=val,
+                                            HeatLossSum=val,
+                                            ChosenHeating=val,
+                                            HeatSource="",
+                                            Comment="")
+    try:
+        db.session.add(new_room)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"new room heating props: {e}")
+        db.session.rollback()
+        return False
+
+@login_required
+def get_heating_settings_all_buildings(project_id: int):
+    heating_settings = db.session.query(models.BuildingHeatingSettings).join(models.Projects).filter(models.BuildingHeatingSettings.ProjectId == project_id).all()
+    return heating_settings
+
+@login_required
 def get_building_heating_settings(building_id: int) -> models.BuildingHeatingSettings:
     settings = db.session.query(models.BuildingHeatingSettings).join(models.Buildings).filter(models.Buildings.id == building_id).first()
     return settings

@@ -96,7 +96,7 @@ class BuildingHeatingSettings(db.Model):
     __tablename__ = "BuildingHeatingSettings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ProjectId = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False)
-    BuildingID = db.Column(db.Integer, db.ForeignKey('Buildings.id', ondelete="SET NULL"), nullable=False)
+    BuildingID = db.Column(db.Integer, db.ForeignKey('Buildings.id', ondelete="SET NULL"), nullable=False, unique=True)
     InsideTemp = db.Column(db.Float)
     VentTemp = db.Column(db.Float)
     Infiltration = db.Column(db.Float)
@@ -115,9 +115,10 @@ class RoomHeatingProperties(db.Model):
     __tablename__ = "RoomHeatingProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
-    ProjectHeatingSettings = db.Column(db.Integer, db.ForeignKey('BuildingHeatingSettings.id', ondelete="SET NULL"), nullable=False, unique=True)
+    ProjectHeatingSettings = db.Column(db.Integer, db.ForeignKey('BuildingHeatingSettings.id', ondelete="SET NULL"), nullable=False)
     OuterWallArea = db.Column(db.Float)
     RoomHeight = db.Column(db.Float)
+    WindowDoorArea = db.Column(db.Float)
     InnerWallArea = db.Column(db.Float)
     RoofArea = db.Column(db.Float)
     FloorGroundArea = db.Column(db.Float)

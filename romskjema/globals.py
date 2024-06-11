@@ -2,6 +2,7 @@ from flask import session
 from flask_login import login_required
 from . import models
 import re
+from datetime import datetime
 
 def pattern_float(input):
     pattern = r"\d+(\.\d+)?"
@@ -36,4 +37,4 @@ def get_project():
 
 def log(entry):
     with open(f"log.txt", "a") as file:
-        file.writelines(f"{entry}\n")
+        file.writelines(f"{datetime.now()}: {entry}\n")

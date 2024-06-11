@@ -4,3 +4,7 @@ set up heating settings building: (sqlite3.OperationalError) table BuildingHeati
 [SQL: INSERT INTO "BuildingHeatingSettings" ("ProjectId", "BuildingID", "InsideTemp", "VentTemp", "Infiltration", "UvalueOuterWall", "UvalueWindowDoor", "UvalueFloorGround", "UvalueFloorAir", "UvalueRoof", "ColdBridge", "YearMidTemp", "TempFloorAir", "Safety") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
 [parameters: (1, 4, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10)]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-06-11 21:31:46.386369: new room heating props: (sqlite3.IntegrityError) UNIQUE constraint failed: RoomHeatingProperties.ProjectHeatingSettings
+[SQL: INSERT INTO "RoomHeatingProperties" ("RoomId", "ProjectHeatingSettings", "OuterWallArea", "RoomHeight", "InnerWallArea", "RoofArea", "FloorGroundArea", "FloorAirArea", "RoomVolume", "HeatLossColdBridge", "HeatLossTransmission", "HeatLossInfiltration", "HeatLossVentilation", "HeatLossSum", "ChosenHeating", "HeatSource", "Comment") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (4, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, '', '')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
