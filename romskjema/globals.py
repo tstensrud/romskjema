@@ -3,6 +3,12 @@ from flask_login import login_required
 from . import models
 import re
 from datetime import datetime
+    
+@login_required
+def get_project():
+    project_id = session.get('project_id')
+    project = models.Projects.query.get(project_id)
+    return project
 
 def pattern_float(input):
     pattern = r"\d+(\.\d+)?"
@@ -28,12 +34,7 @@ def replace_and_convert_to_float(input: str):
         return float_value
     except ValueError:
         return False
-    
-@login_required
-def get_project():
-    project_id = session.get('project_id')
-    project = models.Projects.query.get(project_id)
-    return project
+
 
 def log(entry):
     with open(f"log.txt", "a") as file:

@@ -17,9 +17,9 @@
     <div class="ventilation-system-sorting-container">
       <div class="building-selector-container">
         <form id="project_building" method="POST">
-          <select name="project_building" onchange="showBuildings()">
+          <select name="project_building" id="building_select" onchange="showBuildings()">
             {% if building %}
-              <option value="none">{{building.BuildingName}}</option>
+              <option value="{{building.id}}">{{building.BuildingName}}</option>
             {% else %}
               <option value="none">- Velg bygg -</option>
             {% endif %}
@@ -34,39 +34,44 @@
     </div>
     <div class="ventilation-system-sorting-container">
       <div class="heating-settings">
-        Innetempertaur (C&#176;) <br> <input placeholder="{{heating.InsideTemp}}" class="input-heating" value="{{heating.InsideTemp}}">
+        <form name="building_heating_settings" id="building_heating_settings">
+          <input name="id" id="id" value="{{heating.id}}" hidden>
+        Innetempertaur (C&#176;) <br> <input name="inside_temp" id="inside_temp" placeholder="20" class="input-heating" value="{{heating.InsideTemp}}">
         <br>
-        DUT (C&#176;) <br><input placeholder="-20" class="input-heating" value="{{heating.VentTemp}}">
+        DUT (C&#176;) <br><input name="dut" id="dut" placeholder="-22" class="input-heating" value="{{heating.Dut}}">
         <br>
-        Temp ventilasjon (C&#176;) <br> <input placeholder="21" class="input-heating" value="{{heating.VentTemp}}">
+        Temp ventilasjon (C&#176;) <br> <input name="vent_temp" id="vent_temp" placeholder="21" class="input-heating" value="{{heating.VentTemp}}">
       </div>
       <div class="heating-settings">
-        Luftveksling infilt. (1/h) <br> <input placeholder="0,15" class="input-heating" value="{{heating.Infiltration}}">
+        Luftveksling infilt. (1/h) <br> <input name="infiltration" id="infiltration" placeholder="0,15" class="input-heating" value="{{heating.Infiltration}}">
         <br>
-        U-verdi yttervegg (W/m<sup>2</sup>K)<br><input placeholder="0,22" class="input-heating" value="{{heating.UvalueOuterWall}}">
+        U-verdi yttervegg (W/m<sup>2</sup>K)<br><input name="u_outer" id="u_outer" placeholder="0,22" class="input-heating" value="{{heating.UvalueOuterWall}}">
         <br>
-        U-verdi vindu/dør (W/m<sup>2</sup>K)<br> <input placeholder="0,1,2" class="input-heating" value="{{heating.UvalueWindowDoor}}">
+        U-verdi vindu/dør (W/m<sup>2</sup>K)<br> <input name="u_window_door" id="u_window_door" placeholder="0,1,2" class="input-heating" value="{{heating.UvalueWindowDoor}}">
       </div>
       <div class="heating-settings">
-        U-verdi gulv grunn (W/m<sup>2</sup>K)<br> <input placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorGround}}">
+        U-verdi gulv grunn (W/m<sup>2</sup>K)<br> <input name="u_floor_ground" id="u_floor_ground" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorGround}}">
         <br>
-        U-verdi gulv luft (W/m<sup>2</sup>K) <br><input placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorAir}}">
+        U-verdi gulv luft (W/m<sup>2</sup>K) <br><input name="u_floor_air" id="u_floor_air" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorAir}}">
         <br>
-        U-verdi tak (W/m<sup>2</sup>K) <br> <input placeholder="0,18" class="input-heating" value="{{heating.UvalueRoof}}">
+        U-verdi tak (W/m<sup>2</sup>K) <br> <input name="u_roof" id="u_roof" placeholder="0,18" class="input-heating" value="{{heating.UvalueRoof}}">
       </div>
       <div class="heating-settings">
-        Kuldebroveri (W/m<sup>2</sup>K) <br> <input placeholder="0,06" class="input-heating" value="{{heating.ColdBridge}}">
+        Kuldebroveri (W/m<sup>2</sup>K) <br> <input name="cold_bridge" id="cold_bridge" placeholder="0,06" class="input-heating" value="{{heating.ColdBridge}}">
         <br>
-        Årsmiddeltemp. (C&#176;)<br><input placeholder="5" class="input-heating" value="{{heating.YearMidTemp}}">
+        Årsmiddeltemp. (C&#176;)<br><input name="year_mid_temp" id="year_mid_temp" placeholder="5" class="input-heating" value="{{heating.YearMidTemp}}">
         <br>
-        Temp gulv mot luft (C&#176;)<br> <input placeholder="-20" class="input-heating" value="{{heating.TempFloorAir}}">
+        Temp gulv mot luft (C&#176;)<br> <input name="temp_floor_air" id="temp_floor_air" placeholder="-20" class="input-heating" value="{{heating.TempFloorAir}}">
       </div>
       <div class="heating-settings">
-        Tillegg (%)<br> <input placeholder="10" class="input-heating" value="{{heating.Safety}}">
+        Tillegg (%)<br> <input name="safety" id="safety" placeholder="10" class="input-heating" value="{{heating.Safety}}">
         <br>
         <p>
-          <form method="POST" action="{{ url_for('heating.update_building_settings')}}">
-          <button class="table-button">Oppdater</button>
+          {% if building %}
+          <button class="table-button" type="submit">Oppdater</button>
+          {% else %}
+          <button class="table-button" disabled>Oppdater</button>
+          {% endif %}
           </form>
         </p>
         
@@ -97,11 +102,15 @@
         </th>
 
         <th class="table-cell">
-            Yttervegger m<sup>2</sup>
+          Høyde
         </th>
 
         <th class="table-cell">
-            Innervegger m<sup>2</sup>
+            Yttervegg m<sup>2</sup>
+        </th>
+
+        <th class="table-cell">
+            Innervegg m<sup>2</sup>
         </th>
 
         <th class="table-cell">
@@ -121,23 +130,24 @@
         </th>
 
         <th class="table-cell">
-            Luftmengde m<sup>3</sup>/h
+            Vent. m<sup>3</sup>/h
         </th>
 
         <th class="table-cell">
-            Totalt varmetap W
+          &#8721; varmetap
         </th>
 
-        <th class="table-cell">
-            Varmetap W
-        </th>
-
-        <th class="table-cell">
-            Varmekilde
-        </th>
         <th class="table-cell">
           Valgt varme
-      </th>
+        </th>
+
+        <th class="table-cell">
+          Varme/m2
+        </th>
+
+        <th class="table-cell">
+          Varmekilde
+        </th>
         <th class="table-cell table-cell-long">
             Kommentarer
         </th>
@@ -147,7 +157,7 @@
 </div>
 
 <div class="table-container">
-  <table id="roomsTableVentilation" class="table-wrapper tableView">
+  <table id="heatingTable" class="table-wrapper tableView">
     <tbody>
       {% for room in rooms %}
       <tr class="table-row">
@@ -166,38 +176,41 @@
         <td class="table-cell">
           {{room.RoomName}}
         </td>
-        <td class="table-cell">
-          {{room.heating_properties.OuterWallArea}}
+        <td class="table-cell" data-column="room_height">
+          {{room.heating_properties.RoomHeight}} m
+        </td>
+        <td class="table-cell" data-column="outer_wall_area">
+          {{room.heating_properties.OuterWallArea}} m<sup>2</sup>
+        </td>
+        <td class="table-cell" data-column="inner_wall_area">
+          {{room.heating_properties.InnerWallArea}} m<sup>2</sup>
+        </td>
+        <td class="table-cell" data-column="window_door_area">
+          {{room.heating_properties.WindowDoorArea}} m<sup>2</sup>
+        </td>
+        <td class="table-cell" data-column="roof_area">
+          {{room.heating_properties.RoofArea}} m<sup>2</sup>
+        </td>
+        <td class="table-cell" data-column="floor_ground_area">         
+          {{room.heating_properties.FloorGroundArea}} m<sup>2</sup>
+        </td>
+        <td class="table-cell" data-column="floor_air_area">
+          {{room.heating_properties.FloorAirArea}} m<sup>2</sup>
         </td>
         <td class="table-cell">
-          {{room.heating_properties.InnerWallArea}}
+          {{room.ventilation_properties.AirSupply}} m3/h
         </td>
         <td class="table-cell">
-          {{room.heating_properties.WindowDoorArea}}
+          {{room.heating_properties.HeatLossSum}} W
+        </td>
+        <td class="table-cell" data-column="chosen_heating">
+          {{room.heating_properties.ChosenHeating}} W
         </td>
         <td class="table-cell">
-          {{room.heating_properties.FloorGroundArea}}
+          W/m<sup>2</sup>
         </td>
-        <td class="table-cell">
-          {{room.heating_properties.FloorAirArea}}
-        </td>
-        <td class="table-cell">
-          Luftmengde
-        </td>
-        <td class="table-cell" data-column="supply_air">
-          {{room.heating_properties.HeatLossSum}}
-        </td>
-        <td class="table-cell" data-column="extract_air">
+        <td class="table-cell" data-column="heat_source">
           {{room.heating_properties.HeatSource}}
-        </td>
-        <td class="table-cell">
-          {{room.heating_properties.ChosenHeating}}
-        </td>
-        <td class="table-cell" data-column="system_id">         
-          {{room.heating_properties.HeatSource}}
-        </td>
-        <td class="table-cell" data-column="system_id">         
-          100W
         </td>
         <td class="table-cell table-cell-long" data-column="comment">
           {{room.heating_properties.Comment}}
@@ -206,8 +219,8 @@
       {% endfor %}  
     </tbody>
   </table>
+
+
 </div>
-
-
 <script src="{{ url_for('heating.static', filename='heating_table.js') }}"></script>
 {% endblock %}

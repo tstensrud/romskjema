@@ -232,6 +232,7 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
     try:
         db.session.commit()
         update_system_airflows(vent_properties_room.SystemId)
+        dboh.calculate_total_heat_loss_for_room(room.heating_properties.id)
         return True
     
     except Exception as e:

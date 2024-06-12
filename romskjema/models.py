@@ -108,14 +108,17 @@ class BuildingHeatingSettings(db.Model):
     ColdBridge = db.Column(db.Float)
     YearMidTemp = db.Column(db.Float)
     TempFloorAir = db.Column(db.Float)
+    Dut = db.Column(db.Float)
     Safety = db.Column(db.Integer)
+
+    room_heating = db.relationship('RoomHeatingProperties', backref='building_heating_settings', lazy=True)
 
 
 class RoomHeatingProperties(db.Model):
     __tablename__ = "RoomHeatingProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
-    ProjectHeatingSettings = db.Column(db.Integer, db.ForeignKey('BuildingHeatingSettings.id', ondelete="SET NULL"), nullable=False)
+    BuildingHeatingSettings = db.Column(db.Integer, db.ForeignKey('BuildingHeatingSettings.id', ondelete="SET NULL"), nullable=False)
     OuterWallArea = db.Column(db.Float)
     RoomHeight = db.Column(db.Float)
     WindowDoorArea = db.Column(db.Float)

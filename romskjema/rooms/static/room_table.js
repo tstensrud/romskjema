@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const input = document.createElement("input");
       input.type = "text";
       input.value = originalText;
-      input.classList.add("form-control");
+      input.classList.add("table-input");
       this.innerHTML = "";
       this.appendChild(input);
       input.focus();
@@ -86,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
 
-        // Send AJAX request to update the database
         fetch('/rooms/update_room', {
           method: 'POST',
           headers: {

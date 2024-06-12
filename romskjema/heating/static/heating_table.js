@@ -1,9 +1,10 @@
-/* Edit table in room list - ventilation */
+/* Edit heating table */
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("heatingTable");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,5,6,7,8,9,10,11,14,15]
-  
+    const lockedCells = [0,1,2,3,4,12,13,15]
+    const buildingId = document.getElementById('building_select').value;
+
     for (let cell of cells) {
       cell.addEventListener("click", function() {
         if (lockedCells.includes(this.cellIndex)) return;
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const input = document.createElement("input");
         input.type = "text";
         input.value = originalText;
-        input.classList.add("form-control");
+        input.classList.add("table-input");
         this.innerHTML = "";
         this.appendChild(input);
         input.focus();
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
           for (let cell of cells) {
             const columnName = cell.getAttribute("data-column");
             const hiddenColumnName = cell.getAttribute("hidden-data-column")
-            
+            rowData["building_id"] = buildingId
             if (columnName) {
               rowData[columnName] = cell.innerText;
             }
@@ -41,11 +42,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if (hiddenColumnName) {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
-            rowData["system_update"] = false
           }
   
           // Send AJAX request to update the database
-          fetch('/ventilation/update_ventilation', {
+          fetch('/heating/update_room_info', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -76,59 +76,65 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  /* Updating the ventilation system */
-
-  document.addEventListener('DOMContentLoaded', (event) => {
-    let currentSystemId = 0;
-    document.querySelectorAll('select').forEach((selectElement) => {
-      selectElement.addEventListener('click', () => {
-        currentSystemId = selectElement.value;
-        console.log(currentSystemId);
-      });
   
-      selectElement.addEventListener('change', async () => {
-        await autoSubmitSystemForm(selectElement, currentSystemId);
-      });
-    });
-  });
-  
-  async function autoSubmitSystemForm(selectElement, currentSystemId) {
-    const row = selectElement.closest('tr');
-    const row_id = row.cells[0].innerText;
-    const system_id = selectElement.value;
-  
-    if (system_id != "none") {
-      try {
-        const response = await fetch('/heating/update_heating', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            system_update: true,
-            old_system_id: currentSystemId,
-            row_id: row_id,
-            system_id: system_id
-          })
-        });
-  
-        if (!response.ok) {
-          const errorDetail = await response.text(); // Get detailed error message from response
-          console.error(`Network response was not ok: ${response.status} ${response.statusText}. Details: ${errorDetail}`);
-          throw new Error('Network response was not ok');
-        }
-  
-        const result = await response.json();
-        console.log('Success:', result);
-        window.location.reload();
-      } catch (error) {
-        console.error('Error:', error.message);
-        window.location.reload();
-      }
-    }
-  }
 
   /* Auto submit on the building selector */
   function showBuildings() {
     document.getElementById("project_building").submit();
 }
+
+/* Update building heating settings */
+
+document.getElementById('building_heating_settings').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const buildingId = document.getElementById('building_select').value;
+  const form = event.target;
+
+  if (!form) {
+    console.error('Form not found!');
+    return;
+  }
+
+  const formData = {};
+
+  Array.from(form.elements).forEach(element => {
+    if (element.name) {
+      formData[element.name] = element.value;
+    }
+  });
+  formData["building_id"] = buildingId;
+
+
+  const url = '/heating/building_heating_settings';
+  //console.log('Form Data:', formData);
+  //console.log('Fetch URL:', url);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => {
+    //console.log('Fetch response:', response);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok: ' + response.statusText);
+    }
+
+    return response.json();
+  })
+  .then(data => {
+    console.log('Response data:', data);
+
+    if (data.success) {
+      window.location.href = data.redirect;
+    } else {
+      console.error('Update failed:', data);
+    }
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+});

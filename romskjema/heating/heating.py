@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from .. import models, db
 from .. import db_operations as dbo
 from .. import db_ops_heating as dboh
-from ..globals import get_project, pattern_float, pattern_int
+from ..globals import get_project, pattern_float, pattern_int, replace_and_convert_to_float
 from markupsafe import escape
 
 heating_bp = Blueprint('heating', __name__, static_folder="static", template_folder="templates")
@@ -40,7 +40,55 @@ def heating(building):
         requested_building_id = escape(request.form.get("project_building"))
         return redirect(url_for("heating.heating", building=requested_building_id))
     
-@heating_bp.route('/update_building_settings', methods=['POST'])
+@heating_bp.route('/building_heating_settings', methods=['POST'])
 @login_required
-def update_building_settings():
-    return redirect(url_for('heating.heating'))
+def building_heating_settings():
+    if request.is_json:
+        data = request.get_json()
+        building_id = escape(data["building_id"])
+        processed_data = {}
+        # Replace ,-s to .-s and convert values to float
+        for key, value in data.items():
+            if key == "building_id":
+                processed_data[key] = value
+            else:
+                processed_data[key] = replace_and_convert_to_float(escape(value))
+        
+        if dboh.update_building_heating_settings(processed_data):
+            
+            rooms_in_building = dboh.get_all_rooms_heating_building(building_id)
+            for room in rooms_in_building:
+                dboh.calculate_total_heat_loss_for_room(room.id)
+            flash(f"Oppdatert innstillinger for bygg {building_id}", category="success")
+            response = {"success": True, "redirect": url_for("heating.heating", building=building_id)}
+        else:
+            flash("Kunne ikke oppdatere bygningsdata")
+            response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+            return jsonify(response)
+    return jsonify(response)
+
+@heating_bp.route('/update_room_info', methods=['GET', 'POST'])
+@login_required
+def update_room_info():
+    if request.is_json:
+        data = request.get_json()
+        building_id = escape(data["building_id"])
+        processed_data = {}
+        for key, value in data.items():
+            if key == "heat_source" or key == "comment":
+                processed_data[key] = escape(value)
+            else:
+                value_cleaned_up = escape(value.replace(",", "."))
+                processed_data[key] = pattern_float(value_cleaned_up)
+        if dboh.update_room_heating_data(escape(data["vent_data_id"]), processed_data):
+            if dboh.calculate_total_heat_loss_for_room(data["vent_data_id"]):
+                flash("Data oppdatert", category="success")
+                response = {"success": True, "redirect": url_for("heating.heating", building=building_id)}
+            else:
+                flash("Kunne ikke beregne varmetap", category="error")
+                response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+                return jsonify(response)
+        else:
+            flash("kunne ikke oppdatere varmedaga", category="error")
+            response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+    return jsonify(response)
