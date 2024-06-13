@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
 from flask_login import login_required, current_user
-from .. import models, db
 from .. import db_operations as dbo
 from .. import db_ops_heating as dboh
 from ..globals import get_project, pattern_float, pattern_int, replace_and_convert_to_float
@@ -15,17 +14,23 @@ heating_bp = Blueprint('heating', __name__, static_folder="static", template_fol
 def heating(building):
     project = get_project()
     buildings = dbo.get_all_project_buildings(project.id)
-        
     if request.method == "GET":
         if building is None:
+            heat_loss_project = []
+            heat_loss_project.append(dboh.sum_heat_loss_project(project.id))
+            heat_loss_project.append(dboh.sum_heat_loss_project_chosen(project.id))
             return render_template('heating.html',
                                 user=current_user,
                                 project=project,
                                 heating=None,
                                 project_buildings=buildings,
-                                building=None)
+                                building=None,
+                                summary=heat_loss_project)
         else:
             building = dbo.get_building(building)
+            heatloss_sum = []
+            heatloss_sum.append(dboh.sum_heat_loss_building(building.id))
+            heatloss_sum.append(dboh.sum_heat_loss_chosen_building(building.id))
             heatprops = dboh.get_building_heating_settings(building.id)
             rooms = building.rooms
             return render_template('heating.html',
@@ -33,8 +38,9 @@ def heating(building):
                     project=project,
                     heating=heatprops,
                     project_buildings=buildings,
-                    building = building,
-                    rooms = rooms)
+                    building=building,
+                    rooms = rooms,
+                    heatloss=heatloss_sum)
         
     if request.method == "POST":
         requested_building_id = escape(request.form.get("project_building"))
@@ -47,6 +53,7 @@ def building_heating_settings():
         data = request.get_json()
         building_id = escape(data["building_id"])
         processed_data = {}
+
         # Replace ,-s to .-s and convert values to float
         for key, value in data.items():
             if key == "building_id":
@@ -55,7 +62,6 @@ def building_heating_settings():
                 processed_data[key] = replace_and_convert_to_float(escape(value))
         
         if dboh.update_building_heating_settings(processed_data):
-            
             rooms_in_building = dboh.get_all_rooms_heating_building(building_id)
             for room in rooms_in_building:
                 dboh.calculate_total_heat_loss_for_room(room.id)

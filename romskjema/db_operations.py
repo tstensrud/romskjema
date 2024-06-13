@@ -109,6 +109,16 @@ def delete_room(room_id: int) -> bool:
             globals.log(f"delete_room() first try/except block: {e}")
             return False
     
+    heating_properties = db.session.query(models.RoomHeatingProperties).filter(models.RoomHeatingProperties.RoomId == room_id).first()
+    if heating_properties:
+        try:
+            db.session.delete(heating_properties)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            globals.log(f"Feil sletting av rom heating properties {e}")
+            return False
+    
     room = db.session.query(models.Rooms).filter(models.Rooms.id == room_id).first()
     if room:
         try:
@@ -219,6 +229,7 @@ def update_ventilation_calculations(room_id: int) -> bool:
 
 @login_required
 def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
+    print(f"System id for update ventilation table: {system}")
     vent_properties_room = get_room_vent_prop(vent_prop_id)
     room = vent_properties_room.room_ventilation
     vent_properties_room.AirSupply = new_supply
@@ -228,18 +239,17 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
         vent_properties_room.System = system
     if comment is not None:
         vent_properties_room.Comments = comment
-    
     try:
         db.session.commit()
-        update_system_airflows(vent_properties_room.SystemId)
-        dboh.calculate_total_heat_loss_for_room(room.heating_properties.id)
+        if system is not None:
+            update_system_airflows(vent_properties_room.SystemId)
+            dboh.calculate_total_heat_loss_for_room(room.heating_properties.id)
         return True
-    
     except Exception as e:
         db.session.rollback()
         globals.log(f"update_ventilation_table: {e}")
         return False
-        
+    
 
 @login_required
 def set_system_for_room_vent_prop(room_vent_prop_id: int, system_id: int) -> bool:
@@ -314,7 +324,12 @@ def new_ventilation_system(project_id: int, system_number: str, placement: str, 
 
 @login_required
 def delete_system(system_id: int) -> bool:
+    rooms = db.session.query(models.RoomVentilationProperties).join(models.VentilationSystems).filter(models.VentilationSystems.id==system_id).all()
     db.session.query(models.VentilationSystems).filter(models.VentilationSystems.id == system_id).delete()
+    
+    print(rooms)
+    for room in rooms:
+        room.SystemId = None
     try:
         db.session.commit()
         return True
@@ -359,8 +374,11 @@ def summarize_system_extract(system_id) -> float:
 @login_required
 def update_system_airflows(system_id: int) -> bool:
     system = get_system(system_id)
-    system.AirFlowSupply = summarize_system_supply(system_id)
-    system.AirFlowExtract = summarize_system_extract(system_id)
+    if system:
+        system.AirFlowSupply = summarize_system_supply(system_id)
+        system.AirFlowExtract = summarize_system_extract(system_id)
+    else:
+        print("no system found")
     try:
         db.session.commit()
         return True

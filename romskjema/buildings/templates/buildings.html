@@ -17,15 +17,6 @@
         </form>
     </p>
     <!-- End new room form -->
-    <p>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            {{message}}
-          {% endfor %}
-        {% endif %}
-    {% endwith %}
-    </p>
     {% if not project_buildings %}
         <p class="p-description">Ingen bygg lagt inn for {{ project.ProjectName }}</p>
     {%else %}

@@ -3,17 +3,15 @@
 {% block header %}Ventilasjon{% endblock %}
 
 
-{%block page_subtitle %}Luftmengdetabell{% endblock %}
+{%block page_subtitle %}
+Luftmengdetabell 
+{% if building%}
+  - {{building.BuildingName}} 
+{% else %}
+  alle bygg
+{% endif %}
+{% endblock %}
 {%block content %}
-    <p>
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            {{message}}
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-    </p>
     <div class="ventilation-system-sorting-container">
       <div class="building-selector-container">
         <form id="project_building" method="POST">
@@ -53,15 +51,7 @@
         </th>
 
         <th class="table-cell">
-            m3/pers
-        </th>
-
-        <th class="table-cell">
             Personer summert
-        </th>
-
-        <th class="table-cell">
-            Emisjon
         </th>
 
         <th class="table-cell">
@@ -89,7 +79,7 @@
         </th>
 
         <th class="table-cell">
-            Valgt
+            m<sup>3</sup>/m<sup>2</sup>
         </th>
 
         <th class="table-cell">
@@ -118,44 +108,42 @@
           {{data.room_ventilation.Floor}}
         </td>
         <td class="table-cell table-cell-medium">
-          {{data.room_ventilation.RoomNumber}}
+          {% if building %}
+          <a href="{{ url_for('ventilation.ventilation', building_id=building.id, room_id=data.room_ventilation.id)}}">{{data.room_ventilation.RoomNumber}} </a> 
+          {% else %}
+          {{data.room_ventilation.RoomNumber}} 
+          {% endif %}
         </td>
         <td class="table-cell">
           {{data.room_ventilation.RoomName}}
         </td>
         <td class="table-cell">
-          {{data.AirPerPerson}} m3
+          {{data.AirPersonSum}} m<sup>3</sup>/h
         </td>
         <td class="table-cell">
-          {{data.AirPersonSum}} m3/h
+          {{data.AirEmissionSum}} m<sup>3</sup>/h
         </td>
         <td class="table-cell">
-          {{data.AirEmission}} m3/m2
+            {{data.AirProcess}} m<sup>3</sup>/h
         </td>
         <td class="table-cell">
-          {{data.AirEmissionSum}} m3/h
+          {{data.AirMinimum}} m<sup>3</sup>/h
         </td>
         <td class="table-cell">
-            {{data.AirProcess}} m3/h
-        </td>
-        <td class="table-cell">
-          {{data.AirMinimum}} m3/h
-        </td>
-        <td class="table-cell">
-            {{data.AirDemand}} m3/h
+            {{data.AirDemand}} m<sup>3</sup>/h
         </td>
         <td class="table-cell supplyCell" data-column="supply_air">
-            {{data.AirSupply}} m3/h
+            {{data.AirSupply}} m<sup>3</sup>/h
         </td>
         <td class="table-cell extractCell" data-column="extract_air">
-            {{data.AirExtract}} m3/h
+            {{data.AirExtract}} m<sup>3</sup>/h
         </td>
         <td class="table-cell">
-            {{data.AirChosen}} m3/m2
+            {{data.AirChosen}} m<sup>3</sup>/m<sup>2</sup>
         </td>
         <td class="table-cell" data-column="system_id">         
-          <form id="system" method="POST">
-            
+          
+          <form id="system" method="POST">  
             <select class="table-select" name="system_id" id="system_id">
               {% if not data.room.SystemName %}
                 <option value="none">- System -</option>
@@ -168,12 +156,17 @@
                   <option value="{{system.id}}">{{system.SystemName}}</option>
                 {% endif %}
               {% endfor %}
-              
             </select>
           </form>
+
         </td>
         <td class="table-cell table-cell-long" data-column="comment">
-            {{data.Comments}}
+            {% if data.AirSupply < data.AirDemand %}
+              Tilluft under krav. 
+            {% endif %}
+            {% if data.AirSupply != data.AirExtract %}
+              Ubalanse i rom. 
+            {% endif %}
         </td>
       </tr>
       {% endfor %}

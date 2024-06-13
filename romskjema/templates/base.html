@@ -8,10 +8,33 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/form.css">
     <link rel="stylesheet" href="/static/css/tables.css">
+    <link rel="stylesheet" href="/static/css/flash_popup.css">
     <!-- https://package.elm-lang.org/packages/1602/elm-feather/1.0.0/FeatherIcons#crosshair -->
 
 </head>
 <body>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+      <script>
+        window.onload = function() {
+          showError()
+        }
+      </script>
+        {% for message in messages %}
+            {% if category == 'error' %}
+            <div id="errorPopup" class="popup">
+                <div class="popup-content">
+                <span class="close" onclick="closeError()">&times;</span>
+                    <p>
+                    {{message}}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
 <div class="app-container">
         <!-- SIDE BAR MENU-->
@@ -122,7 +145,6 @@
         <div class="app-content-header">
             <h1 class="app-content-headerText">
               <p>  
-                    
                     {% if user.is_authenticated %}
                         {% if project %}
                             {{project.ProjectName}}
@@ -150,6 +172,6 @@
 <!-- END SITE CONTENT -->
     </div>
 <!-- scripts -->
-
+<script src="{{ url_for('static', filename='js/flash_popup.js') }}"></script>
 </body>
 </html>

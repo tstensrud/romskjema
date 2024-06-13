@@ -12,15 +12,6 @@
         <button type="submit" class="form-button">Opprett</button>
     </form>
 </p>
-<p>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-        {{message}}
-      {% endfor %}
-    {% endif %}
-{% endwith %}
-</p>
 
 <script src="{{ url_for('specifications.static', filename='spec_table.js') }}"></script>
 {% endblock %}

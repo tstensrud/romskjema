@@ -3,17 +3,10 @@
 {% block header %}Ventilasjon{% endblock %}
 
 
-{%block page_subtitle %}Varmetapsberegninger{% endblock %}
+{%block page_subtitle %}Varmetapsberegninger - {{building.BuildingName}}{% endblock %}
 {%block content %}
-    <p>
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            {{message}}
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-    </p>
+
+
     <div class="ventilation-system-sorting-container">
       <div class="building-selector-container">
         <form id="project_building" method="POST">
@@ -30,48 +23,83 @@
             {% endfor %}
           </select>
         </form>
+          {% if heatloss %}
+          <p>
+            NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
+          </p>
+          <table>
+            <tr class="table-row">
+              <td class="room-data-cell">{{building.BuildingName}} oppsummert</td>
+            </tr>
+            <tr  class="table-row">
+              <td class="room-data-cell">Beregnet varmetap</td>
+              <td class="room-data-cell">{{heatloss[0]}} W</td>
+            </tr>
+            <tr  class="table-row">
+              <td class="room-data-cell">Prosjektert varme</td>
+              <td class="room-data-cell">
+                
+                <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{heatloss[1]}} W</span>
+                
+              </td>
+            </tr>
+            </table>
+            {% else %}
+            <table>
+              <tr class="table-row">
+                <td class="room-data-cell">Varmetap oppsummert</td>
+              </tr>
+              <tr  class="table-row">
+                <td class="room-data-cell">Beregnet varmetap</td>
+                <td class="room-data-cell"> {{ (summary[0] / 1000) | round(2)}} kW</td>
+              </tr>
+              <tr  class="table-row">
+                <td class="room-data-cell">Prosjektert varme</td>
+                <td class="room-data-cell">
+                  <span {% if summary[1] < summary[0] %}class="extract-text"{% endif %}>{{ (summary[1] / 1000) | round(2)}} kW</span>
+                </td>
+              </tr>
+              </table>
+            {% endif %}
+          
       </div>
     </div>
     <div class="ventilation-system-sorting-container">
       <div class="heating-settings">
         <form name="building_heating_settings" id="building_heating_settings">
           <input name="id" id="id" value="{{heating.id}}" hidden>
-        Innetempertaur (C&#176;) <br> <input name="inside_temp" id="inside_temp" placeholder="20" class="input-heating" value="{{heating.InsideTemp}}">
+        Innetempertaur (C&#176;) <br> <input name="inside_temp" id="inside_temp" placeholder="20" class="input-heating" value="{{heating.InsideTemp}}" {% if not building %} disabled {% endif %}>
         <br>
-        DUT (C&#176;) <br><input name="dut" id="dut" placeholder="-22" class="input-heating" value="{{heating.Dut}}">
+        DUT (C&#176;) <br><input name="dut" id="dut" placeholder="-22" class="input-heating" value="{{heating.Dut}}"{% if not building %} disabled {% endif %}>
         <br>
-        Temp ventilasjon (C&#176;) <br> <input name="vent_temp" id="vent_temp" placeholder="21" class="input-heating" value="{{heating.VentTemp}}">
+        Temp ventilasjon (C&#176;) <br> <input name="vent_temp" id="vent_temp" placeholder="21" class="input-heating" value="{{heating.VentTemp}}"{% if not building %} disabled {% endif %}>
       </div>
       <div class="heating-settings">
-        Luftveksling infilt. (1/h) <br> <input name="infiltration" id="infiltration" placeholder="0,15" class="input-heating" value="{{heating.Infiltration}}">
+        Luftveksling infilt. (1/h) <br> <input name="infiltration" id="infiltration" placeholder="0,15" class="input-heating" value="{{heating.Infiltration}}"{% if not building %} disabled {% endif %}>
         <br>
-        U-verdi yttervegg (W/m<sup>2</sup>K)<br><input name="u_outer" id="u_outer" placeholder="0,22" class="input-heating" value="{{heating.UvalueOuterWall}}">
+        U-verdi yttervegg (W/m<sup>2</sup>K)<br><input name="u_outer" id="u_outer" placeholder="0,22" class="input-heating" value="{{heating.UvalueOuterWall}}"{% if not building %} disabled {% endif %}>
         <br>
-        U-verdi vindu/dør (W/m<sup>2</sup>K)<br> <input name="u_window_door" id="u_window_door" placeholder="0,1,2" class="input-heating" value="{{heating.UvalueWindowDoor}}">
+        U-verdi vindu/dør (W/m<sup>2</sup>K)<br> <input name="u_window_door" id="u_window_door" placeholder="0,2" class="input-heating" value="{{heating.UvalueWindowDoor}}"{% if not building %} disabled {% endif %}>
       </div>
       <div class="heating-settings">
-        U-verdi gulv grunn (W/m<sup>2</sup>K)<br> <input name="u_floor_ground" id="u_floor_ground" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorGround}}">
+        U-verdi gulv grunn (W/m<sup>2</sup>K)<br> <input name="u_floor_ground" id="u_floor_ground" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorGround}}"{% if not building %} disabled {% endif %}>
         <br>
-        U-verdi gulv luft (W/m<sup>2</sup>K) <br><input name="u_floor_air" id="u_floor_air" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorAir}}">
+        U-verdi gulv luft (W/m<sup>2</sup>K) <br><input name="u_floor_air" id="u_floor_air" placeholder="0,18" class="input-heating" value="{{heating.UvalueFloorAir}}"{% if not building %} disabled {% endif %}>
         <br>
-        U-verdi tak (W/m<sup>2</sup>K) <br> <input name="u_roof" id="u_roof" placeholder="0,18" class="input-heating" value="{{heating.UvalueRoof}}">
+        U-verdi tak (W/m<sup>2</sup>K) <br> <input name="u_roof" id="u_roof" placeholder="0,18" class="input-heating" value="{{heating.UvalueRoof}}"{% if not building %} disabled {% endif %}>
       </div>
       <div class="heating-settings">
-        Kuldebroveri (W/m<sup>2</sup>K) <br> <input name="cold_bridge" id="cold_bridge" placeholder="0,06" class="input-heating" value="{{heating.ColdBridge}}">
+        Kuldebroveri (W/m<sup>2</sup>K) <br> <input name="cold_bridge" id="cold_bridge" placeholder="0,06" class="input-heating" value="{{heating.ColdBridge}}"{% if not building %} disabled {% endif %}>
         <br>
-        Årsmiddeltemp. (C&#176;)<br><input name="year_mid_temp" id="year_mid_temp" placeholder="5" class="input-heating" value="{{heating.YearMidTemp}}">
+        Årsmiddeltemp. (C&#176;)<br><input name="year_mid_temp" id="year_mid_temp" placeholder="5" class="input-heating" value="{{heating.YearMidTemp}}"{% if not building %} disabled {% endif %}>
         <br>
-        Temp gulv mot luft (C&#176;)<br> <input name="temp_floor_air" id="temp_floor_air" placeholder="-20" class="input-heating" value="{{heating.TempFloorAir}}">
+        Temp gulv mot luft (C&#176;)<br> <input name="temp_floor_air" id="temp_floor_air" placeholder="-20" class="input-heating" value="{{heating.TempFloorAir}}"{% if not building %} disabled {% endif %}>
       </div>
       <div class="heating-settings">
-        Tillegg (%)<br> <input name="safety" id="safety" placeholder="10" class="input-heating" value="{{heating.Safety}}">
+        Tillegg (%)<br> <input name="safety" id="safety" placeholder="10" class="input-heating" value="{{heating.Safety}}"{% if not building %} disabled {% endif %}>
         <br>
         <p>
-          {% if building %}
-          <button class="table-button" type="submit">Oppdater</button>
-          {% else %}
-          <button class="table-button" disabled>Oppdater</button>
-          {% endif %}
+          <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
           </form>
         </p>
         
@@ -207,13 +235,19 @@
           {{room.heating_properties.ChosenHeating}} W
         </td>
         <td class="table-cell">
-          W/m<sup>2</sup>
+          {% if room.heating_properties.ChosenHeating != 0 %}
+          {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}W/m<sup>2</sup>
+          {% else %}
+          0 W/m<sup>2</sup>
+          {% endif %}
         </td>
         <td class="table-cell" data-column="heat_source">
           {{room.heating_properties.HeatSource}}
         </td>
         <td class="table-cell table-cell-long" data-column="comment">
-          {{room.heating_properties.Comment}}
+          {% if room.heating_properties.ChosenHeating < room.heating_properties.HeatLossSum %}
+          Valgt varme under krav. 
+          {% endif %}
         </td>
       </tr>
       {% endfor %}  

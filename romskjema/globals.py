@@ -38,4 +38,4 @@ def replace_and_convert_to_float(input: str):
 
 def log(entry):
     with open(f"log.txt", "a") as file:
-        file.writelines(f"{datetime.now()}: {entry}\n")
+        file.writelines(f"- {datetime.now()}: {entry}\n\n")

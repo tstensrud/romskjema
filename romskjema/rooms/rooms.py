@@ -63,13 +63,14 @@ def rooms():
                                    vent_props.room_control, vent_props.notes, vent_props.db_technical,
                                    vent_props.db_neighbour, vent_props.db_corridor, vent_props.comments):
                 dbo.initial_ventilation_calculations(new_room_id)
-
+                building_heating_settings = dboh.get_building_heating_settings(building_id)
+                
                 # Create row for room heating props
-                if dboh.new_room_heating_props(project.buildings.heating_properties.id, new_room_id):
+                if dboh.new_room_heating_props(building_heating_settings.id, new_room_id):
                     flash("Rom opprettet", category="success")
                     return redirect(url_for("rooms.rooms"))
                 else:
-                    flash("Feil ved oppretting av rom", category="error")
+                    flash("Feil ved oppretting av rom heating props", category="error")
                     return redirect(url_for("rooms.rooms"))
         
     elif request.method == "GET":
@@ -98,7 +99,7 @@ def udpate_room():
         
         comments = escape(data["comments"].strip())
         
-        print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
+        #print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
         
         if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
             if dbo.update_ventilation_calculations(room_id):

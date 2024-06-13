@@ -2,7 +2,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("roomsTableVentilation");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,5,6,7,8,9,10,11,14,15]
+    const systemId = document.getElementById("system_id").value;
+    const lockedCells = [0,1,2,3,4,5,6,7,8,9,12,13,14]
   
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const input = document.createElement("input");
         input.type = "text";
         input.value = originalText;
-        input.classList.add("table-input");
+        input.classList.add("table-input-ventilation");
         this.innerHTML = "";
         this.appendChild(input);
         input.focus();
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (hiddenColumnName) {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
+            rowData["system_id"] = systemId;
             rowData["system_update"] = false
           }
   

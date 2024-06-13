@@ -113,3 +113,18 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   });
+
+  /* Input check on airflow */
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('system');
+    var inputFieldArea = document.getElementById('airflow');
+
+    form.addEventListener('submit', function(event) {
+        var inputValueArea = inputFieldArea.value;
+
+        if (isNaN(inputValueArea) || !Number.isInteger(parseFloat(inputValueArea))) {
+            alert('Luftmengde kan kun inneholde tall.');
+            event.preventDefault();
+        }
+    });
+});

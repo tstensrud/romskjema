@@ -9,20 +9,11 @@
     {% if system %}
     Systeminformasjon {{system}}
     {% else %}
-    <p>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              {% for message in messages %}
-                {{message}}
-              {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </p>
     <!-- New system form -->
     <div class="split-container-left">
       <p>
         Legg til system <br>
-          <form class="custom-form profile-form" method="POST" role="form">
+          <form class="custom-form profile-form" id="system" method="POST" role="form">
               Systemnummer <br>
               <input type="text" name="system_number" id="system_number" placeholder="Systemnummer" tabindex="1" required>
               <br>
@@ -65,7 +56,7 @@
               <th class="table-cell table-cell-long">
                 Plassering
               </th>   
-              <th class="table-cell table-cell-very-long">
+              <th class="table-cell table-cell-long">
                 Betjeningsområde
               </th>
               <th class="table-cell ">
@@ -80,8 +71,10 @@
               <th class="table-cell ">
                 Avtrekk
               </th>
-              <th class="table-cell">
+              <th class="table-cell table-cell-long">
                 Spesialsystem
+              </th>
+              <th class="table-cell table-cell-very-long">
               </th>
               <th class="table-cell ">
               </th>
@@ -105,7 +98,7 @@
               <td class="table-cell table-cell-long" data-column="system_location">
                 {{system.Location}}
               </td>
-              <td class="table-cell table-cell-very-long" data-column="service_area">
+              <td class="table-cell table-cell-long" data-column="service_area">
                 {{system.ServiceArea}}
               </td>
               <td class="table-cell" data-column="airflow">
@@ -120,8 +113,15 @@
               <td class="table-cell">
                 {{system.AirFlowExtract}} m3/h
               </td>
-              <td class="table-cell">
+              <td class="table-cell table-cell-long">
                 {{system.SpecialSystem}}
+              </td>
+              <td class="table-cell table-cell-very-long">
+                {% if system.AirFlowSupply != None %}
+                  {% if system.AirFlowSupply > system.AirFlow %}
+                    Prosjektert m3 > aggregat 
+                  {% endif %}
+                {% endif %}
               </td>
               <td id="delete" class="table-cell">
                 <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>

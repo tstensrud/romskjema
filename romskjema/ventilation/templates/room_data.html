@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - romliste{% endblock %}
+{% block header %}Ventilasjon{% endblock %}
+
+
+{%block page_subtitle %}Romdata - {{room_data.RoomNumber}} {{room_data.RoomName}} {% endblock %}
+{%block content %}
+    <!-- End new room form -->
+<p>
+  <table>
+    <tr class="table-row">
+      <td class="room-data-cell">Romdata</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Bygg</td>
+      <td class="room-data-cell">{{room_data.building.BuildingName}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Areal</td>
+      <td class="room-data-cell">{{room_data.Area}} m<sup>2</sup></td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Personbelastning</td>
+      <td class="room-data-cell">{{room_data.RoomPopulation}} stk.
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Kommentar</td>
+      <td class="room-data-cell">{{room_data.Comments}}
+    </tr>
+  </table>
+</p>
+
+<p>
+  <table>
+    <tr class="table-row">
+      <td class="room-data-cell">Ventilasjon oppsummert</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Tilknyttet system</td>
+      <td class="room-data-cell">{{system.SystemName}} </td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Beregnet luftmengde</td>
+      <td class="room-data-cell">{{ventilation_data.AirDemand}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Valgt tilluft</td>
+      <td class="room-data-cell">{{ventilation_data.AirSupply}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Valgt avtrekk</td>
+      <td class="room-data-cell">{{ventilation_data.AirExtract}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Summert personbelastning</td>
+      <td class="room-data-cell">{{ventilation_data.AirPersonSum}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Summert emisjonsbelastning</td>
+      <td class="room-data-cell">{{ventilation_data.AirEmissionSum}} m<sup>3</sup>/h</td>
+    </tr>
+  </table>
+</p>
+
+<p>
+  <table>
+    <tr class="table-row">
+      <td class="room-data-cell">Ventilasjonsgrunnlag</td>
+    </tr>
+    <tr class="table-row">
+      <td class="room-data-cell">Luft per person</td>
+      <td class="room-data-cell">{{ventilation_data.AirPerPerson}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Emisjon</td>
+      <td class="room-data-cell">{{ventilation_data.AirEmission}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Prosess</td>
+      <td class="room-data-cell">{{ventilation_data.AirProcess}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Minimum luftmengde</td>
+      <td class="room-data-cell">{{ventilation_data.AirMinimum}} m<sup>3</sup>/h</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Ventilassjonsprinsipp</td>
+      <td class="room-data-cell">{{ventilation_data.VentilationPrinciple}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Varmeveksler</td>
+      <td class="room-data-cell">{{ventilation_data.HeatExchange}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Styring</td>
+      <td class="room-data-cell">{{ventilation_data.RoomControl}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Presiseringer</td>
+      <td class="room-data-cell">{{ventilation_data.notes}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">dB teknisk</td>
+      <td class="room-data-cell">{{ventilation_data.DbTechnical}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">dB naborom</td>
+      <td class="room-data-cell">{{ventilation_data.DbNeighbour}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">dB korridor</td>
+      <td class="room-data-cell">{{ventilation_data.DbCorridor}}</td>
+    </tr>
+    <tr  class="table-row">
+      <td class="room-data-cell">Kommentarer</td>
+      <td class="room-data-cell">{{ventilation_data.Comments}}</td>
+    </tr>
+  </table>
+</p>
+{% endblock %}

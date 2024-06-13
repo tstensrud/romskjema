@@ -9,18 +9,18 @@ from . import globals
 def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
     building_settings = models.BuildingHeatingSettings(ProjectId = project_id,
                                                        BuildingID = building_id,
-                                                       InsideTemp = 1.0,
-                                                       VentTemp = 1.0,
-                                                       Infiltration = 1.0,
-                                                       UvalueOuterWall = 1.0,
-                                                       UvalueWindowDoor = 1.0,
-                                                       UvalueFloorGround = 1.0,
-                                                       UvalueFloorAir = 1.0,
-                                                       UvalueRoof = 1.0,
-                                                       ColdBridge = 1.0,
-                                                       YearMidTemp = 1.0,
-                                                       TempFloorAir = 1.0,
-                                                       Safety=10,
+                                                       InsideTemp = 20.0,
+                                                       VentTemp = 18.0,
+                                                       Infiltration = 0.15,
+                                                       UvalueOuterWall = 0.22,
+                                                       UvalueWindowDoor = 0.18,
+                                                       UvalueFloorGround = 0.18,
+                                                       UvalueFloorAir = 0.18,
+                                                       UvalueRoof = .018,
+                                                       ColdBridge = 0.06,
+                                                       YearMidTemp = 5.0,
+                                                       TempFloorAir = -22,
+                                                       Safety= 10.0,
                                                        Dut= -22.0)
     try:
         db.session.add(building_settings)
@@ -32,10 +32,10 @@ def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
         return False
 
 @login_required
-def new_room_heating_props(project_heating_settings_id: int, room_id: int) -> bool:
+def new_room_heating_props(building_heating_settings_id: int, room_id: int) -> bool:
     val = 1
     new_room = models.RoomHeatingProperties(RoomId=room_id,
-                                            BuildingHeatingSettings=project_heating_settings_id,
+                                            BuildingHeatingSettings=building_heating_settings_id,
                                             OuterWallArea = val,
                                             RoomHeight=val,
                                             WindowDoorArea=val,
@@ -110,21 +110,6 @@ def update_room_heating_data(heating_room_id: int, data) -> bool:
         globals.log(f"update room heating data: {e}")
         db.session.rollback()
         return False
-    
-
-
-'''
-dT: innetemp - utetemp
-Kuldebro: Normalisert kuldebroverdi * gulvarea * ytterveggareal * dT
-Transmisjon, for hver ytter, inner, gulv, tak og vindu/dør: U-verdi*dT*areal
-Inflitrasjon: dT(inne ute) * romvolum * luftveksling/time
-ventilasjon: 0,35*(luftmengde/areal)*romareal*(innetemp-innblåsttemp)
-
-'''
-
-#                        #
-# Heat loss calculations #
-#                        #
 
 @login_required
 def infiltration_loss(delta_t_inside_outside: float, room_volume: float, air_change_per_hour: float) -> float:
@@ -139,8 +124,6 @@ def ventilation_loss(air_flow_per_area: float, room_area: float, indoor_temp: fl
 @login_required
 def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
     try:
-        db.session.expire_all()
-        db.session.commit()
         room = get_room_heating_data(heating_room_id)
         if not room:
             print(f"No room found for heating_room_id: {heating_room_id}")
@@ -206,3 +189,32 @@ def get_heating_settings_all_buildings(project_id: int):
 def get_building_heating_settings(building_id: int) -> models.BuildingHeatingSettings:
     settings = db.session.query(models.BuildingHeatingSettings).join(models.Buildings).filter(models.Buildings.id == building_id).first()
     return settings
+
+@login_required
+def sum_heat_loss_building(building_id: int) -> float:
+    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
+    return heat_loss
+
+@login_required
+def sum_heat_loss_chosen_building(building_id: int) -> float:
+    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
+    return heat_loss
+
+@login_required
+def sum_heat_loss_project(project_id: int) -> float:
+    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
+    return heat_loss
+
+@login_required
+def sum_heat_loss_project_chosen(project_id: int) -> float:
+    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
+    return heat_loss
+
+'''
+dT: innetemp - utetemp
+Kuldebro: Normalisert kuldebroverdi * gulvarea * ytterveggareal * dT
+Transmisjon, for hver ytter, inner, gulv, tak og vindu/dør: U-verdi*dT*areal
+Inflitrasjon: dT(inne ute) * romvolum * luftveksling/time
+ventilasjon: 0,35*(luftmengde/areal)*romareal*(innetemp-innblåsttemp)
+
+'''

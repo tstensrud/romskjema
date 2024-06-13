@@ -12,15 +12,6 @@
 {% endblock %}
   
 {% block content %}
-<p>
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-      {{message}}
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-</p>
   {% if specification %}
   <p>
   <form method="POST" id ="new_room" action="{{url_for('specifications.new_room')}}">

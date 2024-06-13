@@ -22,10 +22,10 @@ def ventsystems():
         service_area = escape(request.form.get("system_service").strip())
         placement = escape(request.form.get("system_placement").strip())
         system_type = escape(request.form.get("special_system"))
-        if system_type == None:
-            system_type = "Nei"
-        else:
+        if system_type != "None":
             system_type = "Ja"
+        else:
+            system_type = ""
         system_h_ex = escape(request.form.get("heat_exchange").strip())
 
         if dbo.new_ventilation_system(project.id, system_number, placement, service_area, system_h_ex, airflow, system_type):
