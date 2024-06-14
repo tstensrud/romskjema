@@ -11,12 +11,14 @@ specifications_bp = Blueprint('specifications',__name__, static_folder='static',
 @login_required
 def specifications(specification):
     specifications = dbo.get_specifications()
+    endpoint = request.endpoint
     if request.method == "GET":
         if specification is None:
             return render_template("specifications.html",
                             user=current_user,
                             specifications=specifications,
-                            specification=None)
+                            specification=None,
+                            endpoint=endpoint)
         else:
             spec_object = dbo.get_specification_by_name(specification)
             specification_data = dbo.get_specification_room_data(specification)
@@ -24,7 +26,8 @@ def specifications(specification):
                                 user=current_user,
                                 specification=specification,
                                 specification_data=specification_data,
-                                spec_object = spec_object)
+                                spec_object = spec_object,
+                                endpoint=endpoint)
 
 @specifications_bp.route('/new_room', methods=['POST'])
 @login_required
@@ -71,11 +74,15 @@ def new_room():
 @specifications_bp.route('/new_specification', methods=['GET', 'POST'])
 @login_required
 def new_specification():
+    endpoint = request.endpoint
+    print(endpoint)
     if request.method == "GET":
         return render_template('new.html',
                             user=current_user,
                             specifications=specifications,
-                            specification=None)
+                            specification=None,
+                            endpoint=endpoint)
+    
     elif request.method == "POST":
         spec_name = escape(request.form.get("spec_name").strip())
         if dbo.find_specification_name(spec_name):

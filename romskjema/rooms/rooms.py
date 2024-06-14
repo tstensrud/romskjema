@@ -11,6 +11,7 @@ rooms_bp = Blueprint('rooms', __name__, static_folder='static', template_folder=
 @login_required
 def rooms():
     project = get_project()
+    endpoint = request.endpoint
     project_buildings = dbo.get_all_project_buildings(project.id)
     project_rooms = dbo.get_all_project_rooms(project.id)
     project_specification: str = project.Specification
@@ -78,7 +79,8 @@ def rooms():
                             project=project,
                             project_buildings = project_buildings,
                             project_rooms = project_rooms,
-                            project_room_types = project_room_types)
+                            project_room_types = project_room_types,
+                            endpoint=endpoint)
 
 @rooms_bp.route('/update_room', methods=['POST'])
 @login_required

@@ -58,7 +58,7 @@
  /*#1a2238 #9daaf2 #ff6a3d #f4db7d*/
 
  /* Globals */
-:root {
+ :root {
   --app-bg: #1e2d47;
   --sidebar: rgba(21, 30, 47,1);
   --sidebar-main-color: #fff;
@@ -74,16 +74,24 @@
   --filter-reset: #2c394f;
   --filter-shadow: rgba(16, 24, 39, 0.8) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 }
+ 
+
+
 
 .light:root {
   --app-bg: #fff;
   --sidebar: #f3f6fd;
+  --table-border: #1a2131;
+  --table-header: #1a2131;
   --app-content-secondary-color: #f3f6fd;
   --app-content-main-color: #1f1c2e;
   --sidebar-link: #1f1c2e;
   --sidebar-hover-link: rgba(195, 207, 244, 0.5);
   --sidebar-active-link: rgba(195, 207, 244, 1);
   --sidebar-main-color: #1f1c2e;
+  --action-color: #2869ff;
+  --action-color-hover: #6291fd;
+  --filter-reset: #2c394f;
   --filter-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
@@ -209,6 +217,31 @@ body {
 
 /* End side bar */
 
+.mode-switch {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  color: var(--app-content-main-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  
+  .moon {
+    fill: var(--app-content-main-color);
+  }
+}
+.mode-switch:hover {
+  background-color: transparent;
+}
+
+.mode-switch.active .moon {
+  fill: none;
+  
+}
 
 .app-content {
   padding: 16px;
@@ -475,4 +508,20 @@ body {
 }
 .placeholder-text {
   color: var(--sidebar);
+}
+
+.switch-mode-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 200px; 
+  height: 100px;
+  background-color: transparent;
+  padding: 10px; /* Padding inside the div */
+  z-index: 1000; 
+}
+
+a {
+  text-decoration: none;
+  color:#3e7892;
 }

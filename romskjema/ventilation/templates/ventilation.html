@@ -31,8 +31,8 @@ Luftmengdetabell
   <table class="table-wrapper tableView">
     <thead>
       <tr class="table-header">
-        <th class="table-id-cell table-cell-small">
-          id
+        <th class="table-id-celll">
+        
         </th>
         <th class="table-cell table-cell-medium">
           Bygg
@@ -98,8 +98,8 @@ Luftmengdetabell
     <tbody>
       {% for data in ventilation_data %}
       <tr class="table-row">
-        <td class="table-cell table-cell-small" data-column="vent_data_id">
-          {{data.id}}
+        <td class="table-id-cell" hidden-data-column="vent_data_id">
+          <span class="hidden-text">{{data.id}}</span>
         </td>
         <td class="table-cell table-cell-medium">
           {{data.room_ventilation.building.BuildingName}}

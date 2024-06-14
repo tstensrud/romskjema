@@ -47,7 +47,7 @@ Legg til ny bruker
                 </th>
                 
                 <th class="table-cell table-cell-long">
-                    Aktiv konto
+                    Kontostatus
                 </th>
                 <th class="table-cell table-cell-long">
                     Innlogget
@@ -55,7 +55,7 @@ Legg til ny bruker
                 </tr>
             </thead>
         </table>
-  </div>
+    </div>
 
   <div class="table-container">
     <table id="roomsTable" class="table-wrapper">
@@ -75,12 +75,26 @@ Legg til ny bruker
             {{user.admin}}
           </td>
           <td class="table-cell table-cell-long">
-            {{user.is_active}}
+            {% if not user.admin %}
+            <form id="a{{user.id}}" method="POST">
+              <input type="text" name="user_id" value="{{user.id}}" hidden>
+              <select class="table-select" name="status" onchange="changeActiveStatus('a{{user.id}}')">
+                {% if user.is_active %}
+                <option value="active">Aktiv</option>
+                <option value="inactive">Deaktiver</option>
+                {% else %}
+                <option value="inactive">Deaktivert</option>
+                <option value="active">Aktiver</option>
+                {% endif %}
+              </select>
+            </form>
+            {% endif %}
           </td>
           <td class="table-cell table-cell-long">
             {{user.logged_in}}
           </td>
           {% endfor %}
+        </tr>
         </tbody>
       </table>
   </div>
@@ -104,5 +118,10 @@ Legg til ny bruker
         document.addEventListener('DOMContentLoaded', (event) => {
             generateAndPlacePassword();
         });
+  </script>
+  <script>
+  function changeActiveStatus(formId) {
+    document.getElementById(formId).submit();
+  }
   </script>
 {% endblock %}

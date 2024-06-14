@@ -13,6 +13,7 @@ heating_bp = Blueprint('heating', __name__, static_folder="static", template_fol
 @login_required
 def heating(building):
     project = get_project()
+    endpoint = request.endpoint
     buildings = dbo.get_all_project_buildings(project.id)
     if request.method == "GET":
         if building is None:
@@ -25,7 +26,8 @@ def heating(building):
                                 heating=None,
                                 project_buildings=buildings,
                                 building=None,
-                                summary=heat_loss_project)
+                                summary=heat_loss_project,
+                                endpoint=endpoint)
         else:
             building = dbo.get_building(building)
             heatloss_sum = []
@@ -40,7 +42,8 @@ def heating(building):
                     project_buildings=buildings,
                     building=building,
                     rooms = rooms,
-                    heatloss=heatloss_sum)
+                    heatloss=heatloss_sum,
+                    endpoint=endpoint)
         
     if request.method == "POST":
         requested_building_id = escape(request.form.get("project_building"))

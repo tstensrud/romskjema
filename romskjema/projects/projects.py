@@ -10,12 +10,14 @@ projects_bp = Blueprint('projects', __name__, static_folder='static', template_f
 @login_required
 def projects():
     project = get_project()
+    endpoint = request.endpoint
     if project != "none" and project is not None:
         total_area: float = dbo.summarize_project_area(project.id)
         return render_template("home.html", 
                             user=current_user, 
                             project=project, 
-                            total_area = total_area)
+                            total_area = total_area,
+                            endpoint=endpoint)
     else:
         return redirect(url_for("projects.projects_dashboard"))
 
@@ -23,12 +25,15 @@ def projects():
 @login_required
 def settings():
     project = get_project()
+    endpoint = request.endpoint
+    print(endpoint)
     specifications = dbo.get_specifications()
     if request.method == "GET":
         return render_template("settings.html",
                             user = current_user,
                             project = project,
-                            specifications = specifications)
+                            specifications = specifications,
+                            endpoint=endpoint)
     
     elif request.method == "POST":
         new_project_number = request.form.get("project_number").strip()
@@ -62,9 +67,11 @@ def change_project():
 @projects_bp.route('/new_project', methods=['GET', 'POST'])
 @login_required
 def new_project():
+    endpoint = request.endpoint
     if request.method == "GET":
         return render_template("new_project.html",
-                               user=current_user)
+                               user=current_user,
+                               endpoint=endpoint)
     elif request.method == "POST":
         project_name = request.form.get('project_name').strip()
         project_number = request.form.get('project_number').strip()
@@ -91,7 +98,9 @@ def new_project():
 
 @projects_bp.route('/projects_dashboard', methods=['GET', 'POST'])
 @login_required
-def projects_dashboard():    
+def projects_dashboard():
+    endpoint = request.endpoint
+    print(endpoint) 
     if request.method == "POST":
         
         project_id = request.form.get('project_id')
@@ -106,6 +115,7 @@ def projects_dashboard():
         return render_template("projects.html",
                                user=current_user,
                                projects=projects,
-                               project=None)
+                               project=None,
+                               endpoint=endpoint)
 
 

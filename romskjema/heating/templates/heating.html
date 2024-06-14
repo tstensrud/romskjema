@@ -33,13 +33,13 @@
             </tr>
             <tr  class="table-row">
               <td class="room-data-cell">Beregnet varmetap</td>
-              <td class="room-data-cell">{{heatloss[0]}} W</td>
+              <td class="room-data-cell">{{(heatloss[0]) | round(1)}} W</td>
             </tr>
             <tr  class="table-row">
               <td class="room-data-cell">Prosjektert varme</td>
               <td class="room-data-cell">
                 
-                <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{heatloss[1]}} W</span>
+                <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{(heatloss[1]) | round(1)}} W</span>
                 
               </td>
             </tr>
@@ -110,8 +110,8 @@
   <table class="table-wrapper tableView">
     <thead>
       <tr class="table-header">
-        <th class="table-id-cell table-cell-small">
-          id
+        <th class="table-id-cell">
+          
         </th>        
         <th class="table-cell table-cell-small">
           Etasje
@@ -185,8 +185,8 @@
     <tbody>
       {% for room in rooms %}
       <tr class="table-row">
-        <td class="table-cell table-cell-small" data-column="vent_data_id">
-          {{room.id}}
+        <td class="table-id-cell" hidden-data-column="vent_data_id">
+          <span class="hidden-text">{{room.id}}</span>
         </td>
         <td class="table-cell table-cell-small">
           {{room.Floor}}

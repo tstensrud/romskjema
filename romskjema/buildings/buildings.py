@@ -12,6 +12,7 @@ buildings_bp = Blueprint('buildings', __name__, static_folder='static', template
 @login_required
 def buildings():
     project = get_project()
+    endpoint = request.endpoint
    
     if request.method == "GET":
         project_buildings = dbo.get_all_project_buildings(project.id)
@@ -29,7 +30,8 @@ def buildings():
         return render_template("buildings.html", 
                                user=current_user, 
                                project=project, 
-                               project_buildings = ziped_building_data)
+                               project_buildings = ziped_building_data,
+                               endpoint=endpoint)
    
     elif request.method == "POST":
         building_name = escape(request.form.get("building_name").strip())

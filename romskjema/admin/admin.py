@@ -20,31 +20,21 @@ def admin_required(f):
     return decorated_function
 
 @login_required
-def send_user_email(subject: str, body: str, to_email: str) -> None:
+def send_user_email(subject: str, body: str, to_email: str) -> bool:
     from_email = "structortsit@gmail.com"
-    password = "uVgvJarREQ5V7L"
+    password = "blablalba"
 
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-
-    msg = MIMEText(body)
-
-    with smtplib.SMTP_SSL('smtp.gmail.com') as smtp_server:
-        smtp_server.login(from_email, password)
-        smtp_server.sendmail(from_email, to_email, msg.as_string())
+    return True
         
-
-    
-
-
-
 @login_required
 def get_users():
     users = db.session.query(models.User).all()
     return users
 
+@login_required
+def get_user(user_id: int) -> models.User:
+    user = db.session.query(models.User).filter(models.User.id == user_id).first()
+    return user
 
 @login_required
 @admin_required
@@ -56,7 +46,15 @@ def admin():
                             user=current_user,
                             users=users)
     elif request.method == "POST":
-        pass
+        user_id = escape(request.form.get("user_id"))
+        print(user_id)
+        if user_id == "1":
+            return redirect(url_for("admin.admin"))    
+        user = get_user(int(user_id))
+        user.is_active = not user.is_active
+        db.session.commit()
+        return redirect(url_for("admin.admin"))
+
 
 @login_required
 @admin_required
@@ -72,14 +70,14 @@ def new_user():
         flash("Email allerede registrert", category="error")
     else:
         new_user = models.User(email=email, name=name, password=generate_password_hash(password, method='scrypt'))
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-        except Exception as e:
-            flash("Kunne ikke opprette bruker", category="error")
-    subject = "Konto opprettet"
-    body = f"Din nye brukerkonto hos Structor TS IT er opprettet. \n Brukernavn er {email}.\n Passord: {password}"
-    send_user_email(subject, body, email)
-
-
+        subject = "Konto opprettet"
+        body = f"Din nye brukerkonto hos Structor TS IT er opprettet. \n Brukernavn er {email}.\n Passord: {password}"    
+        if send_user_email(subject, body, email):
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+            except Exception as e:
+                flash("Kunne ikke opprette bruker", category="error")
+        else:
+            flash("Kunne ikke opprette epost-forbindelse", category="error")
     return redirect(url_for("admin.admin"))

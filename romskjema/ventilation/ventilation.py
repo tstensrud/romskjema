@@ -12,7 +12,8 @@ ventilation_bp = Blueprint('ventilation', __name__, static_folder='static', temp
 @login_required
 def ventilation(building_id, room_id):
     project = get_project()
-
+    endpoint = request.endpoint
+    print(endpoint)
     if request.method == "POST":
         # Showing specific buildings in the table
         requested_building_id = escape(request.form.get("project_building"))
@@ -31,7 +32,8 @@ def ventilation(building_id, room_id):
                                 project=project,
                                 ventilation_data = ventilation_data,
                                 room_data=room_data,
-                                system=system)
+                                system=system,
+                                endpoint=endpoint)
         # Show all rooms for building
         if building_id is not None and building_id != "showall":
             ventilation_data = dbo.get_ventilation_data_rooms_in_building(project.id, building_id)
@@ -47,7 +49,8 @@ def ventilation(building_id, room_id):
                                ventilation_data = ventilation_data,
                                building=building,
                                project_buildings = project_buildings,
-                               system_names = systems)
+                               system_names = systems,
+                               endpoint=endpoint)
 
 @ventilation_bp.route('/update_ventilation', methods=['POST'])
 @login_required

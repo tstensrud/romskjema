@@ -11,6 +11,8 @@ ventsystems_bp = Blueprint('ventsystems', __name__, static_folder='static', temp
 @ventsystems_bp.route('/', methods=['GET', 'POST'])
 def ventsystems():
     project = get_project()
+    endpoint = request.endpoint
+    print(endpoint)
     
     if request.method == "POST":
         system_number = escape(request.form.get("system_number").strip())
@@ -40,7 +42,8 @@ def ventsystems():
         return render_template("vent_systems.html", 
                                 user=current_user, 
                                 project=project,
-                                systems=systems)
+                                systems=systems,
+                                endpoint=endpoint)
 
 
 @login_required

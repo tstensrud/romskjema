@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   async function autoSubmitSystemForm(selectElement, currentSystemId) {
     const row = selectElement.closest('tr');
-    const row_id = row.cells[0].innerText;
+    const row_id = row.cells[0].querySelector(".hidden-text").textContent;
     const system_id = selectElement.value;
   
     if (system_id != "none") {
