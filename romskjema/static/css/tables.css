@@ -153,4 +153,5 @@
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
+  margin-right: 100px;
 }

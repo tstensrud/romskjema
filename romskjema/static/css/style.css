@@ -386,7 +386,7 @@ body {
   background-color: #2ba972;
 }
 .status.disabled {
-  color: #59719d;
+  color: #ffffff;
   background-color: rgba(89, 113, 157, 0.2);
   max-width: 200px;
 }

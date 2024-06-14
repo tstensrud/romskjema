@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
       input.focus();
 
       const saveData = () => {
-        const newValue = input.value || originalText;
+        const newValue = input.value;
         if (newValue === originalText) {
           this.textContent = originalText;
           return;

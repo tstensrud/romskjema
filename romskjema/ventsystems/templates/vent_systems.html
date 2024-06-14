@@ -74,7 +74,8 @@
               <th class="table-cell table-cell-long">
                 Spesialsystem
               </th>
-              <th class="table-cell table-cell-very-long">
+              <th class="table-cell table-cell-long">
+                Kommentar
               </th>
               <th class="table-cell ">
               </th>
@@ -116,10 +117,12 @@
               <td class="table-cell table-cell-long">
                 {{system.SpecialSystem}}
               </td>
-              <td class="table-cell table-cell-very-long">
+              <td class="table-cell table-cell-long">
                 {% if system.AirFlowSupply != None %}
                   {% if system.AirFlowSupply > system.AirFlow %}
-                    Prosjektert m3 > aggregat 
+                    Prosjektert m3 > aggregat.
+                  {% elif system.AirFlowSupply != system.AirFlowExtract %}
+                    Ubalanse på systemet.
                   {% endif %}
                 {% endif %}
               </td>

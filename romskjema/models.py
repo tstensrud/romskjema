@@ -11,6 +11,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    logged_in = db.Column(db.Boolean, default=False)
+    admin = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
 
 '''
 Project-specific tables

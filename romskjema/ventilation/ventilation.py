@@ -54,12 +54,10 @@ def ventilation(building_id, room_id):
 def update_ventilation():    
     data = request.get_json()
     system_id = escape(data["system_id"])
-    print(f"System ID: {system_id}")
     # If system is updated
     if data["system_update"] == True:
         old_system_id = escape(data["old_system_id"])
         vent_prop_id = escape(data["row_id"])
-        print(f"OLD SYSTEM: {old_system_id}")
         if old_system_id == "none":
             if dbo.set_system_for_room_vent_prop(vent_prop_id, system_id):
                 dbo.update_system_airflows(system_id)

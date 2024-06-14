@@ -38,16 +38,16 @@ def new_room():
     air_minimum = replace_and_convert_to_float(escape(request.form.get("air_minimum")))
     
     if air_per_person is False:
-        flash("Luftmengde per person kan kun inneholde tall")
+        flash("Luftmengde per person kan kun inneholde tall", category="error")
         return redirect(url_for('specifications.specifications', specification=spec))
     elif air_emission is False:
-        flash("Emisjon kan kun inneholde tall")
+        flash("Emisjon kan kun inneholde tall", category="error")
         return redirect(url_for('specifications.specifications', specification=spec))
     elif air_process is False:
-        flash("Prosess kan kun inneholde tall")
+        flash("Prosess kan kun inneholde tall", category="error")
         return redirect(url_for('specifications.specifications', specification=spec))
     elif air_minimum is False:
-        flash("Minimum luftmengde kan kun inneholde tall")
+        flash("Minimum luftmengde kan kun inneholde tall", category="error")
         return redirect(url_for('specifications.specifications', specification=spec))
     
     vent_principle = escape(request.form.get("ventilation_principle"))
@@ -79,7 +79,7 @@ def new_specification():
     elif request.method == "POST":
         spec_name = escape(request.form.get("spec_name").strip())
         if dbo.find_specification_name(spec_name):
-            flash("Spesifikasjon med det navnet finnes allerede")
+            flash("Spesifikasjon med det navnet finnes allerede", category="error")
             return redirect(url_for('specifications.new_specification'))
         else:
             dbo.new_specifitaion(spec_name)

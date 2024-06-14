@@ -126,18 +126,18 @@ def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
     try:
         room = get_room_heating_data(heating_room_id)
         if not room:
-            print(f"No room found for heating_room_id: {heating_room_id}")
+            #print(f"No room found for heating_room_id: {heating_room_id}")
             return False
 
         building = room.building_heating_settings
         if not building:
-            print(f"No building settings found for room with heating_room_id: {heating_room_id}")
+            #print(f"No building settings found for room with heating_room_id: {heating_room_id}")
             return False
         room_data = room.room_heating   
         dt_surfaces_to_air = building.InsideTemp - building.Dut
         dt_floor_ground = building.InsideTemp - building.YearMidTemp
         outer_wall_area = room.OuterWallArea - room.WindowDoorArea
-        print(f"dt_surfaces_to_air: {dt_surfaces_to_air}, dt_floor_ground: {dt_floor_ground}, outer_wall_area: {outer_wall_area}")
+        #print(f"dt_surfaces_to_air: {dt_surfaces_to_air}, dt_floor_ground: {dt_floor_ground}, outer_wall_area: {outer_wall_area}")
         
         transmission_loss_outer_walls = building.UvalueOuterWall * dt_surfaces_to_air * outer_wall_area
         transmission_loss_windows_doors = building.UvalueWindowDoor * dt_surfaces_to_air * room.WindowDoorArea
@@ -146,13 +146,13 @@ def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
         else:
             transmission_loss_floor = building.UvalueFloorAir * dt_floor_ground * room.FloorAirArea
         transmission_loss_roof = building.UvalueRoof * dt_surfaces_to_air * room.RoofArea
-        print(f"Transmission losses calculated: outer_walls={transmission_loss_outer_walls}, windows_doors={transmission_loss_windows_doors}, floor={transmission_loss_floor}, roof={transmission_loss_roof}")
+        #print(f"Transmission losses calculated: outer_walls={transmission_loss_outer_walls}, windows_doors={transmission_loss_windows_doors}, floor={transmission_loss_floor}, roof={transmission_loss_roof}")
         room_cold_bridge_loss = building.ColdBridge * room_data.Area * dt_surfaces_to_air
         room_ventilation_loss = ventilation_loss((room_data.ventilation_properties.AirSupply / room_data.Area), room_data.Area, building.InsideTemp , building.VentTemp)
         room_infiltration_loss = infiltration_loss(dt_surfaces_to_air, (room_data.Area * room.RoomHeight), building.Infiltration)
-        print(f"Cold bridge loss: {room_cold_bridge_loss}, ventilation loss: {room_ventilation_loss}, infiltration loss: {room_infiltration_loss}")
+        #print(f"Cold bridge loss: {room_cold_bridge_loss}, ventilation loss: {room_ventilation_loss}, infiltration loss: {room_infiltration_loss}")
         safety = 1 + ((building.Safety) / 100)
-        print(f"Safety: {building.Safety}")
+        #print(f"Safety: {building.Safety}")
         
         total_heat_loss = safety * (transmission_loss_outer_walls+
                                                     transmission_loss_windows_doors+
@@ -162,7 +162,7 @@ def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
                                                     room_infiltration_loss+
                                                     room_ventilation_loss)
         room.HeatLossSum = round(total_heat_loss,1)
-        print(f"Total heat loss for room {heating_room_id}: {total_heat_loss}")
+        #print(f"Total heat loss for room {heating_room_id}: {total_heat_loss}")
     
         db.session.commit()
         return True

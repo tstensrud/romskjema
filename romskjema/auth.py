@@ -19,6 +19,8 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
+                #user.logged_in = True
+                #db.session.commit()
                 login_user(user, remember=True)
                 return redirect(url_for("projects.projects_dashboard"))
             else:
@@ -41,29 +43,32 @@ def logout():
 '''
 Sign up for testing
 '''
-@auth.route('/sign_up', methods=['GET', 'POST'])
+@auth.route('/initialize', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         email = request.form.get('email')
         name = request.form.get('name')
         password = request.form.get('password')
-        password_confirm = request.form.get('password_re')
 
         user = User.query.filter_by(email=email).first()
         if user:
-            flash("User with email allready exists.", category="error")
-        elif len(email) < 4:
-            flash("Email must be greater than 4 characters", category="error")
-        elif len(name) < 2:
-            flash("Name must be longer than 2 characters")
-        elif password != password_confirm:
-            flash("Passwords does not match")
-        else:
             new_user = User(email=email, name = name, password = generate_password_hash(password, method='scrypt'))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             flash("Account created", category="success")
-    
             return redirect(url_for('projects.projects_dashboard'))
-    return render_template("sign_up.html", user=current_user)
+        
+    if request.method == "GET":
+        email = "admin@admin.com"
+        name = "Administrator"
+        password = "1234"
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            admin_account = User(email=email, name=name, password = generate_password_hash(password, method='scrypt'), logged_in=False, admin=True, is_active=True)
+            db.session.add(admin_account)
+            db.session.commit()
+            login_user(admin_account, remember=True)
+            return redirect(url_for('projects.projects_dashboard'))
+        else:
+            return redirect(url_for('projects.projects_dashboard'))

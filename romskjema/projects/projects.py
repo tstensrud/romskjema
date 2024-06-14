@@ -10,11 +10,14 @@ projects_bp = Blueprint('projects', __name__, static_folder='static', template_f
 @login_required
 def projects():
     project = get_project()
-    total_area: float = dbo.summarize_project_area(project.id)
-    return render_template("home.html", 
-                           user=current_user, 
-                           project=project, 
-                           total_area = total_area)
+    if project != "none" and project is not None:
+        total_area: float = dbo.summarize_project_area(project.id)
+        return render_template("home.html", 
+                            user=current_user, 
+                            project=project, 
+                            total_area = total_area)
+    else:
+        return redirect(url_for("projects.projects_dashboard"))
 
 @projects_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -90,11 +93,13 @@ def new_project():
 @login_required
 def projects_dashboard():    
     if request.method == "POST":
-        # Project selected from /projects drop down
+        
         project_id = request.form.get('project_id')
         if project_id:
             session['project_id'] = project_id
             return redirect(url_for('projects.projects'))
+        else:
+            return redirect(url_for('projects.projects.projects_dashboard'))
         
     elif request.method == "GET":
         projects = dbo.get_all_projects()

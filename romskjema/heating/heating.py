@@ -68,7 +68,7 @@ def building_heating_settings():
             flash(f"Oppdatert innstillinger for bygg {building_id}", category="success")
             response = {"success": True, "redirect": url_for("heating.heating", building=building_id)}
         else:
-            flash("Kunne ikke oppdatere bygningsdata")
+            flash("Kunne ikke oppdatere bygningsdata", category="error")
             response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
             return jsonify(response)
     return jsonify(response)

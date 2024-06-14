@@ -37,7 +37,7 @@ def create_app():
     app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
     app.register_blueprint(heating.heating_bp, url_prefix='/heating')
 
-    app.jinja_env.globals['flash'] = disable_flash
+    #app.jinja_env.globals['flash'] = disable_flash
 
     from .models import User
     create_db(app)
@@ -57,7 +57,7 @@ def create_db(app):
         with app.app_context():
             db.create_all()
 
-def disable_flash(message, category='message'):
-    pass
+#def disable_flash(message, category='message'):
+#    pass
 
     

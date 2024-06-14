@@ -13,28 +13,33 @@
 
 </head>
 <body>
-
-    {% with messages = get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-      <script>
-        window.onload = function() {
-          showError()
-        }
-      </script>
-        {% for message in messages %}
-            {% if category == 'error' %}
-            <div id="errorPopup" class="popup">
-                <div class="popup-content">
-                <span class="close" onclick="closeError()">&times;</span>
-                    <p>
-                    {{message}}
-                    </p>
-                </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="popup" class="popup">
+                <span class="close" onclick="closePopup()">×</span>
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            <p>{{category}}: {{ message }}</p>
+                        {% endif %}
+                {% endfor %}
             </div>
-            {% endif %}
-        {% endfor %}
-      {% endif %}
+        {% endif %}
     {% endwith %}
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const popup = document.getElementById('popup');
+            if (popup) {
+                popup.classList.add('show');
+            }
+        });
+
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            if (popup) {
+                popup.classList.remove('show');
+            }
+        }
+    </script>
 
 <div class="app-container">
         <!-- SIDE BAR MENU-->
@@ -127,10 +132,16 @@
                 </li>
 
                 {% endif %}
-                
+                {% if current_user.admin == True %}
+                <li class="sidebar-list-item">
+                    <a href="{{ url_for('admin.admin') }}">
+                        Admin
+                    </a>
+                </li>
+                {% endif %}
                 <li class="sidebar-list-item">
                     <a href="/logout">
-                        Logg ut &nbsp;&nbsp;&nbsp;
+                        Logg ut
                     </a>
                 </li>
             </ul>
@@ -172,6 +183,5 @@
 <!-- END SITE CONTENT -->
     </div>
 <!-- scripts -->
-<script src="{{ url_for('static', filename='js/flash_popup.js') }}"></script>
 </body>
 </html>
