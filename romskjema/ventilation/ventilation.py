@@ -57,6 +57,7 @@ def ventilation(building_id, room_id):
 def update_ventilation():    
     data = request.get_json()
     system_id = escape(data["system_id"])
+    building_id = escape(data["building_id"])
     # If system is updated
     if data["system_update"] == True:
         old_system_id = escape(data["old_system_id"])
@@ -96,25 +97,26 @@ def update_ventilation():
         new_supply = pattern_float(supply)
         if new_supply is False:
             flash("Tilluft kan kun inneholde tall.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
             return jsonify(response)
         
         extract = escape(data["extract_air"].strip())
         new_extract = pattern_float(extract)
         if new_extract is False:
             flash("Avtrekk kan kun inneholde tall.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
             return jsonify(response)
         
-        comment = escape(data["comment"].strip())
+        #comment = escape(data["comment"].strip())
+        comment = None
 
         if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, system_id, comment):
             if dbo.update_system_airflows(system_id):
                 flash('Data oppdatert', category="success")
-                response = {"success": True, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": True, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
         else:
             flash("Kunne ikke oppdatere verdier.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
             return jsonify(response)
         
     return jsonify(response)

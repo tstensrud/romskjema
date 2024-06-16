@@ -344,7 +344,7 @@ body {
   margin-top: 20px;
   margin-bottom: 20px;
   font-size: 14px;
-  color: #FFFFFF;
+  color: var(--app-content-main-color);
   position: relative;
   background-color: rgba(89, 113, 157, 0.2);
   max-width: 500px;
@@ -377,6 +377,10 @@ body {
 }
 .building-summary-other { grid-area: building-summary-other; }
 .building-summary-other-content { grid-area: building-summary-other-content; }
+
+.building-summary:light {
+  color: black;
+}
 
 .ventilation-system-sorting-container {
   display: flex;
@@ -419,7 +423,7 @@ body {
   background-color: #2ba972;
 }
 .status.disabled {
-  color: #ffffff;
+  color: var(--app-content-main-color);
   background-color: rgba(89, 113, 157, 0.2);
   max-width: 200px;
 }

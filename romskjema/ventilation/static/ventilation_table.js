@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("roomsTableVentilation");
     const cells = table.getElementsByTagName("td");
     const systemId = document.getElementById("system_id").value;
+    const buildingId = document.getElementById("building_id").value;
     const lockedCells = [0,1,2,3,4,5,6,7,8,9,12,13,14]
   
     for (let cell of cells) {
@@ -43,7 +44,10 @@ document.addEventListener("DOMContentLoaded", function() {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
             rowData["system_id"] = systemId;
-            rowData["system_update"] = false
+            rowData["system_update"] = false;
+            if (buildingId !== null) {
+              rowData["building_id"] = buildingId;
+            }
           }
   
           // Send AJAX request to update the database
@@ -97,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const row = selectElement.closest('tr');
     const row_id = row.cells[0].querySelector(".hidden-text").textContent;
     const system_id = selectElement.value;
+    const buildingId = document.getElementById("building_id").value;
   
     if (system_id != "none") {
       try {
@@ -109,7 +114,8 @@ document.addEventListener("DOMContentLoaded", function() {
             system_update: true,
             old_system_id: currentSystemId,
             row_id: row_id,
-            system_id: system_id
+            system_id: system_id,
+            building_id: buildingId
           })
         });
   
