@@ -1,10 +1,11 @@
 /* Edit table in room list - ventilation */
 document.addEventListener("DOMContentLoaded", function() {
+    const projectId = document.getElementById("project_id").value;
     const table = document.getElementById("roomsTableVentilation");
     const cells = table.getElementsByTagName("td");
     const systemId = document.getElementById("system_id").value;
     const buildingId = document.getElementById("building_id").value;
-    const lockedCells = [0,1,2,3,4,5,6,7,8,9,12,13,14]
+    const lockedCells = [0,1,2,3,4,5,6,7,8,9,12,13,14,15]
   
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -48,10 +49,11 @@ document.addEventListener("DOMContentLoaded", function() {
             if (buildingId !== null) {
               rowData["building_id"] = buildingId;
             }
+            rowData["project_id"] = projectId;
           }
   
-          // Send AJAX request to update the database
-          fetch('/ventilation/update_ventilation', {
+          
+          fetch(`/${projectId}/ventilation/update_ventilation`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -82,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
+
   /* Updating the ventilation system */
   document.addEventListener('DOMContentLoaded', (event) => {
     let currentSystemId = 0;
@@ -98,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
   
   async function autoSubmitSystemForm(selectElement, currentSystemId) {
+    const projectId = document.getElementById("project_id").value;
     const row = selectElement.closest('tr');
     const row_id = row.cells[0].querySelector(".hidden-text").textContent;
     const system_id = selectElement.value;
@@ -105,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
     if (system_id != "none") {
       try {
-        const response = await fetch('/ventilation/update_ventilation', {
+        const response = await fetch(`/${projectId}/ventilation/update_ventilation`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -115,7 +119,8 @@ document.addEventListener("DOMContentLoaded", function() {
             old_system_id: currentSystemId,
             row_id: row_id,
             system_id: system_id,
-            building_id: buildingId
+            building_id: buildingId,
+            project_id: projectId
           })
         });
   

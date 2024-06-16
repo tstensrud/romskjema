@@ -62,7 +62,16 @@
                 Gjenvinner
               </th>
               <th class="table-cell">
-                Styring
+                <div class="table-description-dropdown">Styring
+                  <div class="table-description-dropdown-content">
+                    V = VAV <br>
+                    C = CAV <br>
+                    B = Bevegelse <br>
+                    T = Temp <br>
+                    F = Fukt <br>
+                    </div>
+                  </div>  
+                
               </th>
               <th class="table-cell table-cell-long">
                 Presiseringer
@@ -110,14 +119,14 @@
               <td class="table-cell">
                 {{data.ventilation_principle}}
               </td>
-              <td class="table-cell table-cell-medium">
-                  <span class="hover-popup" data-popup="R=Roterende\nB=Batteri\nP=Plate">{{data.heat_exchange}}</span>
+              <td class="table-cell table-cell-medium">  
+                {{data.heat_exchange}}
               </td>
               <td class="table-cell">
-                  <span class="hover-popup" data-popup="V=VAV\nC=CAV\nT=Temp\nB=Bevegelse\nF=Fukt">{{data.room_control}}</span>
+                  {{data.room_control}}
               </td>
               <td class="table-cell table-cell-long">
-                  <span class="notes-popup" data-popup="{{data.notes}}">{{data.notes}}</span>
+                  {{data.notes}}
               </td>
               <td class="table-cell">
                   {{data.db_technical}}
@@ -152,5 +161,5 @@
     </p>
       
   {% endif %}
-<script src="{{ url_for('specifications.static', filename='spec_table.js') }}"></script>
+<script src="{{ url_for('static', filename='js/spec_table.js') }}"></script>
 {% endblock %}

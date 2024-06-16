@@ -9,8 +9,8 @@ rooms_bp = Blueprint('rooms', __name__, static_folder='static', template_folder=
 
 @rooms_bp.route('/', methods=['GET', 'POST'])
 @login_required
-def rooms():
-    project = get_project()
+def rooms(project_id):
+    project = dbo.get_project(project_id)
     endpoint = request.endpoint
     project_buildings = dbo.get_all_project_buildings(project.id)
     project_rooms = dbo.get_all_project_rooms(project.id)
@@ -22,7 +22,7 @@ def rooms():
         
         if not building_id:
             flash("Feil byggnings-ID", category="error")
-            return redirect(url_for("rooms.rooms"))
+            return redirect(url_for("rooms.rooms", project_id = project.id))
         building_id = int(building_id)
         
         room_type_id = escape(request.form.get("room_type"))
@@ -34,21 +34,21 @@ def rooms():
         
         if dbo.check_if_roomnumber_exists(project.id, building_id, room_number):
             flash(f"Romnummer {room_number} finnes allerede for dette bygget", category="error")
-            return redirect(url_for("rooms.rooms"))
+            return redirect(url_for("rooms.rooms", project_id = project.id))
         
         area = escape(request.form.get("room_area").strip())
         try:
             area = float(area)
         except ValueError:
             flash("Areal kan kun inneholde tall", category="error")
-            return redirect(url_for("rooms.rooms"))
+            return redirect(url_for("rooms.rooms", project_id=project_id))
             
         people = escape(request.form.get("room_people").strip())
         try:
             people = int(people)
         except ValueError:
             flash("Personbelastning kan kun inneholde tall", category="error")
-            return redirect(url_for("rooms.rooms"))
+            return redirect(url_for("rooms.rooms", project_id=project_id))
     
         new_room_id = dbo.new_room(building_id, room_type_id, floor, room_number, name, area, people)
 
@@ -68,10 +68,10 @@ def rooms():
                 # Create row for room heating props
                 if dboh.new_room_heating_props(building_heating_settings.id, new_room_id):
                     flash("Rom opprettet", category="success")
-                    return redirect(url_for("rooms.rooms"))
+                    return redirect(url_for("rooms.rooms", project_id = project.id))
                 else:
                     flash("Feil ved oppretting av rom heating props", category="error")
-                    return redirect(url_for("rooms.rooms"))
+                    return redirect(url_for("rooms.rooms", project_id = project.id))
         
     elif request.method == "GET":
         return render_template("rooms.html", 
@@ -80,14 +80,15 @@ def rooms():
                             project_buildings = project_buildings,
                             project_rooms = project_rooms,
                             project_room_types = project_room_types,
-                            endpoint=endpoint)
+                            endpoint=endpoint,
+                            project_id = project_id)
 
 @rooms_bp.route('/update_room', methods=['POST'])
 @login_required
-def udpate_room():
+def udpate_room(project_id):
     if request.method == "POST":
         data = request.get_json()
-
+        project_id = escape(data["project_id"])
         room_id = escape(data["room_id"])
         room_number = escape(data["room_number"].strip())
         room_name = escape(data["room_name"].strip())
@@ -105,7 +106,7 @@ def udpate_room():
         if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
             if dbo.update_ventilation_calculations(room_id):
                 flash(f"Romdata oppdatert for {room_number}", category="success")
-                response = {"success": True, "redirect": url_for("rooms.rooms")}
+                response = {"success": True, "redirect": url_for("rooms.rooms", project_id = project_id)}
         else:
             flash("Kunne ikke oppdatere romdata", category="error")
             response = {"success": False}
@@ -114,14 +115,14 @@ def udpate_room():
 
 @rooms_bp.route('/delete_room', methods=['POST'])
 @login_required
-def delete_room():
+def delete_room(project_id):
     if request.method == "POST":
         data = request.get_json()
         room_id = escape(data["room_id"])
         print(room_id)
         if dbo.delete_room(room_id):
             flash("Rom slettet", category="success")
-            response = {"success": True, "redirect": url_for("rooms.rooms")}
+            response = {"success": True, "redirect": url_for("rooms.rooms", project_id = project_id)}
         else:
             flash("Kunne ikke slette rom", category="error")
             response = {"success": False}

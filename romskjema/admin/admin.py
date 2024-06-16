@@ -20,6 +20,7 @@ def admin_required(f):
     return decorated_function
 
 @login_required
+@admin_required
 def send_user_email(subject: str, body: str, to_email: str) -> bool:
     from_email = "structortsit@gmail.com"
     password = "blablalba"
@@ -27,11 +28,13 @@ def send_user_email(subject: str, body: str, to_email: str) -> bool:
     return True
         
 @login_required
+@admin_required
 def get_users():
     users = db.session.query(models.User).all()
     return users
 
 @login_required
+@admin_required
 def get_user(user_id: int) -> models.User:
     user = db.session.query(models.User).filter(models.User.id == user_id).first()
     return user
@@ -77,7 +80,7 @@ def new_user():
                 db.session.add(new_user)
                 db.session.commit()
             except Exception as e:
-                flash("Kunne ikke opprette bruker", category="error")
+                flash(f"Kunne ikke opprette bruker: {e}", category="error")
         else:
-            flash("Kunne ikke opprette epost-forbindelse", category="error")
+            flash(f"Kunne ikke opprette epost-forbindelse: {e}", category="error")
     return redirect(url_for("admin.admin"))

@@ -4,7 +4,7 @@
 
 {%block page_subtitle %}{{project.ProjectName}}{% endblock %}
 {%block content %}
-    
+    <div class="text-container">
     <h1 class="app-content-Text">Logget inn som {{user.name}}</h1>
     <br>
     <h1 class="app-content-Text">Prosjektnummer</h1>
@@ -26,4 +26,5 @@
     <p class="app-content-Text">
         <form action="{{ url_for('specifications.specifications', specification=project.Specification) }}"><button class="app-content-headerButton" type="submit">{{project.Specification}}</button></form>
     </p>
+</div>
 {% endblock %}

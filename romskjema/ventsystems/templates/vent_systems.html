@@ -11,6 +11,7 @@
     {% else %}
     <!-- New system form -->
     <div class="split-container-left">
+      <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
       <p>
         Legg til system <br>
           <form class="custom-form profile-form" id="system" method="POST" role="form">
@@ -30,8 +31,12 @@
               <input type="text" name="airflow" id="airflow" placeholder="Luftmengde" tabindex="4">
               <br>
               <br>
-              Type gjenvinner <br>
-              <input type="text" name="heat_exchange" id="heat_exchange" placeholder="Roterende/kryss" tabindex="5">
+              <select id="heat_exchange" name="heat_exchange" tabindex="5">
+                <option value="none">- Gjenvinner -</option>
+                <option value="R">Roterende</option>
+                <option value="P">Plate/kryss</option>
+                <option value="B">Batteri</option>
+              </select>
               <br>
               <br>
               <label>Spesialsystem<br>
@@ -63,7 +68,14 @@
                 Viftekapasitet
               </th>
               <th class="table-cell ">
-                Gjenvinner
+                
+                <div class="table-description-dropdown">Gjenvinner
+                  <div class="table-description-dropdown-content">
+                      R: roterende<br>
+                      P: plate/kryss <br>
+                      B: batteri
+                    </div>
+                  </div>
               </th>
               <th class="table-cell ">
                 Tilluft
@@ -138,5 +150,5 @@
 
     <!-- End new system form -->
     {% endif %}
-    <script src="{{ url_for('ventsystems.static', filename='system_table.js') }}"></script>
+    <script src="{{ url_for('static', filename='/js/system_table.js') }}"></script>
 {% endblock %}

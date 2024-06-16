@@ -48,7 +48,6 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
 }
@@ -63,7 +62,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 10px; /* Adjust this value to fit approximately 20 characters */
+  max-width: 10px;
   position: relative;
 }
 
@@ -77,10 +76,12 @@
 
 .table-cell-long {
   max-width: 250px;
+  overflow: hidden;
 }
 
 .table-cell-very-long {
   max-width: 500px;
+  overflow: hidden;
 }
 
 .hidden-text {

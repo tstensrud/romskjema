@@ -11,8 +11,8 @@ heating_bp = Blueprint('heating', __name__, static_folder="static", template_fol
 @heating_bp.route('/', defaults={'building': None}, methods=['GET', 'POST'])
 @heating_bp.route('/<building>', methods=['GET', 'POST'])
 @login_required
-def heating(building):
-    project = get_project()
+def heating(building, project_id):
+    project = dbo.get_project(project_id)
     endpoint = request.endpoint
     buildings = dbo.get_all_project_buildings(project.id)
     if request.method == "GET":
@@ -27,7 +27,8 @@ def heating(building):
                                 project_buildings=buildings,
                                 building=None,
                                 summary=heat_loss_project,
-                                endpoint=endpoint)
+                                endpoint=endpoint,
+                                project_id=project_id)
         else:
             building = dbo.get_building(building)
             heatloss_sum = []
@@ -43,15 +44,16 @@ def heating(building):
                     building=building,
                     rooms = rooms,
                     heatloss=heatloss_sum,
-                    endpoint=endpoint)
+                    endpoint=endpoint,
+                    project_id=project_id)
         
     if request.method == "POST":
         requested_building_id = escape(request.form.get("project_building"))
-        return redirect(url_for("heating.heating", building=requested_building_id))
+        return redirect(url_for("heating.heating", building=requested_building_id, project_id=project_id))
     
 @heating_bp.route('/building_heating_settings', methods=['POST'])
 @login_required
-def building_heating_settings():
+def building_heating_settings(project_id):
     if request.is_json:
         data = request.get_json()
         building_id = escape(data["building_id"])
@@ -69,18 +71,19 @@ def building_heating_settings():
             for room in rooms_in_building:
                 dboh.calculate_total_heat_loss_for_room(room.id)
             flash(f"Oppdatert innstillinger for bygg {building_id}", category="success")
-            response = {"success": True, "redirect": url_for("heating.heating", building=building_id)}
+            response = {"success": True, "redirect": url_for("heating.heating", building=building_id, project_id=project_id)}
         else:
             flash("Kunne ikke oppdatere bygningsdata", category="error")
-            response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+            response = {"success": False, "redirect": url_for("heating.heating", building=building_id, project_id=project_id)}
             return jsonify(response)
     return jsonify(response)
 
 @heating_bp.route('/update_room_info', methods=['GET', 'POST'])
 @login_required
-def update_room_info():
+def update_room_info(project_id):
     if request.is_json:
         data = request.get_json()
+        project_id = escape(data["project_id"])
         building_id = escape(data["building_id"])
         processed_data = {}
         for key, value in data.items():
@@ -92,12 +95,12 @@ def update_room_info():
         if dboh.update_room_heating_data(escape(data["vent_data_id"]), processed_data):
             if dboh.calculate_total_heat_loss_for_room(data["vent_data_id"]):
                 flash("Data oppdatert", category="success")
-                response = {"success": True, "redirect": url_for("heating.heating", building=building_id)}
+                response = {"success": True, "redirect": url_for("heating.heating", building=building_id, project_id=project_id)}
             else:
                 flash("Kunne ikke beregne varmetap", category="error")
-                response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+                response = {"success": False, "redirect": url_for("heating.heating", building=building_id, project_id=project_id)}
                 return jsonify(response)
         else:
             flash("kunne ikke oppdatere varmedaga", category="error")
-            response = {"success": False, "redirect": url_for("heating.heating", building=building_id)}
+            response = {"success": False, "redirect": url_for("heating.heating", building=building_id, project_id=project_id)}
     return jsonify(response)

@@ -1,12 +1,13 @@
 function deleteSystem(event) {
   if (confirm("Vil du slette system? All data assosisert med dette systemet blir slettet")) {
     event.preventDefault();
+    const projectId = document.getElementById("project_id").value;
     const button = event.target;
     const row = button.closest("tr")
     const roomIdCell = row.getElementsByTagName("td")[0]
     const systemId = roomIdCell.querySelector(".hidden-text").textContent;
     
-    fetch('/ventsystems/delete_system', {
+    fetch(`/${projectId}/ventsystems/delete_system`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -38,10 +39,12 @@ function deleteSystem(event) {
   }
 }
 
+/* Update systems table */
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("systemsTableVentilation");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,6,7,8,9,10]
+    const lockedCells = [0,1,5,6,7,8,9,10]
+    const projectId = document.getElementById("project_id").value;
   
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -80,10 +83,12 @@ document.addEventListener("DOMContentLoaded", function() {
             if (hiddenColumnName) {
               rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
             }
+
+            rowData["project_id"] = projectId;
           }
   
           // Send AJAX request to update the database
-          fetch('/ventsystems/update_system', {
+          fetch(`/${projectId}/ventsystems/update_system`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

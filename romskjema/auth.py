@@ -22,7 +22,7 @@ def login():
                 #user.logged_in = True
                 #db.session.commit()
                 login_user(user, remember=True)
-                return redirect(url_for("projects.projects_dashboard"))
+                return redirect(url_for("projects.projects"))
             else:
                 flash("Feil i brukernavn eller passord", category="error")
         else:
@@ -57,7 +57,7 @@ def signup():
             db.session.commit()
             login_user(new_user, remember=True)
             flash("Account created", category="success")
-            return redirect(url_for('projects.projects_dashboard'))
+            return redirect(url_for('projects.projects'))
         
     if request.method == "GET":
         email = "admin@admin.com"
@@ -69,6 +69,6 @@ def signup():
             db.session.add(admin_account)
             db.session.commit()
             login_user(admin_account, remember=True)
-            return redirect(url_for('projects.projects_dashboard'))
+            return redirect(url_for('projects.projects'))
         else:
-            return redirect(url_for('projects.projects_dashboard'))
+            return redirect(url_for('projects.projects'))

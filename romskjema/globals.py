@@ -5,7 +5,7 @@ import re
 from datetime import datetime
     
 @login_required
-def get_project():
+def get_project() -> models.Projects:
     project_id = session.get('project_id')
     project = models.Projects.query.get(project_id)
     return project

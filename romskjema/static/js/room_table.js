@@ -7,14 +7,16 @@ function deleteRoom(event) {
     const row = button.closest("tr")
     const roomIdCell = row.getElementsByTagName("td")[0]
     const roomId = roomIdCell.querySelector(".hidden-text").textContent;
+    const projectId = document.getElementById("project_id").value;
     
-    fetch('/rooms/delete_room', {
+    fetch(`/${projectId}/rooms/delete_room`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         room_id: roomId,
+        project_id: projectId
       })
     })
     .then(response => {
@@ -45,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const table = document.getElementById("roomsTable");
   const cells = table.getElementsByTagName("td");
   const lockedCells = [0,1,2,4,9]
+  const projectId = document.getElementById("project_id").value;
 
   for (let cell of cells) {
     cell.addEventListener("click", function() {
@@ -84,9 +87,10 @@ document.addEventListener("DOMContentLoaded", function() {
           if (hiddenColumnName) {
             rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
           }
+          rowData["project_id"] = projectId;
         }
 
-        fetch('/rooms/update_room', {
+        fetch(`/${projectId}/rooms/update_room`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -118,28 +122,22 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Get the form and input elements
   var form = document.getElementById('new_room');
   var inputFieldArea = document.getElementById('room_area');
   var inputFieldPeople = document.getElementById('room_people');
 
-  // Add submit event listener to the form
   form.addEventListener('submit', function(event) {
-      // Get the value of the input field
       var inputValueArea = inputFieldArea.value;
       var inputValuePeople = inputFieldPeople.value;
 
-      // Check if the input value is an integer
       if (isNaN(inputValueArea) || !Number.isInteger(parseFloat(inputValueArea))) {
-          // If it is an integer, show an alert and prevent form submission
           alert('Areal kan kun inneholde tall');
-          event.preventDefault(); // Prevent form submission
+          event.preventDefault();
       }
 
       if (isNaN(inputValueArea) || !Number.isInteger(parseInt(inputValuePeople))) {
-          // If it is an integer, show an alert and prevent form submission
           alert('Personer kan kun inneholde tall');
-          event.preventDefault(); // Prevent form submission
+          event.preventDefault(); 
       }
   });
 });

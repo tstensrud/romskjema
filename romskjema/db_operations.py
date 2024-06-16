@@ -14,6 +14,11 @@ def get_all_projects():
     return projects
 
 @login_required
+def get_project(project_id: int) -> models.Projects:
+    project = db.session.query(models.Projects).filter(models.Projects.id == project_id).first()
+    return project
+
+@login_required
 def get_all_project_names():
     project_names = []
     projects = models.Projects.query.all()

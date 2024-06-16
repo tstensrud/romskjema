@@ -46,12 +46,12 @@
 
                 {% if project %}
                 <ul class="sidebar-list">
-                    {% if endpoint == "projects.projects" %}
+                    {% if endpoint == "project.project" %}
                     <li class="sidebar-list-item active">
                     {%else %}
                     <li class="sidebar-list-item">
                     {% endif %}
-                    <a href="{{ url_for('projects.projects') }}">
+                    <a href="{{ url_for('project.project', project_id=project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> 
                     <span>Oversikt</span>
                     </a>
@@ -61,7 +61,7 @@
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('buildings.buildings') }}">
+                    <a href="{{ url_for('buildings.buildings', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"></path><polyline points="2.32 6.16 12 11 21.68 6.16"></polyline><line x1="12" y1="22.76" x2="12" y2="11"></line></svg> 
                     <span>Bygg</span>
                     </a>
@@ -71,7 +71,7 @@
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('rooms.rooms') }}">
+                    <a href="{{ url_for('rooms.rooms', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg> 
                     <span>Romliste</span>
                     </a>
@@ -82,7 +82,7 @@
                 {% else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('ventsystems.ventsystems') }}">
+                    <a href="{{ url_for('ventsystems.ventsystems', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg> 
                     <span>Ventilasjonsystemer</span>
                     </a>
@@ -92,7 +92,7 @@
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('ventilation.ventilation') }}">
+                    <a href="{{ url_for('ventilation.ventilation', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6" y2="6"></line><line x1="6" y1="18" x2="6" y2="18"></line></svg> 
                     <span>Luftmengdetabell</span>
                     </a>
@@ -102,7 +102,7 @@
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('heating.heating') }}">
+                    <a href="{{ url_for('heating.heating', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> 
                     <span>Varmeberegninger</span>
                     </a>
@@ -119,19 +119,19 @@
                     <span>Tappevann/SPV</span>
                     </a>
                 </li>
-                {% if endpoint == "projects.settings" %}
+                {% if endpoint == "project.settings" %}
                 <li class="sidebar-list-item active">
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('projects.settings') }}">
+                    <a href="{{ url_for('project.settings', project_id = project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 
                     <span>Prosjektinnstillinger</span>
                     </a>
                 </li>
                 <p class="p-menu-item">
                 <li class="sidebar-list-item">
-                    <a href="{{ url_for('projects.projects_dashboard') }}">
+                    <a href="{{ url_for('projects.projects') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 
                     <span>Prosjekter</span>
                     </a>
@@ -139,14 +139,14 @@
                 </p>
                 {% else %}
                 
-                {% if endpoint == "projects.projects_dashboard" %}
+                {% if endpoint == "projects.projects" %}
                 <li class="sidebar-list-item active">
                 {%else %}
                 <li class="sidebar-list-item">
                 {% endif %}
-                    <a href="{{ url_for('projects.projects_dashboard') }}">
+                    <a href="{{ url_for('projects.projects') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 
-                    <span>Prosjekt dashboard</span>
+                    <span>Prosjekter dashboard</span>
                     </a>
                 </li>
                 {% if endpoint == "projects.new_project" %}

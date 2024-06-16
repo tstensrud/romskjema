@@ -10,6 +10,7 @@
 
     <p>
       <p>Legg til nytt rom</p>
+      <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
       <form id="new_room" method="POST" role="form">
         <select name="room_type" id="room_type">
           <option>- Romtype -</option>
@@ -127,5 +128,5 @@
       </table>
   </div>
   
-  <script src="{{ url_for('rooms.static', filename='room_table.js') }}"></script>
+  <script src="{{ url_for('static', filename='/js/room_table.js') }}"></script>
 {% endblock %}

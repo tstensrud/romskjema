@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const cells = table.getElementsByTagName("td");
     const lockedCells = [0,1,2,3,4,11,12,14,15]
     const buildingId = document.getElementById('building_select').value;
+    const projectId = document.getElementById("project_id").value;
 
     for (let cell of cells) {
       cell.addEventListener("click", function() {
@@ -35,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const columnName = cell.getAttribute("data-column");
             const hiddenColumnName = cell.getAttribute("hidden-data-column")
             rowData["building_id"] = buildingId
+            rowData["project_id"] = projectId;
             if (columnName) {
               rowData[columnName] = cell.innerText;
             }
@@ -45,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
   
           // Send AJAX request to update the database
-          fetch('/heating/update_room_info', {
+          fetch(`/${projectId}/heating/update_room_info`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -89,6 +91,7 @@ document.getElementById('building_heating_settings').addEventListener('submit', 
   event.preventDefault();
   const buildingId = document.getElementById('building_select').value;
   const form = event.target;
+  const projectId = document.getElementById("project_id").value;
 
   if (!form) {
     console.error('Form not found!');
@@ -103,9 +106,10 @@ document.getElementById('building_heating_settings').addEventListener('submit', 
     }
   });
   formData["building_id"] = buildingId;
+  formData["projet_id"] = projectId;
 
 
-  const url = '/heating/building_heating_settings';
+  const url = `/${projectId}/heating/building_heating_settings`;
   //console.log('Form Data:', formData);
   //console.log('Fetch URL:', url);
 
@@ -136,33 +140,5 @@ document.getElementById('building_heating_settings').addEventListener('submit', 
   })
   .catch(error => {
     console.error('Fetch error:', error);
-  });
-});
-
-/* Input check on settings */
-document.addEventListener('DOMContentLoaded', function() {
-  // Get the form and input elements
-  var form = document.getElementById('new_room');
-  var inputFieldArea = document.getElementById('room_area');
-  var inputFieldPeople = document.getElementById('room_people');
-
-  // Add submit event listener to the form
-  form.addEventListener('submit', function(event) {
-      // Get the value of the input field
-      var inputValueArea = inputFieldArea.value;
-      var inputValuePeople = inputFieldPeople.value;
-
-      // Check if the input value is an integer
-      if (isNaN(inputValueArea) || !Number.isInteger(parseFloat(inputValueArea))) {
-          // If it is an integer, show an alert and prevent form submission
-          alert('Areal kan kun inneholde tall');
-          event.preventDefault(); // Prevent form submission
-      }
-
-      if (isNaN(inputValueArea) || !Number.isInteger(parseInt(inputValuePeople))) {
-          // If it is an integer, show an alert and prevent form submission
-          alert('Personer kan kun inneholde tall');
-          event.preventDefault(); // Prevent form submission
-      }
   });
 });

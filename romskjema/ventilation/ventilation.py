@@ -10,17 +10,16 @@ ventilation_bp = Blueprint('ventilation', __name__, static_folder='static', temp
 @ventilation_bp.route('/<building_id>', defaults={'room_id': None}, methods=['GET', 'POST'])
 @ventilation_bp.route('/<building_id>/<room_id>', methods=['GET'])
 @login_required
-def ventilation(building_id, room_id):
-    project = get_project()
+def ventilation(building_id, room_id, project_id):
+    project = dbo.get_project(project_id)
     endpoint = request.endpoint
-    print(endpoint)
     if request.method == "POST":
         # Showing specific buildings in the table
         requested_building_id = escape(request.form.get("project_building"))
         if requested_building_id != "none" and requested_building_id != "showall":
-            return redirect(url_for("ventilation.ventilation", building_id = requested_building_id))
+            return redirect(url_for("ventilation.ventilation", building_id = requested_building_id, project_id=project_id))
         else:
-            return redirect(url_for("ventilation.ventilation", building_id = "showall"))
+            return redirect(url_for("ventilation.ventilation", building_id = "showall", project_id=project_id))
     
     elif request.method == "GET":
         if room_id:
@@ -33,7 +32,8 @@ def ventilation(building_id, room_id):
                                 ventilation_data = ventilation_data,
                                 room_data=room_data,
                                 system=system,
-                                endpoint=endpoint)
+                                endpoint=endpoint,
+                                project_id=project_id)
         # Show all rooms for building
         if building_id is not None and building_id != "showall":
             ventilation_data = dbo.get_ventilation_data_rooms_in_building(project.id, building_id)
@@ -50,14 +50,17 @@ def ventilation(building_id, room_id):
                                building=building,
                                project_buildings = project_buildings,
                                system_names = systems,
-                               endpoint=endpoint)
+                               endpoint=endpoint,
+                               project_id=project_id)
 
 @ventilation_bp.route('/update_ventilation', methods=['POST'])
 @login_required
-def update_ventilation():    
+def update_ventilation(project_id):
     data = request.get_json()
     system_id = escape(data["system_id"])
     building_id = escape(data["building_id"])
+    project_id = escape(data["project_id"])
+    
     # If system is updated
     if data["system_update"] == True:
         old_system_id = escape(data["old_system_id"])
@@ -66,28 +69,28 @@ def update_ventilation():
             if dbo.set_system_for_room_vent_prop(vent_prop_id, system_id):
                 dbo.update_system_airflows(system_id)
                 flash("System satt", category="success")
-                response = {"success": True, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": True, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
             else:
                 flash("System kunne ikke settes", category="error")
-                response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": False, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
             return jsonify(response)
 
         if old_system_id == system_id:
             if dbo.update_system_airflows(system_id):
                 flash("System oppdatert", category="success")
-                response = {"success": True, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": True, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
             else:
                 flash("Kunne ikke oppdatere luftmengde dbo.update_system_airflows", category="error")
-                response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": False, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
                 return jsonify(response)
         else:
             dbo.set_system_for_room_vent_prop(vent_prop_id, system_id)
             if dbo.update_airflow_changed_system(system_id, old_system_id):
                 flash("System oppdatert", category="success")
-                response = {"success": True, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": True, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
             else:
                 flash("Kunne ikke oppdatere luftmengder: update_airflow_changed_system", category="error")
-                response = {"success": False, "redirect": url_for("ventilation.ventilation")}
+                response = {"success": False, "redirect": url_for("ventilation.ventilation", project_id=project_id)}
                 return jsonify(response)
 
     else:       
@@ -97,26 +100,26 @@ def update_ventilation():
         new_supply = pattern_float(supply)
         if new_supply is False:
             flash("Tilluft kan kun inneholde tall.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id, project_id=project_id)}
             return jsonify(response)
         
         extract = escape(data["extract_air"].strip())
         new_extract = pattern_float(extract)
         if new_extract is False:
             flash("Avtrekk kan kun inneholde tall.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id, project_id=project_id)}
             return jsonify(response)
         
-        #comment = escape(data["comment"].strip())
-        comment = None
+        comment = escape(data["comment"].strip())
+        #comment = None
 
         if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, system_id, comment):
             if dbo.update_system_airflows(system_id):
                 flash('Data oppdatert', category="success")
-                response = {"success": True, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
+                response = {"success": True, "redirect": url_for("ventilation.ventilation", building_id = building_id, project_id=project_id)}
         else:
             flash("Kunne ikke oppdatere verdier.", category="error")
-            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id)}
+            response = {"success": False, "redirect": url_for("ventilation.ventilation", building_id = building_id, project_id=project_id)}
             return jsonify(response)
         
     return jsonify(response)

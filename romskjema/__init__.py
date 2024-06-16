@@ -20,22 +20,26 @@ def create_app():
     from .admin import admin
     from .rooms import rooms
     from .ventilation import ventilation
+    from. project import project
     from .projects import projects
     from .ventsystems import ventsystems
     from .buildings import buildings
     from .specifications import specifications
     from .heating import heating
+    
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(admin.admin_bp, url_prefix='/admin')
-    app.register_blueprint(rooms.rooms_bp, url_prefix='/rooms')
-    app.register_blueprint(ventilation.ventilation_bp, url_prefix='/ventilation')
     app.register_blueprint(projects.projects_bp, url_prefix='/projects')
-    app.register_blueprint(ventsystems.ventsystems_bp, url_prefix='/ventsystems')
-    app.register_blueprint(buildings.buildings_bp, url_prefix='/buildings')
     app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
-    app.register_blueprint(heating.heating_bp, url_prefix='/heating')
+
+    app.register_blueprint(rooms.rooms_bp, url_prefix='/<project_id>/rooms')
+    app.register_blueprint(ventilation.ventilation_bp, url_prefix='/<project_id>/ventilation')
+    app.register_blueprint(project.project_bp, url_prefix='/<project_id>/project')
+    app.register_blueprint(ventsystems.ventsystems_bp, url_prefix='/<project_id>/ventsystems')
+    app.register_blueprint(buildings.buildings_bp, url_prefix='/<project_id>/buildings')
+    app.register_blueprint(heating.heating_bp, url_prefix='/<project_id>/heating')
 
     #app.jinja_env.globals['flash'] = disable_flash
 

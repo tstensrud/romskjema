@@ -6,7 +6,7 @@
 {%block page_subtitle %}Varmetapsberegninger - {{building.BuildingName}}{% endblock %}
 {%block content %}
 
-
+<input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
     <div class="ventilation-system-sorting-container">
       <div class="building-selector-container">
         <form id="project_building" method="POST">
@@ -51,13 +51,16 @@
               </tr>
               <tr  class="table-row">
                 <td class="room-data-cell">Beregnet varmetap</td>
+                {% if summary[0] %}
                 <td class="room-data-cell"> {{ (summary[0] / 1000) | round(2)}} kW</td>
+                
               </tr>
               <tr  class="table-row">
                 <td class="room-data-cell">Prosjektert varme</td>
                 <td class="room-data-cell">
                   <span {% if summary[1] < summary[0] %}class="extract-text"{% endif %}>{{ (summary[1] / 1000) | round(2)}} kW</span>
                 </td>
+                {% endif %}
               </tr>
               </table>
             {% endif %}
@@ -183,71 +186,73 @@
 <div class="table-container">
   <table id="heatingTable" class="table-wrapper tableView">
     <tbody>
-      {% for room in rooms %}
-      <tr class="table-row">
-        <td class="table-id-cell" hidden-data-column="vent_data_id">
-          <span class="hidden-text">{{room.id}}</span>
-        </td>
-        <td class="table-cell table-cell-small">
-          {{room.Floor}}
-        </td>
-        <td class="table-cell table-cell-medium">
-          {{room.RoomNumber}}
-        </td>
-        <td class="table-cell">
-          {{room.RoomName}}
-        </td>
-        <td class="table-cell" data-column="room_height">
-          {{room.heating_properties.RoomHeight}} m
-        </td>
-        <td class="table-cell" data-column="outer_wall_area">
-          {{room.heating_properties.OuterWallArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell" data-column="inner_wall_area">
-          {{room.heating_properties.InnerWallArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell" data-column="window_door_area">
-          {{room.heating_properties.WindowDoorArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell" data-column="roof_area">
-          {{room.heating_properties.RoofArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell" data-column="floor_ground_area">         
-          {{room.heating_properties.FloorGroundArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell" data-column="floor_air_area">
-          {{room.heating_properties.FloorAirArea}} m<sup>2</sup>
-        </td>
-        <td class="table-cell">
-          {{room.ventilation_properties.AirSupply}} m3/h
-        </td>
-        <td class="table-cell">
-          {{room.heating_properties.HeatLossSum}} W
-        </td>
-        <td class="table-cell" data-column="chosen_heating">
-          {{room.heating_properties.ChosenHeating}} W
-        </td>
-        <td class="table-cell">
-          {% if room.heating_properties.ChosenHeating != 0 %}
-          {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}W/m<sup>2</sup>
-          {% else %}
-          0 W/m<sup>2</sup>
-          {% endif %}
-        </td>
-        <td class="table-cell" data-column="heat_source">
-          {{room.heating_properties.HeatSource}}
-        </td>
-        <td class="table-cell table-cell-long" data-column="comment">
-          {% if room.heating_properties.ChosenHeating < room.heating_properties.HeatLossSum %}
-          Valgt varme under krav. 
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}  
+      {% if rooms|length >= 1 %}
+        {% for room in rooms %}
+        <tr class="table-row">
+          <td class="table-id-cell" hidden-data-column="vent_data_id">
+            <span class="hidden-text">{{room.id}}</span>
+          </td>
+          <td class="table-cell table-cell-small">
+            {{room.Floor}}
+          </td>
+          <td class="table-cell table-cell-medium">
+            {{room.RoomNumber}}
+          </td>
+          <td class="table-cell">
+            {{room.RoomName}}
+          </td>
+          <td class="table-cell" data-column="room_height">
+            {{room.heating_properties.RoomHeight}} m
+          </td>
+          <td class="table-cell" data-column="outer_wall_area">
+            {{room.heating_properties.OuterWallArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.heating_properties.InnerWallArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell" data-column="window_door_area">
+            {{room.heating_properties.WindowDoorArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell" data-column="roof_area">
+            {{room.heating_properties.RoofArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell" data-column="floor_ground_area">         
+            {{room.heating_properties.FloorGroundArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell" data-column="floor_air_area">
+            {{room.heating_properties.FloorAirArea}} m<sup>2</sup>
+          </td>
+          <td class="table-cell">
+            {{room.ventilation_properties.AirSupply}} m3/h
+          </td>
+          <td class="table-cell">
+            {{room.heating_properties.HeatLossSum}} W
+          </td>
+          <td class="table-cell" data-column="chosen_heating">
+            {{room.heating_properties.ChosenHeating}} W
+          </td>
+          <td class="table-cell">
+            {% if room.heating_properties.ChosenHeating != 0 %}
+            {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}W/m<sup>2</sup>
+            {% else %}
+            0 W/m<sup>2</sup>
+            {% endif %}
+          </td>
+          <td class="table-cell" data-column="heat_source">
+            {{room.heating_properties.HeatSource}}
+          </td>
+          <td class="table-cell table-cell-long" data-column="comment">
+            {% if room.heating_properties.ChosenHeating < room.heating_properties.HeatLossSum %}
+            Valgt varme under krav. 
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}  
+      {% endif %}
     </tbody>
   </table>
 
 
 </div>
-<script src="{{ url_for('heating.static', filename='heating_table.js') }}"></script>
+<script src="{{ url_for('static', filename='/js/heating_table.js') }}"></script>
 {% endblock %}
