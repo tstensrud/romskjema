@@ -25,25 +25,25 @@
         </form>
           {% if heatloss %}
           <p>
-            NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
-          </p>
-          <table>
-            <tr class="table-row">
-              <td class="room-data-cell">{{building.BuildingName}} oppsummert</td>
-            </tr>
-            <tr  class="table-row">
-              <td class="room-data-cell">Beregnet varmetap</td>
-              <td class="room-data-cell">{{(heatloss[0]) | round(1)}} W</td>
-            </tr>
-            <tr  class="table-row">
-              <td class="room-data-cell">Prosjektert varme</td>
-              <td class="room-data-cell">
-                
-                <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{(heatloss[1]) | round(1)}} W</span>
-                
-              </td>
-            </tr>
+            <table>
+              <tr class="table-row">
+                <td class="room-data-cell">{{building.BuildingName}} oppsummert</td>
+              </tr>
+              <tr  class="table-row">
+                <td class="room-data-cell">Beregnet varmetap</td>
+                <td class="room-data-cell">{{(heatloss[0]) | round(1)}} W</td>
+              </tr>
+              <tr  class="table-row">
+                <td class="room-data-cell">Prosjektert varme</td>
+                <td class="room-data-cell">
+                  <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{(heatloss[1]) | round(1)}} W</span>   
+                </td>
+              </tr>
             </table>
+            </p>
+            <p>
+              NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
+            </p>
             {% else %}
             <table>
               <tr class="table-row">
