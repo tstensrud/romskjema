@@ -5,9 +5,12 @@ from flask_login import login_required
 import math
 from . import globals
 
+'''
+Heating
+'''
 @login_required
-def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
-    building_settings = models.BuildingHeatingSettings(ProjectId = project_id,
+def set_up_energy_settings_building(project_id: int, building_id: int) -> bool:
+    building_settings = models.BuildingEnergySettings(ProjectId = project_id,
                                                        BuildingID = building_id,
                                                        InsideTemp = 20.0,
                                                        VentTemp = 18.0,
@@ -21,7 +24,11 @@ def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
                                                        YearMidTemp = 5.0,
                                                        TempFloorAir = -22,
                                                        Safety= 10.0,
-                                                       Dut= -22.0)
+                                                       Dut= -22.0,
+                                                       RoomTempSummer=26.0,
+                                                       InternalLoadPeople=1.0,
+                                                       InternalLoadLight=1.0,
+                                                       VentAirTempSummer=18.0)
     try:
         db.session.add(building_settings)
         db.session.commit()
@@ -32,10 +39,10 @@ def set_up_heating_settings_building(project_id: int, building_id: int) -> bool:
         return False
 
 @login_required
-def new_room_heating_props(building_heating_settings_id: int, room_id: int) -> bool:
+def new_room_heating_props(building_energy_settings_id: int, room_id: int) -> bool:
     val = 1
     new_room = models.RoomHeatingProperties(RoomId=room_id,
-                                            BuildingHeatingSettings=building_heating_settings_id,
+                                            BuildingEnergySettings=building_energy_settings_id,
                                             OuterWallArea = val,
                                             RoomHeight=val,
                                             WindowDoorArea=val,
@@ -64,7 +71,7 @@ def new_room_heating_props(building_heating_settings_id: int, room_id: int) -> b
 @login_required
 def update_building_heating_settings(updated_data) -> bool:
     building_heat_settings_id = updated_data["id"]
-    building_settings = db.session.query(models.BuildingHeatingSettings).filter(models.BuildingHeatingSettings.id == building_heat_settings_id).first()
+    building_settings = db.session.query(models.BuildingEnergySettings).filter(models.BuildingEnergySettings.id == building_heat_settings_id).first()
     building_settings.InsideTemp = updated_data["inside_temp"]
     building_settings.Dut = updated_data["dut"]
     building_settings.VentTemp = updated_data["vent_temp"]
@@ -182,12 +189,12 @@ def get_all_rooms_heating_building(building_id: int) -> list:
 
 @login_required
 def get_heating_settings_all_buildings(project_id: int):
-    heating_settings = db.session.query(models.BuildingHeatingSettings).join(models.Projects).filter(models.BuildingHeatingSettings.ProjectId == project_id).all()
+    heating_settings = db.session.query(models.BuildingEnergySettings).join(models.Projects).filter(models.BuildingEnergySettings.ProjectId == project_id).all()
     return heating_settings
 
 @login_required
-def get_building_heating_settings(building_id: int) -> models.BuildingHeatingSettings:
-    settings = db.session.query(models.BuildingHeatingSettings).join(models.Buildings).filter(models.Buildings.id == building_id).first()
+def get_building_energy_settings(building_id: int) -> models.BuildingEnergySettings:
+    settings = db.session.query(models.BuildingEnergySettings).join(models.Buildings).filter(models.Buildings.id == building_id).first()
     return settings
 
 @login_required
@@ -211,10 +218,75 @@ def sum_heat_loss_project_chosen(project_id: int) -> float:
     return heat_loss
 
 '''
+Cooling
+'''
+
+@login_required
+def new_room_cooling_props(building_energy_settings_id: int, room_id: int) -> bool:
+    new_room = models.RoomCoolingProperties(RoomId=room_id,
+                                            BuildingEnergySettings=building_energy_settings_id,
+                                            SunAdition=100.0,
+                                            SunReduction=0.5)
+    try:
+        db.session.add(new_room)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"new room cooling props: {e}")
+        db.session.rollback()
+        return False
+
+def get_all_rooms_cooling_building(building_id: int):
+    rooms = db.session.query(models.RoomCoolingProperties).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).all()
+    return rooms
+
+def get_room_cooling_data(cooling_room_id: int) -> models.RoomCoolingProperties:
+    room = db.session.query(models.RoomCoolingProperties).filter(models.RoomCoolingProperties.id == cooling_room_id).first()
+    return room
+
+def cooling_calculations(building_id: int, cooling_room_id: int) -> bool:
+    building_settings = get_building_energy_settings(building_id)
+    room = get_room_cooling_data(cooling_room_id)
+    heatload_sun = room.SunAdition * room.SunReduction
+    sum_internal_heat_loads = room.SumInternalHeatloadPeople + room.SumInternalHeatloadLight + room.InternalHeatloadEquipment + heatload_sun
+    cooling_from_vent = 0.35 * room.room_cooling.ventilation_properties.AirSupply * (building_settings.InsideTemp - building_settings.VentAirTempSummer)
+    sum_cooling = cooling_from_vent + room.CoolingEquipment
+
+    room.CoolingSum = sum_cooling
+    room.SumInternalHeatLoad = sum_internal_heat_loads
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"cooling calculatiosn: {e}")
+        db.session.rollback()
+        return False
+
+
+
+
+'''
+
+Varme
 dT: innetemp - utetemp
 Kuldebro: Normalisert kuldebroverdi * gulvarea * ytterveggareal * dT
 Transmisjon, for hver ytter, inner, gulv, tak og vindu/dør: U-verdi*dT*areal
 Inflitrasjon: dT(inne ute) * romvolum * luftveksling/time
 ventilasjon: 0,35*(luftmengde/areal)*romareal*(innetemp-innblåsttemp)
 
+'''
+
+
+'''
+Kjøling
+Varmetilskudd sol: soltilskudd(W/m2K) * solreduksjon (0-1,0)
+Sum varme: personer + lys + sol + ekstrautstyr
+
+kjøletilskudd luft: tilluft*0,35*(temp rom - temp luft)
+sum kjøling: kjøletilskudd luft + lokal kjøling
+
+ekstra luftmengde for å klare kjøling:
+hvis sum internlast > sum kjøletilskudd
+
+(varme-kjøling)/(0,35*(temp inn - temp ute))
 '''

@@ -26,6 +26,7 @@ def create_app():
     from .buildings import buildings
     from .specifications import specifications
     from .heating import heating
+    from .cooling import cooling
     
 
     app.register_blueprint(views, url_prefix='/')
@@ -40,6 +41,7 @@ def create_app():
     app.register_blueprint(ventsystems.ventsystems_bp, url_prefix='/<project_id>/ventsystems')
     app.register_blueprint(buildings.buildings_bp, url_prefix='/<project_id>/buildings')
     app.register_blueprint(heating.heating_bp, url_prefix='/<project_id>/heating')
+    app.register_blueprint(cooling.cooling_bp, url_prefix='/<project_id>/cooling')
 
     #app.jinja_env.globals['flash'] = disable_flash
 

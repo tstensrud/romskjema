@@ -59,19 +59,19 @@ Luftmengdetabell
         </th>
 
         <th class="table-cell">
-            Personer summert
+            Sum personer m<sup>3</sup>/h
         </th>
 
         <th class="table-cell">
-            Emisjon summert
+            Sum emisjon m<sup>3</sup>/h
         </th>
 
         <th class="table-cell">
-            Prosess
+            Prosess m<sup>3</sup>/h
         </th>
 
         <th class="table-cell">
-          Minimum
+          Minimum m<sup>3</sup>/h
         </th>
 
         <th class="table-cell">
@@ -83,18 +83,18 @@ Luftmengdetabell
         </th>
 
         <th class="table-cell table-cell-medium">
-            Tilluft
+            Tilluft m<sup>3</sup>/h
         </th>
 
         <th class="table-cell table-cell-medium">
-            Avtrekk
+            Avtrekk m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th class="table-cell table-cell-medium">
             m<sup>3</sup>/m<sup>2</sup>
         </th>
-        <th class="table-cell table-cell-medium">
-          Min
+        <th class="table-cell">
+          Min m<sup>3</sup>/h
       </th>
 
         <th class="table-cell">
@@ -129,31 +129,31 @@ Luftmengdetabell
           {{data.room_ventilation.RoomName}}
         </td>
         <td class="table-cell">
-          {{data.AirPersonSum}} m<sup>3</sup>/h
+          {{data.AirPersonSum}}
         </td>
         <td class="table-cell">
-          {{data.AirEmissionSum}} m<sup>3</sup>/h
+          {{data.AirEmissionSum}}
         </td>
         <td class="table-cell">
-            {{data.AirProcess}} m<sup>3</sup>/h
+            {{data.AirProcess}}
         </td>
         <td class="table-cell">
-          {{data.AirMinimum}} m<sup>3</sup>/h
+          {{data.AirMinimum}}
         </td>
         <td class="table-cell">
-            {{data.AirDemand}} m<sup>3</sup>/h
+            {{data.AirDemand}}
         </td>
         <td class="table-cell supplyCell table-cell-medium" data-column="supply_air">
-            {{data.AirSupply}} m<sup>3</sup>/h
+            {{data.AirSupply}}
         </td>
         <td class="table-cell extractCell table-cell-medium" data-column="extract_air">
-            {{data.AirExtract}} m<sup>3</sup>/h
-        </td>
-        <td class="table-cell">
-            {{data.AirChosen}} m<sup>3</sup>/m<sup>2</sup>
+            {{data.AirExtract}}
         </td>
         <td class="table-cell table-cell-medium">
-          {{data.AirMinimum * data.room_ventilation.Area }} m3/h
+            {{data.AirChosen}}
+        </td>
+        <td class="table-cell">
+          {{data.AirMinimum * data.room_ventilation.Area }}
       </td>
         <td class="table-cell" data-column="system_id">         
           

@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
-from .. import db_ops_heating as dboh
+from .. import db_ops_energy as dboh
 from ..globals import get_project, pattern_float, pattern_int, replace_and_convert_to_float
 from markupsafe import escape
 
@@ -34,7 +34,7 @@ def heating(building, project_id):
             heatloss_sum = []
             heatloss_sum.append(dboh.sum_heat_loss_building(building.id))
             heatloss_sum.append(dboh.sum_heat_loss_chosen_building(building.id))
-            heatprops = dboh.get_building_heating_settings(building.id)
+            heatprops = dboh.get_building_energy_settings(building.id)
             rooms = building.rooms
             return render_template('heating.html',
                     user=current_user,

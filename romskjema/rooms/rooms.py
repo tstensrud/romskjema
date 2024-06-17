@@ -1,8 +1,8 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
-from .. import db_ops_heating as dboh
-from ..globals import get_project, pattern_float, pattern_int
+from .. import db_ops_energy as dboh
+from ..globals import pattern_float, pattern_int
 from markupsafe import escape
 
 rooms_bp = Blueprint('rooms', __name__, static_folder='static', template_folder='templates')
@@ -57,21 +57,23 @@ def rooms(project_id):
             vent_props = dbo.get_room_type_data(room_type_id, project_specification)
 
             # Create row for room vent props
-            if dbo.new_vent_prop_room(new_room_id, vent_props.air_per_person, vent_props.air_emission,
+            new_room_vent_prop = dbo.new_vent_prop_room(new_room_id, vent_props.air_per_person, vent_props.air_emission,
                                    vent_props.air_process, vent_props.air_minimum,
                                    vent_props.ventilation_principle, vent_props.heat_exchange,
                                    vent_props.room_control, vent_props.notes, vent_props.db_technical,
-                                   vent_props.db_neighbour, vent_props.db_corridor, vent_props.comments):
+                                   vent_props.db_neighbour, vent_props.db_corridor, vent_props.comments)
+            if new_room_vent_prop:
                 dbo.initial_ventilation_calculations(new_room_id)
-                building_heating_settings = dboh.get_building_heating_settings(building_id)
+            building_heating_settings = dboh.get_building_energy_settings(building_id)
                 
-                # Create row for room heating props
-                if dboh.new_room_heating_props(building_heating_settings.id, new_room_id):
-                    flash("Rom opprettet", category="success")
-                    return redirect(url_for("rooms.rooms", project_id = project.id))
-                else:
-                    flash("Feil ved oppretting av rom heating props", category="error")
-                    return redirect(url_for("rooms.rooms", project_id = project.id))
+            # Create row for room heating props
+            new_room_heating = dboh.new_room_heating_props(building_heating_settings.id, new_room_id)
+            print(new_room_heating)
+            new_room_cooling = dboh.new_room_cooling_props(building_heating_settings.id, new_room_id)
+            print(new_room_cooling)
+
+            return redirect(url_for("rooms.rooms", project_id = project.id))
+                
         
     elif request.method == "GET":
         return render_template("rooms.html", 

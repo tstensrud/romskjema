@@ -50,6 +50,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   position: relative;
+  justify-content: center;
 }
 
 

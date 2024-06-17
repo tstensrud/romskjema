@@ -24,7 +24,7 @@
           </select>
         </form>
           {% if heatloss %}
-          <p>
+            <p>
             <table>
               <tr class="table-row">
                 <td class="room-data-cell">{{building.BuildingName}} oppsummert</td>
@@ -44,7 +44,7 @@
             <p>
               NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
             </p>
-            {% else %}
+          {% else %}
             <table>
               <tr class="table-row">
                 <td class="room-data-cell">Varmetap oppsummert</td>
@@ -64,9 +64,9 @@
               </tr>
               </table>
             {% endif %}
-          
       </div>
     </div>
+
     <div class="ventilation-system-sorting-container">
       <div class="heating-settings">
         <form name="building_heating_settings" id="building_heating_settings">
@@ -105,7 +105,6 @@
           <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
           </form>
         </p>
-        
       </div>
     </div>
     
@@ -202,40 +201,40 @@
             {{room.RoomName}}
           </td>
           <td class="table-cell" data-column="room_height">
-            {{room.heating_properties.RoomHeight}} m
+            {{room.heating_properties.RoomHeight}}
           </td>
           <td class="table-cell" data-column="outer_wall_area">
-            {{room.heating_properties.OuterWallArea}} m<sup>2</sup>
+            {{room.heating_properties.OuterWallArea}}
           </td>
           <td class="table-cell" data-column="inner_wall_area">
-            {{room.heating_properties.InnerWallArea}} m<sup>2</sup>
+            {{room.heating_properties.InnerWallArea}}
           </td>
           <td class="table-cell" data-column="window_door_area">
-            {{room.heating_properties.WindowDoorArea}} m<sup>2</sup>
+            {{room.heating_properties.WindowDoorArea}}
           </td>
           <td class="table-cell" data-column="roof_area">
             {{room.heating_properties.RoofArea}} m<sup>2</sup>
           </td>
           <td class="table-cell" data-column="floor_ground_area">         
-            {{room.heating_properties.FloorGroundArea}} m<sup>2</sup>
+            {{room.heating_properties.FloorGroundArea}}
           </td>
           <td class="table-cell" data-column="floor_air_area">
-            {{room.heating_properties.FloorAirArea}} m<sup>2</sup>
+            {{room.heating_properties.FloorAirArea}}
           </td>
           <td class="table-cell">
-            {{room.ventilation_properties.AirSupply}} m3/h
+            {{room.ventilation_properties.AirSupply}}
           </td>
           <td class="table-cell">
-            {{room.heating_properties.HeatLossSum}} W
+            {{room.heating_properties.HeatLossSum}}
           </td>
           <td class="table-cell" data-column="chosen_heating">
-            {{room.heating_properties.ChosenHeating}} W
+            {{room.heating_properties.ChosenHeating}}
           </td>
           <td class="table-cell">
             {% if room.heating_properties.ChosenHeating != 0 %}
-            {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}W/m<sup>2</sup>
+            {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}
             {% else %}
-            0 W/m<sup>2</sup>
+            0
             {% endif %}
           </td>
           <td class="table-cell" data-column="heat_source">

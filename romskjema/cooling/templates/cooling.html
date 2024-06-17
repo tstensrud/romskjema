@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - Varmetapsberegninger{% endblock %}
+{% block header %}Ventilasjon{% endblock %}
+
+
+{%block page_subtitle %}Kjøling{% if building %} - bygg {{building.BuildingName}} {% else %} - oppsummert {% endif %}{% endblock %}
+{%block content %}
+
+<input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
+
+<div class="ventilation-system-sorting-container">
+  <div class="heating-settings">
+    <p>
+      <form id="project_building" method="POST">
+        <select name="project_building" id="building_select" onchange="showBuildings()">
+          {% if building %}
+            <option value="{{building.id}}">{{building.BuildingName}}</option>
+          {% else %}
+            <option value="none">- Velg bygg -</option>
+          {% endif %}
+          {% for project_building in project_buildings %}
+            {% if project_building.BuildingName != building.BuildingName %}
+            <option value="{{project_building.id}}">{{project_building.BuildingName}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </form>
+    </p>
+    
+    <form name="building_cooling_settings" id="building_cooling_settings">
+      <input name="id" id="id" value="" hidden>
+    Romtemp sommer (C&#176;) <br> <input name="inside_temp" id="inside_temp" placeholder="26" class="input-heating" value="{{cooling.RoomTempSummer}}" {% if not building %} disabled {% endif %}>
+    <br>
+    Internlast lys (W/m<sup>2</sup>) <br><input name="internal_load_light" id="internal_load_light" placeholder="8" class="input-heating" value="{{cooling.InternalLoadLight}}"{% if not building %} disabled {% endif %}>
+    <br>
+    Internlast personer (W/pers) <br> <input name="internal_load_people" id="internal_load_people" placeholder="80" class="input-heating" value="{{cooling.InternalLoadPeople}}"{% if not building %} disabled {% endif %}>
+  </div>
+  <div class="heating-settings">
+    Tillufstemp sommer (C&#176;)<br><input name="vent_temp_summer" id="vent_temp_summer" placeholder="18" class="input-heating" value="{{cooling.VentAirTempSummer}}"{% if not building %} disabled {% endif %}>
+    <p>
+      <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
+      </form>
+    </p>
+  </div>
+
+</div>
+<p>
+  Soltilskudd og solreduksjon vil variere fra rom til rom. 
+</p>
+    
+<div class="table-header-container">
+  <table class="table-wrapper tableView">
+    <thead>
+      <tr class="table-header">
+        <th class="table-id-cell">
+          
+        </th>        
+        <th class="table-cell table-cell-small">
+          Etasje
+        </th>
+                
+        <th class="table-cell table-cell-medium">
+          Romnr
+        </th>
+        
+        <th class="table-cell">
+          Romnavn
+        </th>
+
+        <th class="table-cell">
+          Sum internlaster W
+        </th>
+
+
+
+        <th class="table-cell">
+            Kjøling utstyr W
+        </th>
+
+        <th class="table-cell">
+            Sum kjøletilskudd W
+        </th>
+
+        <th class="table-cell">
+            Varme &divide; kjøling W
+        </th>
+
+        <th class="table-cell">
+            Luftmengde tillegg
+        </th>
+
+        <th class="table-cell table-cell-long">
+            Kommentarer
+        </th>
+      </tr>
+    </thead>
+  </table>
+</div>
+
+<div class="table-container">
+  <table id="heatingTable" class="table-wrapper tableView">
+    <tbody>
+      {% if rooms|length >= 1 %}
+      {% for room in rooms %}
+        <tr class="table-row">
+          <td class="table-id-cell" hidden-data-column="vent_data_id">
+            <span class="hidden-text">{{room.id}}</span>
+          </td>
+          <td class="table-cell table-cell-small">
+            {{room.Floor}}
+          </td>
+          <td class="table-cell table-cell-medium">
+            {{room.RoomNumber}}
+          </td>
+          <td class="table-cell">
+            {{room.RoomName}}
+          </td>
+          <td class="table-cell" data-column="room_height">
+            {{room.cooling_properties.SumInternalHeatLoad}}
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+          {{room.cooling_properties.CoolingEquipment}}
+          </td>
+          <td class="table-cell" data-column="window_door_area">
+            {{room.cooling_properties.CoolingSum}}
+          </td>
+          <td class="table-cell" data-column="roof_area">
+            (varme-kjøling)/(0,35*(temp inn - temp ute))
+          </td>
+          <td class="table-cell" data-column="floor_ground_area">         
+            +++
+          </td>
+          <td class="table-cell table-cell-long">
+          Kommentar
+          </td>
+        </tr>
+        {% endfor %}  
+      {% endif %}
+    </tbody>
+  </table>
+
+
+</div>
+<script src="{{ url_for('static', filename='/js/cooling_table.js') }}"></script>
+{% endblock %}

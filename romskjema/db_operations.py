@@ -1,6 +1,6 @@
 from sqlalchemy import func, and_
 from . import models, db
-from . import db_ops_heating as dboh
+from . import db_ops_energy as dboh
 from flask_login import login_required
 import math
 from . import globals
@@ -59,7 +59,7 @@ def new_building(project_id: int, building_name: str) -> bool:
     try:
         db.session.add(new_building)
         db.session.commit()
-        dboh.set_up_heating_settings_building(project_id, new_building.id)
+        dboh.set_up_energy_settings_building(project_id, new_building.id)
         return True
     except Exception as e:
         globals.log(f"new building: {e}")
@@ -81,7 +81,7 @@ Rooms methods
 '''
 @login_required
 def new_room(building_id: int, room_type_id: int, floor: str, room_number: str, room_name: str, area: float, room_pop: int):
-    new_room = models.Rooms(BuildingId = building_id, RoomType = room_type_id, Floor = floor, RoomNumber = room_number,
+    new_room = models.Rooms(BuildingId = building_id, RoomTypeId = room_type_id, Floor = floor, RoomNumber = room_number,
                                 RoomName = room_name, Area = area, RoomPopulation = room_pop)
     try:
         db.session.add(new_room)
