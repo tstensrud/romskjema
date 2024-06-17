@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, request, session
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
+from .. import db_ops_energy as dboh
 from ..globals import get_project, pattern_float
 from markupsafe import escape
 
@@ -111,11 +112,11 @@ def update_ventilation(project_id):
             return jsonify(response)
         
         comment = escape(data["comment"].strip())
-        #comment = None
+        
 
         if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, system_id, comment):
             if dbo.update_system_airflows(system_id):
-                flash('Data oppdatert', category="success")
+                dboh.calculate_total_heat_loss_for_room(dbo.get_room_vent_prop(vent_prop_id).room_ventilation.energy_properties.id)
                 response = {"success": True, "redirect": url_for("ventilation.ventilation", building_id = building_id, project_id=project_id)}
         else:
             flash("Kunne ikke oppdatere verdier.", category="error")

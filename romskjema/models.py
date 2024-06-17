@@ -56,8 +56,7 @@ class Rooms(db.Model):
 
     room_type = db.relationship('RoomTypes', backref='room_type', uselist=False, lazy=True)
     ventilation_properties = db.relationship('RoomVentilationProperties', backref='room_ventilation', uselist=False, lazy=True)
-    heating_properties = db.relationship('RoomHeatingProperties', backref="room_heating", uselist=False, lazy=True)
-    cooling_properties = db.relationship('RoomCoolingProperties', backref='room_cooling', uselist=False, lazy=True)
+    energy_properties = db.relationship('RoomEnergyProperties', backref="room_energy", uselist=False, lazy=True)
 
 class VentilationSystems(db.Model):
     __tablename__ = "VentilationSystems"
@@ -117,22 +116,17 @@ class BuildingEnergySettings(db.Model):
     TempFloorAir = db.Column(db.Float)
     Dut = db.Column(db.Float)
     Safety = db.Column(db.Integer)
-    # Cooling properties
-    RoomTempSummer = db.Column(db.Float)
-    InternalLoadPeople = db.Column(db.Float)
-    InternalLoadLight = db.Column(db.Float)
-    SunAdition = db.Column(db.Float)
-    VentAirTempSummer = db.Column(db.Float)
-
-    room_heating = db.relationship('RoomHeatingProperties', backref='building_heating_settings', lazy=True)
-    room_cooling = db.relationship('RoomCoolingProperties', backref="building_cooling_settings", lazy=True)
 
 
-class RoomHeatingProperties(db.Model):
-    __tablename__ = "RoomHeatingProperties"
+    room_energy = db.relationship('RoomEnergyProperties', backref='building_energy_settings', lazy=True)
+
+
+class RoomEnergyProperties(db.Model):
+    __tablename__ = "RoomEnergyProperties"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
     BuildingEnergySettings = db.Column(db.Integer, db.ForeignKey('BuildingEnergySettings.id', ondelete="SET NULL"), nullable=False)
+    # Heating settings
     OuterWallArea = db.Column(db.Float)
     RoomHeight = db.Column(db.Float)
     WindowDoorArea = db.Column(db.Float)
@@ -148,13 +142,12 @@ class RoomHeatingProperties(db.Model):
     HeatLossSum = db.Column(db.Float)
     ChosenHeating = db.Column(db.Float)
     HeatSource = db.Column(db.String(50))
-    Comment = db.Column(db.String(250))
-
-class RoomCoolingProperties(db.Model):
-    __tablename__ = "RoomCoolingProperties"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    RoomId = db.Column(db.Integer, db.ForeignKey('Rooms.id', ondelete="SET NULL"), nullable=False, unique=True)
-    BuildingEnergySettings = db.Column(db.Integer, db.ForeignKey('BuildingEnergySettings.id', ondelete="SET NULL"), nullable=False)
+    # Cooling settings
+    RoomTempSummer = db.Column(db.Float)
+    InternalLoadPeople = db.Column(db.Float)
+    InternalLoadLight = db.Column(db.Float)
+    SunAdition = db.Column(db.Float)
+    VentAirTempSummer = db.Column(db.Float)
     SumInternalHeatloadPeople = db.Column(db.Float)
     SumInternalHeatloadLight = db.Column(db.Float)
     InternalHeatloadEquipment = db.Column(db.Float)
@@ -164,7 +157,6 @@ class RoomCoolingProperties(db.Model):
     CoolingVentilationAir = db.Column(db.Float)
     CoolingEquipment = db.Column(db.Float)
     CoolingSum = db.Column(db.Float)
-    #Comment = db.Column(db.String(250))
     
 
 ''' 

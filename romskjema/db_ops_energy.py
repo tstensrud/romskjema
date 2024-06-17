@@ -23,12 +23,8 @@ def set_up_energy_settings_building(project_id: int, building_id: int) -> bool:
                                                        ColdBridge = 0.06,
                                                        YearMidTemp = 5.0,
                                                        TempFloorAir = -22,
-                                                       Safety= 10.0,
                                                        Dut= -22.0,
-                                                       RoomTempSummer=26.0,
-                                                       InternalLoadPeople=1.0,
-                                                       InternalLoadLight=1.0,
-                                                       VentAirTempSummer=18.0)
+                                                       Safety= 10.0)
     try:
         db.session.add(building_settings)
         db.session.commit()
@@ -39,9 +35,9 @@ def set_up_energy_settings_building(project_id: int, building_id: int) -> bool:
         return False
 
 @login_required
-def new_room_heating_props(building_energy_settings_id: int, room_id: int) -> bool:
+def new_room_energy(building_energy_settings_id: int, room_id: int) -> bool:
     val = 1
-    new_room = models.RoomHeatingProperties(RoomId=room_id,
+    new_room = models.RoomEnergyProperties(RoomId=room_id,
                                             BuildingEnergySettings=building_energy_settings_id,
                                             OuterWallArea = val,
                                             RoomHeight=val,
@@ -58,7 +54,19 @@ def new_room_heating_props(building_energy_settings_id: int, room_id: int) -> bo
                                             HeatLossSum=val,
                                             ChosenHeating=val,
                                             HeatSource="",
-                                            Comment="")
+                                            RoomTempSummer=val,
+                                            InternalLoadPeople=val,
+                                            InternalLoadLight=val,
+                                            VentAirTempSummer=val,
+                                            SumInternalHeatloadPeople=val,
+                                            SumInternalHeatloadLight=val,
+                                            InternalHeatloadEquipment=val,
+                                            SunAdition=val,
+                                            SunReduction=val,
+                                            SumInternalHeatLoad=val,
+                                            CoolingVentilationAir=val,
+                                            CoolingEquipment=val,
+                                            CoolingSum=val)
     try:
         db.session.add(new_room)
         db.session.commit()
@@ -94,13 +102,13 @@ def update_building_heating_settings(updated_data) -> bool:
         return False
 
 @login_required
-def get_room_heating_data(heating_room_id: int) -> models.RoomHeatingProperties:
-    room = db.session.query(models.RoomHeatingProperties).filter(models.RoomHeatingProperties.id == heating_room_id).first()
+def get_room_energy_data(energy_room_id: int) -> models.RoomEnergyProperties:
+    room = db.session.query(models.RoomEnergyProperties).filter(models.RoomEnergyProperties.id == energy_room_id).first()
     return room
 
 @login_required
 def update_room_heating_data(heating_room_id: int, data) -> bool:
-    room = get_room_heating_data(heating_room_id)
+    room = get_room_energy_data(heating_room_id)
     room.OuterWallArea = data["outer_wall_area"]
     room.RoomHeight = data["room_height"]
     room.InnerWallArea = data["inner_wall_area"]
@@ -129,18 +137,18 @@ def ventilation_loss(air_flow_per_area: float, room_area: float, indoor_temp: fl
     return round(ventilation_loss, 1)
 
 @login_required
-def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
+def calculate_total_heat_loss_for_room(energy_room_id: int) -> bool:
     try:
-        room = get_room_heating_data(heating_room_id)
+        room = get_room_energy_data(energy_room_id)
         if not room:
             #print(f"No room found for heating_room_id: {heating_room_id}")
             return False
 
-        building = room.building_heating_settings
+        building = room.building_energy_settings
         if not building:
             #print(f"No building settings found for room with heating_room_id: {heating_room_id}")
             return False
-        room_data = room.room_heating   
+        room_data = room.room_energy  
         dt_surfaces_to_air = building.InsideTemp - building.Dut
         dt_floor_ground = building.InsideTemp - building.YearMidTemp
         outer_wall_area = room.OuterWallArea - room.WindowDoorArea
@@ -179,8 +187,8 @@ def calculate_total_heat_loss_for_room(heating_room_id: int) -> bool:
         return False
 
 @login_required
-def get_all_rooms_heating_building(building_id: int) -> list:
-    rooms = db.session.query(models.RoomHeatingProperties).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).all()
+def get_all_rooms_energy_building(building_id: int) -> list:
+    rooms = db.session.query(models.RoomEnergyProperties).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).all()
     if not rooms:
         print(f"No rooms found for building_id: {building_id}")
     else:
@@ -188,7 +196,7 @@ def get_all_rooms_heating_building(building_id: int) -> list:
     return rooms
 
 @login_required
-def get_heating_settings_all_buildings(project_id: int):
+def get_energy_settings_all_buildings(project_id: int):
     heating_settings = db.session.query(models.BuildingEnergySettings).join(models.Projects).filter(models.BuildingEnergySettings.ProjectId == project_id).all()
     return heating_settings
 
@@ -199,22 +207,22 @@ def get_building_energy_settings(building_id: int) -> models.BuildingEnergySetti
 
 @login_required
 def sum_heat_loss_building(building_id: int) -> float:
-    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
+    heat_loss = db.session.query(func.sum(models.RoomEnergyProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
     return heat_loss
 
 @login_required
 def sum_heat_loss_chosen_building(building_id: int) -> float:
-    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
+    heat_loss = db.session.query(func.sum(models.RoomEnergyProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).scalar()
     return heat_loss
 
 @login_required
 def sum_heat_loss_project(project_id: int) -> float:
-    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
+    heat_loss = db.session.query(func.sum(models.RoomEnergyProperties.HeatLossSum)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
     return heat_loss
 
 @login_required
 def sum_heat_loss_project_chosen(project_id: int) -> float:
-    heat_loss = db.session.query(func.sum(models.RoomHeatingProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
+    heat_loss = db.session.query(func.sum(models.RoomEnergyProperties.ChosenHeating)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).scalar()
     return heat_loss
 
 '''
@@ -222,44 +230,66 @@ Cooling
 '''
 
 @login_required
-def new_room_cooling_props(building_energy_settings_id: int, room_id: int) -> bool:
-    new_room = models.RoomCoolingProperties(RoomId=room_id,
-                                            BuildingEnergySettings=building_energy_settings_id,
-                                            SunAdition=100.0,
-                                            SunReduction=0.5)
+def update_internal_heat_loads(energy_room_id: int) -> bool:
+    room = get_room_energy_data(energy_room_id)
+
+
+@login_required
+def set_standard_cooling_settings(room_id: int, data) -> bool:
+    room = get_room_energy_data(room_id)
+    room.RoomTempSummer = data["room_temp_summer"]
+    room.InternalLoadPeople = data["internal_load_people"]
+    room.InternalLoadLight = data["internal_load_light"]
+    room.VentAirTempSummer = data["vent_temp_summer"]
+    room.SunAdition = data["sun_adition"]
+    room.SunReduction = data["sun_reduction"]
+
+
     try:
-        db.session.add(new_room)
         db.session.commit()
         return True
     except Exception as e:
-        globals.log(f"new room cooling props: {e}")
+        globals.log(f"Set standard cooling settings: {e}")
         db.session.rollback()
         return False
 
-def get_all_rooms_cooling_building(building_id: int):
-    rooms = db.session.query(models.RoomCoolingProperties).join(models.Rooms).join(models.Buildings).filter(models.Buildings.id == building_id).all()
-    return rooms
-
-def get_room_cooling_data(cooling_room_id: int) -> models.RoomCoolingProperties:
-    room = db.session.query(models.RoomCoolingProperties).filter(models.RoomCoolingProperties.id == cooling_room_id).first()
-    return room
-
-def cooling_calculations(building_id: int, cooling_room_id: int) -> bool:
-    building_settings = get_building_energy_settings(building_id)
-    room = get_room_cooling_data(cooling_room_id)
-    heatload_sun = room.SunAdition * room.SunReduction
-    sum_internal_heat_loads = room.SumInternalHeatloadPeople + room.SumInternalHeatloadLight + room.InternalHeatloadEquipment + heatload_sun
-    cooling_from_vent = 0.35 * room.room_cooling.ventilation_properties.AirSupply * (building_settings.InsideTemp - building_settings.VentAirTempSummer)
-    sum_cooling = cooling_from_vent + room.CoolingEquipment
-
-    room.CoolingSum = sum_cooling
-    room.SumInternalHeatLoad = sum_internal_heat_loads
+@login_required
+def calculate_heat_loads_for_room(energy_room_id: int) -> bool:
+    room = get_room_energy_data(energy_room_id)
+    room.SumInternalHeatloadLight = room.InternalLoadLight * room.room_energy.Area
+    room.SumInternalHeatloadPeople = room.InternalLoadPeople * room.room_energy.RoomPopulation
+    room.SumInternalHeatLoad = room.SunAdition * room.SunReduction
     try:
         db.session.commit()
         return True
     except Exception as e:
-        globals.log(f"cooling calculatiosn: {e}")
         db.session.rollback()
+        globals.log(f"Calculate heat lods for room: {e}")
+        return False
+
+
+@login_required
+def calculate_total_cooling_for_room(energy_room_id: int) -> bool:
+    if calculate_heat_loads_for_room(energy_room_id):
+        room = get_room_energy_data(energy_room_id)   
+        
+        heatload_sun = room.SunAdition * room.SunReduction
+        sum_internal_heat_loads = room.SumInternalHeatloadPeople + room.SumInternalHeatloadLight + room.InternalHeatloadEquipment + heatload_sun
+        
+        cooling_from_vent = 0.35 * room.room_energy.ventilation_properties.AirSupply * (room.RoomTempSummer - room.VentAirTempSummer)
+        sum_cooling = cooling_from_vent + room.CoolingEquipment
+
+        room.SumInternalHeatLoad = round(sum_internal_heat_loads, 1)
+        room.CoolingSum = round(sum_cooling,1)
+        print("Sum of Cooling:", sum_cooling)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            globals.log(f"cooling calculatiosn: {e}")
+            db.session.rollback()
+            return False
+    else:
         return False
 
 

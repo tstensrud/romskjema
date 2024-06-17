@@ -26,7 +26,6 @@ def rooms(project_id):
         building_id = int(building_id)
         
         room_type_id = escape(request.form.get("room_type"))
-        room_type = dbo.get_room_type_name(project.Specification, room_type_id)
         floor = escape(request.form.get("room_floor").strip())
         name = escape(request.form.get("room_name").strip())
         
@@ -67,12 +66,12 @@ def rooms(project_id):
             building_heating_settings = dboh.get_building_energy_settings(building_id)
                 
             # Create row for room heating props
-            new_room_heating = dboh.new_room_heating_props(building_heating_settings.id, new_room_id)
-            print(new_room_heating)
-            new_room_cooling = dboh.new_room_cooling_props(building_heating_settings.id, new_room_id)
-            print(new_room_cooling)
+            new_room_energy = dboh.new_room_energy(building_heating_settings.id, new_room_id)
+            if new_room_energy != True:
+                flash("Kunne ikke opprette rom", category="error")
 
-            return redirect(url_for("rooms.rooms", project_id = project.id))
+        return redirect(url_for("rooms.rooms", project_id = project.id))
+            
                 
         
     elif request.method == "GET":
@@ -107,6 +106,7 @@ def udpate_room(project_id):
         
         if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
             if dbo.update_ventilation_calculations(room_id):
+                dboh.calculate_total_cooling_for_room(dbo.get_room(room_id).energy_properties.id)
                 flash(f"Romdata oppdatert for {room_number}", category="success")
                 response = {"success": True, "redirect": url_for("rooms.rooms", project_id = project_id)}
         else:

@@ -27,12 +27,10 @@ def cooling(project_id, building):
                                 building=building)
         else:
             building = dbo.get_building(building)
-            coolingprops = dboh.get_building_energy_settings(building.id)
             rooms = building.rooms
             return render_template('cooling.html',
                                    user=current_user,
                                    project=project,
-                                   cooling=coolingprops,
                                    building=building,
                                    project_buildings=project_buildings,
                                    rooms=rooms,
@@ -45,7 +43,7 @@ def cooling(project_id, building):
 @login_required
 @cooling_bp.route('/building_cooling_settings', methods=['POST'])
 def building_cooling_settings(project_id):
-    if request.is_json():
+    if request.is_json:
         data = request.get_json()
         building_id = escape(data["building_id"])
         processed_data = {}
@@ -54,5 +52,16 @@ def building_cooling_settings(project_id):
             if key == "building_id":
                 processed_data[key] = value
             else:
-                processed_data[key] = replace_and_convert_to_float(escape(value))
+                processed_data[key] = replace_and_convert_to_float(escape(value)) 
+            
+        rooms = dboh.get_all_rooms_energy_building(building_id)
+        for room in rooms:
+            dboh.set_standard_cooling_settings(room.id, processed_data)
+            dboh.calculate_total_cooling_for_room(room.id)
+        
+        response = {"success": True, "redirect": url_for("cooling.cooling", building=building_id, project_id=project_id)}
+    else:
+        flash("Kunne ikke oppdatere bygningsdata kjøling", category="error")
+        response = {"success": False, "redirect": url_for("cooling.cooling", building=building_id, project_id=project_id)} 
+    return jsonify(response)
         

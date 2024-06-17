@@ -9,7 +9,7 @@
 <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
 
 <div class="ventilation-system-sorting-container">
-  <div class="heating-settings">
+  <div class="building-selector-container">
     <p>
       <form id="project_building" method="POST">
         <select name="project_building" id="building_select" onchange="showBuildings()">
@@ -26,27 +26,35 @@
         </select>
       </form>
     </p>
-    
+  </div>
+</div>
+<div class="ventilation-system-sorting-container">
+  <div class="heating-settings">
     <form name="building_cooling_settings" id="building_cooling_settings">
-      <input name="id" id="id" value="" hidden>
-    Romtemp sommer (C&#176;) <br> <input name="inside_temp" id="inside_temp" placeholder="26" class="input-heating" value="{{cooling.RoomTempSummer}}" {% if not building %} disabled {% endif %}>
+      <input name="id" id="id" value="{{building.id}}" hidden>
+    Romtemp sommer (C&#176;) <br> <input name="room_temp_summer" id="room_temp_summer" placeholder="26" class="input-heating" value="26" {% if not building %} disabled {% endif %}>
     <br>
-    Internlast lys (W/m<sup>2</sup>) <br><input name="internal_load_light" id="internal_load_light" placeholder="8" class="input-heating" value="{{cooling.InternalLoadLight}}"{% if not building %} disabled {% endif %}>
+    Internlast lys (W/m<sup>2</sup>) <br><input name="internal_load_light" id="internal_load_light" placeholder="8" class="input-heating" value="8"{% if not building %} disabled {% endif %}>
     <br>
-    Internlast personer (W/pers) <br> <input name="internal_load_people" id="internal_load_people" placeholder="80" class="input-heating" value="{{cooling.InternalLoadPeople}}"{% if not building %} disabled {% endif %}>
+    Internlast personer (W/pers) <br> <input name="internal_load_people" id="internal_load_people" placeholder="80" class="input-heating" value="25"{% if not building %} disabled {% endif %}>
   </div>
   <div class="heating-settings">
-    Tillufstemp sommer (C&#176;)<br><input name="vent_temp_summer" id="vent_temp_summer" placeholder="18" class="input-heating" value="{{cooling.VentAirTempSummer}}"{% if not building %} disabled {% endif %}>
+    Tilluftstemp. sommer (C&#176;)<br><input name="vent_temp_summer" id="vent_temp_summer" placeholder="18" class="input-heating" value="18"{% if not building %} disabled {% endif %}>
+    <br>
+    Soltilskudd (W/m<sup>2</sup>)<br><input name="sun_adition" id="sun_adition" placeholder="18" class="input-heating" value="100"{% if not building %} disabled {% endif %}>
+    <br>
+    Solreduksjon (0 - 1.0) (C&#176;)<br><input name="sun_reduction" id="sun_reduction" placeholder="18" class="input-heating" value="0.5"{% if not building %} disabled {% endif %}>
+  </div>
+  <div class="heating-settings">
     <p>
-      <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
+      <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Sett standardverdier</button>
       </form>
     </p>
+    <p>
+      NB! Dette setter standardverdier for ALLE rom. Hvis enkeltrom har egne krav må disse endres manuelt for det gjellende rommet.
+    </p>
   </div>
-
 </div>
-<p>
-  Soltilskudd og solreduksjon vil variere fra rom til rom. 
-</p>
     
 <div class="table-header-container">
   <table class="table-wrapper tableView">
@@ -66,25 +74,45 @@
         <th class="table-cell">
           Romnavn
         </th>
-
         <th class="table-cell">
-          Sum internlaster W
-        </th>
+          Romtemp (C&#176;)
+      </th>
 
-
-
+      <th class="table-cell">
+        Temp vent (C&#176;)
+      </th>
         <th class="table-cell">
-            Kjøling utstyr W
-        </th>
-
-        <th class="table-cell">
-            Sum kjøletilskudd W
+          Personer (W)
         </th>
 
         <th class="table-cell">
-            Varme &divide; kjøling W
+          Lys (W)
         </th>
 
+        <th class="table-cell">
+          Utstyr (W)
+        </th>
+
+        <th class="table-cell">
+          Soltilskudd (W/m<sup>2</sup>)
+        </th>
+
+        <th class="table-cell">
+          Solreduksjon (0-1.0)
+        </th>
+
+        <th class="table-cell">
+          Sum internlast (W)
+        </th>
+
+        <th class="table-cell">
+          Kjøling utstyr W
+        </th>
+
+        <th class="table-cell">
+          Sum kjøling W
+        </th>
+        
         <th class="table-cell">
             Luftmengde tillegg
         </th>
@@ -115,23 +143,46 @@
           <td class="table-cell">
             {{room.RoomName}}
           </td>
-          <td class="table-cell" data-column="room_height">
-            {{room.cooling_properties.SumInternalHeatLoad}}
-          </td>
-          <td class="table-cell" data-column="inner_wall_area">
-          {{room.cooling_properties.CoolingEquipment}}
+          <td class="table-cell" data-column="window_door_area">
+            {{room.energy_properties.RoomTempSummer}}
           </td>
           <td class="table-cell" data-column="window_door_area">
-            {{room.cooling_properties.CoolingSum}}
+            {{room.energy_properties.VentAirTempSummer}}
           </td>
-          <td class="table-cell" data-column="roof_area">
-            (varme-kjøling)/(0,35*(temp inn - temp ute))
+          <td class="table-cell" data-column="room_height">
+            {{room.energy_properties.InternalLoadPeople}}
           </td>
-          <td class="table-cell" data-column="floor_ground_area">         
-            +++
+          <td class="table-cell" data-column="inner_wall_area">
+          {{room.energy_properties.InternalLoadLight}}
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.energy_properties.InternalHeatloadEquipment}}
+            </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.energy_properties.SunAdition}}
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.energy_properties.SunReduction}}
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.energy_properties.SumInternalHeatLoad}}
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            Utstyr kj
+          </td>
+          <td class="table-cell" data-column="inner_wall_area">
+            {{room.energy_properties.CoolingSum}}
+          </td>
+          <td class="table-cell" data-column="floor_ground_area">
+              {% if (room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) > 0 %}
+              {{ (room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) / (0.35*(room.energy_properties.VentAirTempSummer - room.energy_properties.RoomTempSummer)) }}    
+              {% endif %}
+            <!-- (varme-kjøling)/(0,35*(temp inn - temp ute))  -->
           </td>
           <td class="table-cell table-cell-long">
-          Kommentar
+          {% if (room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) > 0 %}
+            Ikke nok kjøling på Ventilasjon
+          {% endif %}
           </td>
         </tr>
         {% endfor %}  

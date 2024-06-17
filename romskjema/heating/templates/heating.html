@@ -201,47 +201,47 @@
             {{room.RoomName}}
           </td>
           <td class="table-cell" data-column="room_height">
-            {{room.heating_properties.RoomHeight}}
+            {{room.energy_properties.RoomHeight}}
           </td>
           <td class="table-cell" data-column="outer_wall_area">
-            {{room.heating_properties.OuterWallArea}}
+            {{room.energy_properties.OuterWallArea}}
           </td>
           <td class="table-cell" data-column="inner_wall_area">
-            {{room.heating_properties.InnerWallArea}}
+            {{room.energy_properties.InnerWallArea}}
           </td>
           <td class="table-cell" data-column="window_door_area">
-            {{room.heating_properties.WindowDoorArea}}
+            {{room.energy_properties.WindowDoorArea}}
           </td>
           <td class="table-cell" data-column="roof_area">
-            {{room.heating_properties.RoofArea}} m<sup>2</sup>
+            {{room.energy_properties.RoofArea}} m<sup>2</sup>
           </td>
           <td class="table-cell" data-column="floor_ground_area">         
-            {{room.heating_properties.FloorGroundArea}}
+            {{room.energy_properties.FloorGroundArea}}
           </td>
           <td class="table-cell" data-column="floor_air_area">
-            {{room.heating_properties.FloorAirArea}}
+            {{room.energy_properties.FloorAirArea}}
           </td>
           <td class="table-cell">
             {{room.ventilation_properties.AirSupply}}
           </td>
           <td class="table-cell">
-            {{room.heating_properties.HeatLossSum}}
+            {{room.energy_properties.HeatLossSum}}
           </td>
           <td class="table-cell" data-column="chosen_heating">
-            {{room.heating_properties.ChosenHeating}}
+            {{room.energy_properties.ChosenHeating}}
           </td>
           <td class="table-cell">
-            {% if room.heating_properties.ChosenHeating != 0 %}
-            {{(room.heating_properties.ChosenHeating / room.Area) | round(1)}}
+            {% if room.energy_properties.ChosenHeating != 0 %}
+            {{(room.energy_properties.ChosenHeating / room.Area) | round(1)}}
             {% else %}
             0
             {% endif %}
           </td>
           <td class="table-cell" data-column="heat_source">
-            {{room.heating_properties.HeatSource}}
+            {{room.energy_properties.HeatSource}}
           </td>
           <td class="table-cell table-cell-long" data-column="comment">
-            {% if room.heating_properties.ChosenHeating < room.heating_properties.HeatLossSum %}
+            {% if room.energy_properties.ChosenHeating < room.energy_properties.HeatLossSum %}
             Valgt varme under krav. 
             {% endif %}
           </td>

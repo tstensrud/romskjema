@@ -114,10 +114,10 @@ def delete_room(room_id: int) -> bool:
             globals.log(f"delete_room() first try/except block: {e}")
             return False
     
-    heating_properties = db.session.query(models.RoomHeatingProperties).filter(models.RoomHeatingProperties.RoomId == room_id).first()
-    if heating_properties:
+    energy_properties = db.session.query(models.RoomEnergyProperties).filter(models.RoomEnergyProperties.RoomId == room_id).first()
+    if energy_properties:
         try:
-            db.session.delete(heating_properties)
+            db.session.delete(energy_properties)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -248,7 +248,7 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
         db.session.commit()
         if system is not None:
             update_system_airflows(vent_properties_room.SystemId)
-            dboh.calculate_total_heat_loss_for_room(room.heating_properties.id)
+            dboh.calculate_total_heat_loss_for_room(room.energy_properties.id)
         return True
     except Exception as e:
         db.session.rollback()
