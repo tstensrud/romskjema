@@ -28,7 +28,7 @@ def get_all_project_names():
 
 @login_required
 def get_all_project_rooms(project_id):
-    rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor).all()
+    rooms = db.session.query(models.Rooms).join(models.Buildings).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.Buildings.BuildingName, models.Rooms.Floor, models.Rooms.RoomNumber).all()
     return rooms
 
 @login_required

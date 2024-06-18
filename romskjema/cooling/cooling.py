@@ -53,7 +53,6 @@ def building_cooling_settings(project_id):
                 processed_data[key] = value
             else:
                 processed_data[key] = replace_and_convert_to_float(escape(value)) 
-            
         rooms = dboh.get_all_rooms_energy_building(building_id)
         for room in rooms:
             dboh.set_standard_cooling_settings(room.id, processed_data)
@@ -64,4 +63,24 @@ def building_cooling_settings(project_id):
         flash("Kunne ikke oppdatere bygningsdata kjøling", category="error")
         response = {"success": False, "redirect": url_for("cooling.cooling", building=building_id, project_id=project_id)} 
     return jsonify(response)
+
+@login_required
+@cooling_bp.route('/update_cooling_table', methods=['POST'])
+def update_cooling_table(project_id):
+    if request.is_json:
+        data = request.get_json()
+        building_id = escape(data["building_id"])
+        processed_data = {}
+        for key, value in data.items():
+            if key == "building_id":
+                processed_data[key] = value
+            else:
+                processed_data[key] = replace_and_convert_to_float(escape(value))
         
+        if dboh.update_room_data_cooling(processed_data["energy_data_id"], processed_data):
+            response = {"success": True, "redirect": url_for("cooling.cooling", building=building_id, project_id=project_id)}
+        else:
+            flash("Kunne ikke oppdatere romdata kjøling", category="error")
+            response = {"success": False, "redirect": url_for("cooling.cooling", building=building_id, project_id=project_id)} 
+    return jsonify(response)
+    

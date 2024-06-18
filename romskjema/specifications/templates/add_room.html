@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{%block title%}Romskjema - endre prosjektinnstillinger{% endblock %}
+{% block header %}Kravspesifikasjoner{% endblock %}
+{% block pagetitle %}Ny kravspesifikasjon{%endblock%}
+
+{% block page_subtitle %}Legg til nye romtyper for {{specification}}{% endblock %}
+{% block content %}
+<input type="text" class="input-spec" name="spec_id" id="spec_id" value="{{spec_object.id}}" hidden>
+<input type="text" class="input-spec" name="spec" id="spec" value="{{specification}}" hidden>
+<form id ="new_room"></form>
+    <div class="heating-settings">
+        <p>
+        <p>
+            Romtype <br>
+            <input type="text" class="input-spec" name="room_type" id="room_type" placeholder="Romtype" tabindex="1">
+        </p>
+        <p>
+            Luftmengde per person m<sup>3</sup>/pers <br>
+            <input type="text" class="input-spec" name="air_per_person" id="air_per_person" placeholder="m3/pers" tabindex="2">
+        </p>
+        <p>
+            Emisjonsbelastning m<sup>3</sup>/h <br>
+            <input type="text" class="input-spec" name="air_emission" id="air_emission" placeholder="Emisjon m3/h" tabindex="3">
+        </p>
+        <p>
+            Prosess m<sup>3</sup>/h <br>
+            <input type="text" class="input-spec" name="air_process" id="air_process" placeholder="Prosess m3/h" tabindex="4">
+        </p>
+        <p>
+            Minimum luftmengde m<sup>3</sup>/m<sup>2</sup> <br>
+            <input type="text" class="input-spec" name="air_minimum" id="air_minimum" placeholder="m3/m2" tabindex="5">
+        </p>
+        <p>
+            Ventilasjonsprinsipp <br>
+            <select tabindex="6" name="ventilation_principle">
+                <option value="o">Omrøring</option>
+                <option value="f">Fortrengning</option>
+                <option value="a">Annet</option>
+            </select>
+        </p>
+        <p>
+            Ventilasjonsprinsipp: <br>
+            <select tabindex="6" name="heat_ex"  tabindex="7">
+                <option value="r">Roterenede</option>
+                <option value="p">Fortrengning</option>
+                <option value="b">Annet</option>
+            </select>    
+        </p>
+        <p>
+            db-teknisk, db-naborom, db-korridor <br>
+            <input type="text" class="input-spec" name="db_technical" id="db_technical" placeholder="dB-teknisk" tabindex="10"> <br>
+            <input type="text" class="input-spec" name="db_neighbour" id="db_neighbour" placeholder="dB-naborom" tabindex="11"> <br>
+            <input type="text" class="input-spec" name="db_corridor" id="db_corridor" placeholder="db-korridor" tabindex="12">   
+        </p>
+    </div>
+
+    <div class="heating-settings">
+        <p>
+            Styring: <br>
+            <div class="checkbox-group">
+                <label for="vav">VAV:</label>
+                <input type="radio" id="vav" name="vav" tabindex="8">
+            </div>
+            <div class="checkbox-group">
+                <label for="cav">CAV</label>
+                <input type="radio" id="cav" name="vav" tabindex="9">
+            </div>
+            <div class="checkbox-group">
+                <label for="temp">Temp</label>
+                <input type="checkbox" name="temp" tabindex="10">
+            </div>
+            <div class="checkbox-group">
+                <label for="movement">Bevegelse</label>
+                <input type="checkbox" id="movement" name="movenet" tabindex="11">
+            </div>
+            <div class="checkbox-group">
+                <label for="moisture">Temp</label>
+                <input type="checkbox" id="moisture" name="moisture" tabindex="12">
+            </div>
+            <div class="checkbox-group">
+                <label for="time">Temp</label>
+                <input type="checkbox" id="time" name="time" tabindex="13">
+            </div>
+        </p>
+        <p>
+            Presiseringer: <br>
+            <textarea class="form-text-area" name="notes" tabindex="9"></textarea>
+        </p>
+        <p>
+            <button type="submit" class="spec-button" tabindex="14" onclick="submitNewRoom()">Legg til</button>
+        </p>
+    </div>
+</form>
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+{% endblock %}

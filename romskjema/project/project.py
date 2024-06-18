@@ -55,3 +55,14 @@ def settings(project_id):
 
         db.session.commit()
         return redirect(url_for('project.project', project_id=project_id))
+
+@login_required
+@project_bp.route('/reports', methods=['GET'])
+def reports(project_id):
+    project = dbo.get_project(project_id)
+    endpoint = request.endpoint
+    return render_template('reports.html',
+                           user=current_user,
+                           project=project,
+                           endpoint=endpoint,
+                           project_id=project_id)

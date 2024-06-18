@@ -5,7 +5,7 @@
 
 {% block page_subtitle %}
   {% if specification %}
-    Romtyper {{specification}}
+    Romtyper {{specification}} - <a href="{{ url_for('specifications.new_room', specification=specification)}}">Legg til nye romtyper</a>
   {% else %}
     Kravspesifikasjoner
   {% endif %}
@@ -13,26 +13,6 @@
   
 {% block content %}
   {% if specification %}
-  <p>
-  <form method="POST" id ="new_room" action="{{url_for('specifications.new_room')}}">
-    <input type="text" class="input-spec" name="spec" id="spec" value="{{specification}}" hidden>
-    <input type="text" class="input-spec" name="spec_id" id="spec" value="{{spec_object.id}}" hidden>
-    <input type="text" class="input-spec" name="room_type" id="room_type" placeholder="Romtype" tabindex="1" required>
-    <input type="text" class="input-spec" name="air_per_person" id="air_per_person" placeholder="m3/pers" tabindex="2" required>
-    <input type="text" class="input-spec" name="air_emission" id="air_emission" placeholder="Emisjon m3/h" tabindex="3" required>
-    <input type="text" class="input-spec" name="air_process" id="air_process" placeholder="Prosess m3/h" tabindex="4" required>
-    <input type="text" class="input-spec" name="air_minimum" id="air_minimum" placeholder="Minimum m3/m2" tabindex="5" required>
-    <input type="text" class="input-spec" name="ventilation_principle" id="ventilation_principle" placeholder="Prinsipp" tabindex="6" required>
-    <input type="text" class="input-spec" name="heat_ex" id="heat_ex" placeholder="Varmeveksler" tabindex="7">
-    <input type="text" class="input-spec" name="room_control" id="room_control" placeholder="Styring" tabindex="8" required>
-    <input type="text" class="input-spec" name="notes" id="notes" placeholder="Presiseringer" tabindex="9">
-    <input type="text" class="input-spec" name="db_technical" id="db_technical" placeholder="dB-teknisk" tabindex="10">
-    <input type="text" class="input-spec" name="db_neighbour" id="db_neighbour" placeholder="dB-naborom" tabindex="11">
-    <input type="text" class="input-spec" name="db_corridor" id="db_corridor" placeholder="db-korridor" tabindex="12">
-    <input type="text" class="input-spec" name="comments" id="comments" placeholder="Kommentar" tabindex="13">
-    <button type="submit" class="spec-button" tabindex="14">Legg til</button>
-  </form>
-  </p>
     <div class="table-header-container">
       <table id="roomsTable" class="table-wrapper">
           <thead>

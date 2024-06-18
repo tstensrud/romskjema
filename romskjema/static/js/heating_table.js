@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const table = document.getElementById("heatingTable");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,11,12,14,15]
+    const lockedCells = [0,1,2,3,11,12,14,15,16]
     const buildingId = document.getElementById('building_select').value;
     const projectId = document.getElementById("project_id").value;
 

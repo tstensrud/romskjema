@@ -1,8 +1,8 @@
 /* Edit heating table */
 document.addEventListener("DOMContentLoaded", function() {
-    const table = document.getElementById("heatingTable");
+    const table = document.getElementById("coolingTable");
     const cells = table.getElementsByTagName("td");
-    const lockedCells = [0,1,2,3,4,11,12,14,15]
+    const lockedCells = [0,1,2,3,13,14,15]
     const buildingId = document.getElementById('building_select').value;
     const projectId = document.getElementById("project_id").value;
 
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
   
           // Send AJAX request to update the database
-          fetch(`/${projectId}/heating/update_room_info`, {
+          fetch(`/${projectId}/cooling/update_cooling_table`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

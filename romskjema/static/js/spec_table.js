@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var inputValueAirPro = inputFieldAIrPro.value;
         var inputValueAirMin = inputFieldAirMin.value;
 
-        if (isNaN(inputValueAirPp) || !Number.isInteger(parseFloat(inputValueAirPp))) {
+        if (inputValueAirPp === "" || isNaN(inputValueAirPp) || !Number.isInteger(parseFloat(inputValueAirPp))) {
             alert('Luft per person kan kun inneholde tall. Eks: 7,2');
             event.preventDefault();
         }
@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
         }
 
-        if (isNaN(inputValueAirPro) || !Number.isInteger(parseFloat(inputValueAirPro))) {
+        if (inputValueAirPro === "" || isNaN(inputValueAirPro) || !Number.isInteger(parseFloat(inputValueAirPro))) {
             alert('Prosess kan kun inne holde tall. Eks 200')
             event.preventDefault();
         }
 
-        if (isNaN(inputValueAirMin) || !Number.isInteger(parseFloat(inputValueAirMin))) {
-            alert('Minimumsverdi kan kun inne holde tall. Eks 3,6')
+        if (!Number.isInteger(parseFloat(inputValueAirMin))) {
+            alert('Minimumsverdi kan kun inne holde tall større enn 0. Eks 3,6')
             event.preventDefault();
         }
 

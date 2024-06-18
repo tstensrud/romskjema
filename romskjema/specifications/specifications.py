@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template, flash, request
+from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from ..globals import replace_and_convert_to_float
@@ -29,47 +29,24 @@ def specifications(specification):
                                 spec_object = spec_object,
                                 endpoint=endpoint)
 
-@specifications_bp.route('/new_room', methods=['POST'])
+@specifications_bp.route('/<specification>/new_room', methods=['GET', 'POST'])
 @login_required
-def new_room():
-    spec = escape(request.form.get("spec"))
-    spec_id = escape(request.form.get("spec_id"))
-    room_type = escape(request.form.get("room_type"))
-    air_per_person = replace_and_convert_to_float(escape(request.form.get("air_per_person")))
-    air_emission = replace_and_convert_to_float(escape(request.form.get("air_emission")))
-    air_process = replace_and_convert_to_float(escape(request.form.get("air_process")))
-    air_minimum = replace_and_convert_to_float(escape(request.form.get("air_minimum")))
+def new_room(specification):
+    endpoint = request.endpoint
+    spec_object = dbo.get_specification_by_name(specification)
+    if request.method == "GET":
+        return render_template('add_room.html',
+                                user=current_user,
+                                specification=specification,
+                                spec_object = spec_object,
+                                endpoint=endpoint)
     
-    if air_per_person is False:
-        flash("Luftmengde per person kan kun inneholde tall", category="error")
-        return redirect(url_for('specifications.specifications', specification=spec))
-    elif air_emission is False:
-        flash("Emisjon kan kun inneholde tall", category="error")
-        return redirect(url_for('specifications.specifications', specification=spec))
-    elif air_process is False:
-        flash("Prosess kan kun inneholde tall", category="error")
-        return redirect(url_for('specifications.specifications', specification=spec))
-    elif air_minimum is False:
-        flash("Minimum luftmengde kan kun inneholde tall", category="error")
-        return redirect(url_for('specifications.specifications', specification=spec))
-    
-    vent_principle = escape(request.form.get("ventilation_principle"))
-    heat_ex = escape(request.form.get("heat_ex"))
-    room_control = escape(request.form.get("room_control"))
-    notes = escape(request.form.get("notes"))
-    dbtech = escape(request.form.get("db_technical"))
-    dbneigh = escape(request.form.get("db_neighbour"))
-    dbcorr = escape(request.form.get("db_corridor"))
-    comments = escape(request.form.get("comments"))
-    if dbo.new_specification_room_type(spec_id, room_type, air_per_person, air_emission, air_process, air_minimum,
-                                       vent_principle, heat_ex, room_control, notes, dbtech, dbneigh, dbcorr,
-                                       comments):
-        flash("Romtype opprettet", category="success")
-        
-    else:
-        flash("Feil i oppretting av romtype", category="error")
-
-    return redirect(url_for('specifications.specifications', specification=spec))
+    if request.method == "POST":
+        if request.is_json:
+            data = request.get_json()
+            print(f"Data: {data}")
+            response = {"success": False, "redirect": url_for("specifications.new_room", specification=specification)}
+            return jsonify(response)
 
 @specifications_bp.route('/new_specification', methods=['GET', 'POST'])
 @login_required

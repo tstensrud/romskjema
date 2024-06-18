@@ -54,10 +54,10 @@ def new_room_energy(building_energy_settings_id: int, room_id: int) -> bool:
                                             HeatLossSum=val,
                                             ChosenHeating=val,
                                             HeatSource="",
-                                            RoomTempSummer=val,
-                                            InternalLoadPeople=val,
-                                            InternalLoadLight=val,
-                                            VentAirTempSummer=val,
+                                            RoomTempSummer=26.0,
+                                            InternalLoadPeople=100,
+                                            InternalLoadLight=7.0,
+                                            VentAirTempSummer=18.0,
                                             SumInternalHeatloadPeople=val,
                                             SumInternalHeatloadLight=val,
                                             InternalHeatloadEquipment=val,
@@ -107,8 +107,8 @@ def get_room_energy_data(energy_room_id: int) -> models.RoomEnergyProperties:
     return room
 
 @login_required
-def update_room_heating_data(heating_room_id: int, data) -> bool:
-    room = get_room_energy_data(heating_room_id)
+def update_room_heating_data(energy_room_id: int, data) -> bool:
+    room = get_room_energy_data(energy_room_id)
     room.OuterWallArea = data["outer_wall_area"]
     room.RoomHeight = data["room_height"]
     room.InnerWallArea = data["inner_wall_area"]
@@ -237,12 +237,12 @@ def update_internal_heat_loads(energy_room_id: int) -> bool:
 @login_required
 def set_standard_cooling_settings(room_id: int, data) -> bool:
     room = get_room_energy_data(room_id)
-    room.RoomTempSummer = data["room_temp_summer"]
-    room.InternalLoadPeople = data["internal_load_people"]
-    room.InternalLoadLight = data["internal_load_light"]
-    room.VentAirTempSummer = data["vent_temp_summer"]
-    room.SunAdition = data["sun_adition"]
-    room.SunReduction = data["sun_reduction"]
+    room.RoomTempSummer = data["room_temp_summer"] if data["room_temp_summer"] != 0 else room.RoomTempSummer
+    room.InternalLoadPeople = data["internal_load_people"] if data["internal_load_people"] != 0 else room.InternalLoadPeople
+    room.InternalLoadLight = data["internal_load_light"] if data["internal_load_light"] != 0 else room.InternalLoadLight
+    room.VentAirTempSummer = data["vent_temp_summer"] if data["vent_temp_summer"] != 0 else room.VentAirTempSummer
+    room.SunAdition = data["sun_adition"] if data["sun_adition"] != 0 else room.SunAdition
+    room.SunReduction = data["sun_reduction"] if data["sun_reduction"] != 0 else room.SunReduction
 
 
     try:
@@ -258,7 +258,7 @@ def calculate_heat_loads_for_room(energy_room_id: int) -> bool:
     room = get_room_energy_data(energy_room_id)
     room.SumInternalHeatloadLight = room.InternalLoadLight * room.room_energy.Area
     room.SumInternalHeatloadPeople = room.InternalLoadPeople * room.room_energy.RoomPopulation
-    room.SumInternalHeatLoad = room.SunAdition * room.SunReduction
+    room.SumInternalHeatLoad = (room.SunAdition * room.SunReduction) + room.InternalHeatloadEquipment
     try:
         db.session.commit()
         return True
@@ -279,9 +279,9 @@ def calculate_total_cooling_for_room(energy_room_id: int) -> bool:
         cooling_from_vent = 0.35 * room.room_energy.ventilation_properties.AirSupply * (room.RoomTempSummer - room.VentAirTempSummer)
         sum_cooling = cooling_from_vent + room.CoolingEquipment
 
+        room.CoolingVentilationAir = round(cooling_from_vent, 1)
         room.SumInternalHeatLoad = round(sum_internal_heat_loads, 1)
         room.CoolingSum = round(sum_cooling,1)
-        print("Sum of Cooling:", sum_cooling)
         try:
             db.session.commit()
             return True
@@ -292,8 +292,27 @@ def calculate_total_cooling_for_room(energy_room_id: int) -> bool:
     else:
         return False
 
-
-
+@login_required
+def update_room_data_cooling(energy_room_id: int, data) -> bool:
+    print(data)
+    room = get_room_energy_data(energy_room_id)
+    room.RoomTempSummer = data["room_temp_summer"]
+    room.InternalLoadPeople = data["internal_load_people"]
+    room.InternalLoadLight = data["internal_load_light"]
+    room.InternalHeatloadEquipment = data["internal_load_equipment"]
+    room.SunAdition = data["sun_adition"]
+    room.SunReduction = data["sun_reduction"]
+    room.CoolingEquipment = data["equipment_cooling"]
+    try:
+        db.session.commit()
+    except Exception as e:
+        globals.log(f"Update room data cooling: {e}")
+        db.session.rollback()
+        return False
+    if calculate_total_cooling_for_room(energy_room_id):
+        return True
+    else:
+        return False
 
 '''
 

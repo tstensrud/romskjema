@@ -32,18 +32,18 @@
   <div class="heating-settings">
     <form name="building_cooling_settings" id="building_cooling_settings">
       <input name="id" id="id" value="{{building.id}}" hidden>
-    Romtemp sommer (C&#176;) <br> <input name="room_temp_summer" id="room_temp_summer" placeholder="26" class="input-heating" value="26" {% if not building %} disabled {% endif %}>
+    Romtemp sommer (C&#176;) <br> <input name="room_temp_summer" id="room_temp_summer" placeholder="26" class="input-heating" value="0" {% if not building %} disabled {% endif %}>
     <br>
-    Internlast lys (W/m<sup>2</sup>) <br><input name="internal_load_light" id="internal_load_light" placeholder="8" class="input-heating" value="8"{% if not building %} disabled {% endif %}>
+    Internlast lys (W/m<sup>2</sup>) <br><input name="internal_load_light" id="internal_load_light" placeholder="8" class="input-heating" value="0"{% if not building %} disabled {% endif %}>
     <br>
-    Internlast personer (W/pers) <br> <input name="internal_load_people" id="internal_load_people" placeholder="80" class="input-heating" value="25"{% if not building %} disabled {% endif %}>
+    Internlast personer (W/pers) <br> <input name="internal_load_people" id="internal_load_people" placeholder="80" class="input-heating" value="0"{% if not building %} disabled {% endif %}>
   </div>
   <div class="heating-settings">
-    Tilluftstemp. sommer (C&#176;)<br><input name="vent_temp_summer" id="vent_temp_summer" placeholder="18" class="input-heating" value="18"{% if not building %} disabled {% endif %}>
+    Tilluftstemp. sommer (C&#176;)<br><input name="vent_temp_summer" id="vent_temp_summer" placeholder="18" class="input-heating" value="0"{% if not building %} disabled {% endif %}>
     <br>
-    Soltilskudd (W/m<sup>2</sup>)<br><input name="sun_adition" id="sun_adition" placeholder="18" class="input-heating" value="100"{% if not building %} disabled {% endif %}>
+    Soltilskudd (W/m<sup>2</sup>)<br><input name="sun_adition" id="sun_adition" placeholder="18" class="input-heating" value="0"{% if not building %} disabled {% endif %}>
     <br>
-    Solreduksjon (0 - 1.0) (C&#176;)<br><input name="sun_reduction" id="sun_reduction" placeholder="18" class="input-heating" value="0.5"{% if not building %} disabled {% endif %}>
+    Solreduksjon (0 - 1.0) (C&#176;)<br><input name="sun_reduction" id="sun_reduction" placeholder="18" class="input-heating" value="0"{% if not building %} disabled {% endif %}>
   </div>
   <div class="heating-settings">
     <p>
@@ -51,7 +51,8 @@
       </form>
     </p>
     <p>
-      NB! Dette setter standardverdier for ALLE rom. Hvis enkeltrom har egne krav må disse endres manuelt for det gjellende rommet.
+      NB! Dette setter standardverdier for ALLE rom. Sett 0 på de verdiene du ikke vil endre. <br>
+      De feltene hvor det settes en annen verdi enn 0 blir endret for alle rom i prosjektet.
     </p>
   </div>
 </div>
@@ -75,14 +76,29 @@
           Romnavn
         </th>
         <th class="table-cell">
-          Romtemp (C&#176;)
+          <div class="table-description-dropdown">Romtemp (C&#176;)
+            <div class="table-description-dropdown-content">
+                 Maks temperatur tillatt ved sommer
+              </div>
+            </div>
       </th>
 
       <th class="table-cell">
-        Temp vent (C&#176;)
+        <div class="table-description-dropdown">Temp vent (C&#176;)
+          <div class="table-description-dropdown-content">
+               Temperatur på innblåst luft sommer
+            </div>
+          </div>
       </th>
+
         <th class="table-cell">
-          Personer (W)
+          <div class="table-description-dropdown">Personer (W/m<sup>2</sup>)
+            <div class="table-description-dropdown-content">
+                 Watt per person. Standard er 100W for lite aktivitet.<br>
+                 Rom med høyere aktivitet, feks, dansesaler, vil ha høyere <br>
+                 internlaster. Må sjekkes opp mot bruken av rommet.
+              </div>
+            </div>
         </th>
 
         <th class="table-cell">
@@ -90,7 +106,13 @@
         </th>
 
         <th class="table-cell">
-          Utstyr (W)
+          <div class="table-description-dropdown">Utstyr (W/m<sup>2</sup>)
+            <div class="table-description-dropdown-content">
+                 Hvis rommet har ekstrautstyr som avgir varme. <br>
+                 For eksempel AV-anlegg, maskiner eller annet <br>
+                 elektrisk utstyr.
+              </div>
+            </div>
         </th>
 
         <th class="table-cell">
@@ -98,11 +120,15 @@
         </th>
 
         <th class="table-cell">
-          Solreduksjon (0-1.0)
+          <div class="table-description-dropdown">Solreduksjon (0-1.0)
+            <div class="table-description-dropdown-content">
+                 1 = 100%. 0 = ingen solskjerming på vindu. <br>
+              </div>
+            </div>
         </th>
 
         <th class="table-cell">
-          Sum internlast (W)
+          &#8721; internlast (W)
         </th>
 
         <th class="table-cell">
@@ -110,11 +136,16 @@
         </th>
 
         <th class="table-cell">
-          Sum kjøling W
+          &#8721; kjøling W
         </th>
         
         <th class="table-cell">
-            Luftmengde tillegg
+          <div class="table-description-dropdown">Luftmengde tillegg
+            <div class="table-description-dropdown-content">
+                Tilfør den ekstra luftmengden under for å klare <br>
+                kjøling i rom med bare luft
+              </div>
+            </div>
         </th>
 
         <th class="table-cell table-cell-long">
@@ -126,12 +157,12 @@
 </div>
 
 <div class="table-container">
-  <table id="heatingTable" class="table-wrapper tableView">
+  <table id="coolingTable" class="table-wrapper tableView">
     <tbody>
       {% if rooms|length >= 1 %}
       {% for room in rooms %}
         <tr class="table-row">
-          <td class="table-id-cell" hidden-data-column="vent_data_id">
+          <td class="table-id-cell" hidden-data-column="energy_data_id">
             <span class="hidden-text">{{room.id}}</span>
           </td>
           <td class="table-cell table-cell-small">
@@ -143,39 +174,39 @@
           <td class="table-cell">
             {{room.RoomName}}
           </td>
-          <td class="table-cell" data-column="window_door_area">
+          <td class="table-cell" data-column="room_temp_summer">
             {{room.energy_properties.RoomTempSummer}}
           </td>
-          <td class="table-cell" data-column="window_door_area">
+          <td class="table-cell" data-column="vent_air_temp_summer">
             {{room.energy_properties.VentAirTempSummer}}
           </td>
-          <td class="table-cell" data-column="room_height">
+          <td class="table-cell" data-column="internal_load_people">
             {{room.energy_properties.InternalLoadPeople}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell" data-column="internal_load_light">
           {{room.energy_properties.InternalLoadLight}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell" data-column="internal_load_equipment">
             {{room.energy_properties.InternalHeatloadEquipment}}
             </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell" data-column="sun_adition">
             {{room.energy_properties.SunAdition}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell" data-column="sun_reduction">
             {{room.energy_properties.SunReduction}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell">
             {{room.energy_properties.SumInternalHeatLoad}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
-            Utstyr kj
+          <td class="table-cell" data-column="equipment_cooling">
+            {{room.energy_properties.CoolingEquipment}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td class="table-cell">
             {{room.energy_properties.CoolingSum}}
           </td>
-          <td class="table-cell" data-column="floor_ground_area">
+          <td class="table-cell">
               {% if (room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) > 0 %}
-              {{ (room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) / (0.35*(room.energy_properties.VentAirTempSummer - room.energy_properties.RoomTempSummer)) }}    
+              {{ ((room.energy_properties.SumInternalHeatLoad - room.energy_properties.CoolingSum) / (0.35*(room.energy_properties.VentAirTempSummer - room.energy_properties.RoomTempSummer)))|round (1) }}    
               {% endif %}
             <!-- (varme-kjøling)/(0,35*(temp inn - temp ute))  -->
           </td>

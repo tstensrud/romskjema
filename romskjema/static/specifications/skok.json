@@ -596,5 +596,20 @@
       "db_neighbour": "48dB",
       "db_corridor": "34dB",
     "comments": ""
-  }
+  },
+  
+  "spesialventilasjon": {
+    "air_per_person": 0,
+    "air_emission": 0,
+    "air_process": 0,
+    "air_minimum": 0,
+  "ventilation_principle": "",
+  "heat_exchange": "",
+  "room_control": "",
+  "notes": "",
+    "db_technical": "",
+    "db_neighbour": "",
+    "db_corridor": "",
+  "comments": ""
+}
 }

@@ -27,18 +27,17 @@
     {% endwith %}
 
 
-<div class="app-container">
+        <div class="app-container">
         <!-- SIDE BAR MENU-->
         <div class="switch-mode-container">
             <p>
-        
-        <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
-            <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
-              <defs></defs>
-              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-            </svg>
-          </button>
-        </p>
+                <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
+                <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+                <defs></defs>
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                </svg>
+                </button>
+            </p>
         </div>
         {% if user.is_authenticated %}
         
@@ -53,7 +52,7 @@
                     {% endif %}
                     <a href="{{ url_for('project.project', project_id=project.id) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> 
-                    <span>Oversikt</span>
+                    <span>Prosjektoversikt</span>
                     </a>
                 </li>
                 {% if endpoint == "buildings.buildings" %}
@@ -133,6 +132,19 @@
                     <span>Prosjektinnstillinger</span>
                     </a>
                 </li>
+
+                {% if endpoint == "project.reports" %}
+                <li class="sidebar-list-item active">
+                {%else %}
+                <li class="sidebar-list-item">
+                {% endif %}
+                        <a href="{{ url_for('project.reports', project_id = project.id) }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> 
+                        <span>Rapporter</span>
+                        </a>
+                    </li>
+
+
                 <p class="p-menu-item">
                 <li class="sidebar-list-item">
                     <a href="{{ url_for('projects.projects') }}">
@@ -189,7 +201,8 @@
                 </li>
             </ul>
                   <div class="sidebar-bottom">
-                    Structor Tekniske Systemer <br> Romskjema &copy; 2024
+                    blablabla <br>
+                    Structor TS &copy; 2024
                   </div>
             </div>
         {% endif %}

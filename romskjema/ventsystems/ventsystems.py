@@ -19,7 +19,12 @@ def ventsystems(project_id):
             flash("Systemnummer finnes allerede", category="error")
             return redirect(url_for('ventsystems.ventsystems'))
         
-        airflow = float(escape(request.form.get("airflow").strip()))
+        try:
+            airflow = float(escape(request.form.get("airflow").strip()))
+        except ValueError:
+            flash("Luftmengde kan kun inneholde tall", category="error")
+            return redirect(url_for('ventsystems.ventsystems', project_id=project_id))
+        
         service_area = escape(request.form.get("system_service").strip())
         placement = escape(request.form.get("system_placement").strip())
         system_type = escape(request.form.get("special_system"))
@@ -27,8 +32,15 @@ def ventsystems(project_id):
             system_type = "Ja"
         else:
             system_type = ""
+        
+        
         system_h_ex_in = escape(request.form.get("heat_exchange").strip())
-        system_h_ex = system_h_ex_in.capitalize()
+        if system_h_ex_in == "none":
+            flash("Du må velge en type gjenvinner for aggregatet", category="error")
+            return redirect(url_for('ventsystems.ventsystems', project_id=project_id))
+        if system_h_ex_in != "0":
+            system_h_ex = system_h_ex_in.capitalize()
+        else: system_h_ex = None
 
         if dbo.new_ventilation_system(project.id, system_number, placement, service_area, system_h_ex, airflow, system_type):
             flash("System opprettet", category="success")

@@ -36,6 +36,7 @@
                 <option value="R">Roterende</option>
                 <option value="P">Plate/kryss</option>
                 <option value="B">Batteri</option>
+                <option value="0">Ingen</option>
               </select>
               <br>
               <br>
@@ -118,7 +119,11 @@
                 {{system.AirFlow}} m3/h
               </td>
               <td class="table-cell" data-column="system_hx">
+                {% if system.HeatExchange == None %}
+                
+                {% else %}
                 {{system.HeatExchange}}
+                {% endif %}
               </td>
               <td class="table-cell">
                 {{system.AirFlowSupply}} m3/h
