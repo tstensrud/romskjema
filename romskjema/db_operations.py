@@ -285,6 +285,11 @@ def summarize_supply_air_building(project_id: int, building_id: int) -> float:
     return supply
 
 @login_required
+def summarize_demand_building(project_id: int, building_id: int) -> float:
+    supply = db.session.query(func.sum(models.RoomVentilationProperties.AirDemand)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
+    return supply
+
+@login_required
 def summarize_extract_air_building(project_id: int, building_id: int) -> float:
     supply = db.session.query(func.sum(models.RoomVentilationProperties.AirExtract)).join(models.Rooms).join(models.Buildings).join(models.Projects).filter(and_(models.Projects.id == project_id, models.Buildings.id == building_id)).scalar()
     return supply
@@ -345,7 +350,7 @@ def delete_system(system_id: int) -> bool:
     
 @login_required
 def get_all_systems(project_id: int) -> list:
-    systems = db.session.query(models.VentilationSystems).join(models.Projects).filter(models.Projects.id == project_id).all()
+    systems = db.session.query(models.VentilationSystems).join(models.Projects).filter(models.Projects.id == project_id).order_by(models.VentilationSystems.SystemName).all()
     return systems
 
 @login_required
@@ -487,23 +492,37 @@ def get_specification_room_data(specification_name: str):
     return data
 
 @login_required
-def new_specification_room_type(specification_id: int, name: str, air_per_person: float, air_emission: float, air_process: float,
-                 air_minimum: float, vent_principle: str, heat_ex: str, room_control: str, notes: str,
-                 dbt: str, dbn: str, dbc: str, comments: str) -> bool:
+def new_specification_room_type(specification_id: int, data) -> bool:
+    room_control = ""
+    if data["control_vav"] == "1":
+        room_control = room_control + "V, "
+    else:
+        room_control = room_control + "C, "
+    if data["control_co2"] == "True":
+        room_control = room_control + "CO2, "
+    if data["control_temp"] == "True":
+        room_control = room_control + "T, "
+    if data["control_movement"] == "True":
+        room_control = room_control + "B, "
+    if data["control_moisture"] == "True":
+        room_control = room_control + "F, "
+    if data["control_time"] == "True":
+        room_control = room_control + "Tid"
+
     room = models.RoomTypes(specification_id=specification_id,
-                            name=name,
-                            air_per_person=air_per_person,
-                            air_emission=air_emission,
-                            air_process=air_process,
-                            air_minimum=air_minimum,
-                            ventilation_principle=vent_principle,
-                            heat_exchange=heat_ex,
+                            name=data["room_type"],
+                            air_per_person=data["air_p_p"],
+                            air_emission=data["air_emission"],
+                            air_process=data["air_process"],
+                            air_minimum=data["air_minimum"],
+                            ventilation_principle=data["vent_princ"],
+                            heat_exchange=data["heat_ex"],
                             room_control=room_control,
-                            notes=notes,
-                            db_technical=dbt,
-                            db_neighbour=dbn,
-                            db_corridor=dbc,
-                            comments=comments)
+                            notes=data["notes"],
+                            db_technical=data["db_t"],
+                            db_neighbour=data["db_n"],
+                            db_corridor=data["db_c"],
+                            comments="")
     try:
         db.session.add(room)
         db.session.commit()

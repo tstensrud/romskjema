@@ -34,7 +34,6 @@ def create_app():
     app.register_blueprint(admin.admin_bp, url_prefix='/admin')
     app.register_blueprint(projects.projects_bp, url_prefix='/projects')
     app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
-
     app.register_blueprint(rooms.rooms_bp, url_prefix='/<project_id>/rooms')
     app.register_blueprint(ventilation.ventilation_bp, url_prefix='/<project_id>/ventilation')
     app.register_blueprint(project.project_bp, url_prefix='/<project_id>/project')

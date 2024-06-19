@@ -8,7 +8,7 @@
 
 <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
     <div class="ventilation-system-sorting-container">
-      <div class="building-selector-container">
+      <div class="building-selector-container no-print">
         <form id="project_building" method="POST">
           <select name="project_building" id="building_select" onchange="showBuildings()">
             {% if building %}
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <div class="ventilation-system-sorting-container">
+    <div class="ventilation-system-sorting-container no-print">
       <div class="heating-settings">
         <form name="building_heating_settings" id="building_heating_settings">
           <input name="id" id="id" value="{{heating.id}}" hidden>
@@ -191,6 +191,7 @@
     <tbody>
       {% if rooms|length >= 1 %}
         {% for room in rooms %}
+        {% if room.ventilation_properties.room.SpecialSystem != "Ja" %}
         <tr class="table-row">
           <td class="table-id-cell" hidden-data-column="vent_data_id">
             <span class="hidden-text">{{room.id}}</span>
@@ -250,6 +251,7 @@
             {% endif %}
           </td>
         </tr>
+        {% endif %}
         {% endfor %}  
       {% endif %}
     </tbody>

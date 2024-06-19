@@ -8,35 +8,44 @@
 {%block content %}
     <!-- New room form -->
     <div class="text-container">
-    <h1  class="app-content-Text">Legg til bygg i prosjekt</h1>
-    <p>
-        <form class="custom-form profile-form" method="POST" role="form">
-            <input type="text" name="building_name" id="building_name" placeholder="Navn på bygg">
-                <button type="submit" class="form-button">
-                    Legg til
-                </button>
-        </form>
-    </p>
+        <h1  class="app-content-Text">Legg til bygg i prosjekt</h1>
+        <p>
+            <form class="custom-form profile-form" method="POST" role="form">
+                <input type="text" name="building_name" id="building_name" placeholder="Navn på bygg">
+                    <button type="submit" class="form-button">
+                        Legg til
+                    </button>
+            </form>
+        </p>
     <!-- End new room form -->
     {% if not project_buildings %}
         <p class="p-description">Ingen bygg lagt inn for {{ project.ProjectName }}</p>
     {%else %}
-        {% for building, area, supply, extract in project_buildings %}
+        {% for building, area, supply, extract, heating in project_buildings %}
         <div class="building-summary">
-            <div class="building-summary-header">{{building.BuildingName}}</div>
-            <div class="building-summary-air-flows">
-            Prosjektert luftmengde
-            </div>
-            <div class="building-summary-supply">
+            <p>
+                {{building.BuildingName}}
+            </p>
+            <p>
+                Prosjektert luftmengde
+            <br>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 -5 20 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 
                 <span class="supply-text"> {% if supply == None %}0{% else %}{{supply}}{% endif %}</span> m<sup>3</sup>/h
-            </div>
-            <div class="building-summary-extract">
+                <br>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 -5 20 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span class="extract-text">{% if extract == None %}0{% else %}{{extract}}{% endif %}</span> m<sup>3</sup>/h
-            </div>
-            <div class="building-summary-other">Areal</div>
-            <div class="building-summaru-other-content">{% if area == None %}0{% else %}{{area}}{% endif %} m<sup>2</sup></div>
+            </p>            
+            <p>
+                Prosjektert varme
+                <br>
+                {{heating}} W
+            </p>
+
+            <p>
+                Prosjektert areal
+                <br>
+                {% if area == None %}0{% else %}{{area}}{% endif %} m<sup>2</sup>
+            </p>
         </div>
         {% endfor %}
     {% endif %}

@@ -5,14 +5,14 @@
 
 {%block page_subtitle %}
 Luftmengdetabell 
-{% if building%}
+{% if building %}
   - {{building.BuildingName}}
   {% else %}
   alle bygg
 {% endif %}
 {% endblock %}
 {%block content %}
-    <div class="ventilation-system-sorting-container">
+    <div class="ventilation-system-sorting-container no-print">
       <div class="building-selector-container">
         {% if project_buildings|length > 1 %}
         <form id="project_building" method="POST">
@@ -34,12 +34,36 @@ Luftmengdetabell
     {% endif %}
     <input type="text" name="project_id" id="project_id" value="{{project_id}}" hidden readonly>
     <!-- End new room form -->
+    <p>
+      {% if building %}
+      {% if summaries %}
+      <table>
+        <tr class="table-row">
+          <td class="room-data-cell"> {{building.BuildingName}} - oppsummering</td>
+        </tr>
+        <tr class="table-row">
+          <td class="room-data-cell">Dimensjonert luftmengde</td>
+          <td class="room-data-cell">{{summaries[0]}} m<sup>3</sup>/h</td>
+        </tr>
+        
+        <tr  class="table-row">
+          <td class="room-data-cell">Prosjektert tilluft</td>
+          <td class="room-data-cell"> {{summaries[1]}} m<sup>3</sup>/h</td>
+        </tr>
+        <tr  class="table-row">
+          <td class="room-data-cell">Prosjektert avtrekk</td>
+          <td class="room-data-cell">{{summaries[2]}} m<sup>3</sup>/h</td>
+        </tr>
+      </table>
+      {% endif %}
+      {% endif %}
+      </p>
     
 <div class="table-header-container">
   <table class="table-wrapper tableView">
     <thead>
       <tr class="table-header">
-        <th class="table-id-celll">
+        <th class="table-id-cell no-print">
         
         </th>
         <th class="table-cell table-cell-medium">
@@ -100,7 +124,7 @@ Luftmengdetabell
         <th class="table-cell">
             System
         </th>
-        <th class="table-cell table-cell-long">
+        <th class="table-cell table-cell-long no-print">
             Kommentarer
         </th>
 
@@ -113,7 +137,7 @@ Luftmengdetabell
     <tbody>
       {% for data in ventilation_data %}
       <tr class="table-row">
-        <td class="table-id-cell" hidden-data-column="vent_data_id">
+        <td class="table-id-cell no-print" hidden-data-column="vent_data_id">
           <span class="hidden-text">{{data.id}}</span>
         </td>
         <td class="table-cell table-cell-medium">
@@ -174,19 +198,24 @@ Luftmengdetabell
           </form>
 
         </td>
-        <td class="table-cell table-cell-long" data-column="comment">
+        <td class="table-cell table-cell-long no-print" data-column="comment">
+          {% if data.room.SpecialSystem != "Ja" %} 
+            
             {% if data.AirSupply < data.AirDemand %}
               Tilluft under krav. 
             {% endif %}
+            
             {% if data.AirSupply != data.AirExtract %}
               Ubalanse i rom. 
             {% endif %}
+            
             {% if data.SystemId != None %}
-            {% if data.room.HeatExchange not in data.HeatExchange %}
-            Systemgjenvinner ulikt romkrav.
-            {% endif %}
+              {% if data.room.HeatExchange not in data.HeatExchange %}
+                Systemgjenvinner ulikt romkrav.
+              {% endif %}
             {% endif %}
 
+          {% endif %}
         </td>
       </tr>
       {% endfor %}

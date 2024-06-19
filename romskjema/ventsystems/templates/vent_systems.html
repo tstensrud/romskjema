@@ -10,7 +10,7 @@
     Systeminformasjon {{system}}
     {% else %}
     <!-- New system form -->
-    <div class="split-container-left">
+    <div class="split-container-left no-print">
       <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
       <p>
         Legg til system <br>
@@ -90,7 +90,7 @@
               <th class="table-cell table-cell-long">
                 Kommentar
               </th>
-              <th class="table-cell ">
+              <th class="table-cell no-print">
               </th>
             </tr>
           </thead>
@@ -102,54 +102,116 @@
         <table id="systemsTableVentilation" class="table-wrapper">
           <tbody>
             {% for system in systems %}
-            <tr class="table-row">
-              <td hidden-data-column="system_id" class="table-id-cell">
-                <span class="hidden-text">{{system.id}}</span>
-              </td>
-              <td class="table-cell" data-column="system_number">
-                {{system.SystemName}}
-              </td>
-              <td class="table-cell table-cell-long" data-column="system_location">
-                {{system.Location}}
-              </td>
-              <td class="table-cell table-cell-long" data-column="service_area">
-                {{system.ServiceArea}}
-              </td>
-              <td class="table-cell" data-column="airflow">
-                {{system.AirFlow}} m3/h
-              </td>
-              <td class="table-cell" data-column="system_hx">
-                {% if system.HeatExchange == None %}
-                
-                {% else %}
-                {{system.HeatExchange}}
-                {% endif %}
-              </td>
-              <td class="table-cell">
-                {{system.AirFlowSupply}} m3/h
-              </td>
-              <td class="table-cell">
-                {{system.AirFlowExtract}} m3/h
-              </td>
-              <td class="table-cell table-cell-long">
-                {{system.SpecialSystem}}
-              </td>
-              <td class="table-cell table-cell-long">
-                {% if system.AirFlowSupply != None %}
-                  {% if system.AirFlowSupply > system.AirFlow %}
-                    Prosjektert m3 > aggregat.
-                  {% elif system.AirFlowSupply != system.AirFlowExtract %}
-                    Ubalanse på systemet.
+              {% if system.SpecialSystem == "" %}
+              <tr class="table-row">
+                <td hidden-data-column="system_id" class="table-id-cell">
+                  <span class="hidden-text">{{system.id}}</span>
+                </td>
+                <td class="table-cell" data-column="system_number">
+                  {{system.SystemName}}
+                </td>
+                <td class="table-cell table-cell-long" data-column="system_location">
+                  {{system.Location}}
+                </td>
+                <td class="table-cell table-cell-long" data-column="service_area">
+                  {{system.ServiceArea}}
+                </td>
+                <td class="table-cell" data-column="airflow">
+                  {{system.AirFlow}} m3/h
+                </td>
+                <td class="table-cell" data-column="system_hx">
+                  {% if system.HeatExchange == None %}
+                  
+                  {% else %}
+                  {{system.HeatExchange}}
                   {% endif %}
+                </td>
+                <td class="table-cell">
+                  {{system.AirFlowSupply}} m3/h
+                </td>
+                <td class="table-cell">
+                  {{system.AirFlowExtract}} m3/h
+                </td>
+                <td class="table-cell table-cell-long">
+                  {{system.SpecialSystem}}
+                </td>
+                <td class="table-cell table-cell-long">
+                  {% if system.AirFlowSupply != None %}
+                    {% if system.AirFlowSupply > system.AirFlow %}
+                      Prosjektert m3 > aggregat.
+                    {% elif system.AirFlowSupply != system.AirFlowExtract %}
+                      Ubalanse på systemet.
+                    {% endif %}
+                  {% endif %}
+                </td>
+                <td id="delete" class="table-cell no-print">
+                  <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
+                </td>
+                </tr>
                 {% endif %}
-              </td>
-              <td id="delete" class="table-cell">
-                <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
-              </td>
-              </tr>
               {% endfor %}
+
+                  <tr class="table-row">
+                    <td>
+                      <br>
+                    </td>
+                  </tr>
+                <tr class="table-row">
+                  <td class="table-id-cell">
+
+                  </td>
+                  <td class="table-cell">
+                    Spesialsystemer
+                  </td>
+                </tr>
+
+              {% for system in systems %}
+              {% if system.SpecialSystem == "Ja" %}
+              <tr class="table-row">
+                <td hidden-data-column="system_id" class="table-id-cell">
+                  <span class="hidden-text">{{system.id}}</span>
+                </td>
+                <td class="table-cell" data-column="system_number">
+                  {{system.SystemName}}
+                </td>
+                <td class="table-cell table-cell-long" data-column="system_location">
+                  {{system.Location}}
+                </td>
+                <td class="table-cell table-cell-long" data-column="service_area">
+                  {{system.ServiceArea}}
+                </td>
+                <td class="table-cell" data-column="airflow">
+                  {{system.AirFlow}} m3/h
+                </td>
+                <td class="table-cell" data-column="system_hx">
+                </td>
+                <td class="table-cell">
+                  {{system.AirFlowSupply}} m3/h
+                </td>
+                <td class="table-cell">
+                  {{system.AirFlowExtract}} m3/h
+                </td>
+                <td class="table-cell table-cell-long">
+                  {{system.SpecialSystem}}
+                </td>
+                <td class="table-cell table-cell-long">
+                  {% if system.AirFlowSupply %}
+                  {% if system.AirFlowSupply > system.AirFlow or system.AirFlowExtract > system.AirFlow %}
+                      Prosjektert m3 > system.
+                  {% endif %}
+                  {% endif %}
+                </td>
+                <td id="delete" class="table-cell no-print">
+                  <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
+                </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+
+
             </tbody>
           </table>
+      
       </div>
     </div>
 

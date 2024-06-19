@@ -44,9 +44,29 @@ def new_room(specification):
     if request.method == "POST":
         if request.is_json:
             data = request.get_json()
-            print(f"Data: {data}")
-            response = {"success": False, "redirect": url_for("specifications.new_room", specification=specification)}
+            processed_data = {}
+            float_values = ["air_p_p", "air_emission", "air_process", "air_minimum"]
+            for key, value in data.items():
+                if key in float_values:
+                    value = replace_and_convert_to_float(escape(value))
+                    if value is False:
+                        flash("Luftmengder skal kun inneholde tall", category="error")
+                        response = {"success": False, "redirect": url_for('specifications.new_room', specification=specification)}
+                        return jsonify(response)
+                    else:
+                        processed_data[key] = value
+                else:
+                    processed_data[key] = escape(value)
+
+            if dbo.new_specification_room_type(processed_data["spec_id"], processed_data):
+                response = {"success": True, "redirect": url_for('specifications.new_room', specification=specification)}
+            else:
+                flash("Kunne ikke lage nytt rom", category="error")
+                response = {"success": False, "redirect": url_for('specifications.new_room', specification=specification)}
             return jsonify(response)
+        else:
+            return redirect(url_for('specifictaions.new_room', specification=specification))
+
 
 @specifications_bp.route('/new_specification', methods=['GET', 'POST'])
 @login_required

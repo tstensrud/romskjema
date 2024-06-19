@@ -23,6 +23,11 @@ def ventilation(building_id, room_id, project_id):
             return redirect(url_for("ventilation.ventilation", building_id = "showall", project_id=project_id))
     
     elif request.method == "GET":
+        summaries = []
+        summaries.append(dbo.summarize_demand_building(project_id, building_id))
+        summaries.append(dbo.summarize_supply_air_building(project_id, building_id))
+        summaries.append(dbo.summarize_extract_air_building(project_id, building_id))
+        
         if room_id:
             room_data = dbo.get_room(room_id)
             ventilation_data = room_data.ventilation_properties
@@ -48,6 +53,7 @@ def ventilation(building_id, room_id, project_id):
                                user=current_user,
                                project=project,
                                ventilation_data = ventilation_data,
+                               summaries = summaries,
                                building=building,
                                project_buildings = project_buildings,
                                system_names = systems,

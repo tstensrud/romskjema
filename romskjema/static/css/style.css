@@ -57,6 +57,7 @@
 }
  /*#1a2238 #9daaf2 #ff6a3d #f4db7d*/
 
+
  /* Globals */
  :root {
   --app-bg: #1e2d47;
@@ -338,7 +339,8 @@ body {
 }
 
 .building-summary {
-  display: grid; 
+  display: float;
+  position: left; 
   border-radius: 4px;
   padding: 4px 8px;
   margin-top: 20px;
@@ -348,38 +350,6 @@ body {
   position: relative;
   background-color: rgba(89, 113, 157, 0.2);
   max-width: 500px;
-
-  grid-template-columns: 1.5fr 0.5fr 1fr; 
-  grid-template-rows: 0.3fr 0.3fr 2.4fr 1fr 1fr; 
-  gap: 0px 0px; 
-  grid-template-areas: 
-  "building-summary-header building-summary-header building-summary-header"
-  "building-summary-air-flows building-summary-air-flows building-summary-air-flows"
-  "building-summary-supply building-summary-extract building-summary-extract"
-  "building-summary-other building-summary-other building-summary-other"
-  "building-summary-other-content building-summary-other-content building-summary-other-content"; 
-}
-.building-summary-header { 
-  grid-area: building-summary-header; 
-  text-align: center;
-  font-size: 16px;
-}
-.building-summary-air-flows { 
-  grid-area: building-summary-air-flows; 
-}
-.building-summary-supply { 
-  grid-area: building-summary-supply;
-  align-items: center;
-}
-.building-summary-extract { 
-  grid-area: building-summary-extract; 
-  align-items: center;
-}
-.building-summary-other { grid-area: building-summary-other; }
-.building-summary-other-content { grid-area: building-summary-other-content; }
-
-.building-summary:light {
-  color: black;
 }
 
 .ventilation-system-sorting-container {

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/static/css/form.css">
     <link rel="stylesheet" href="/static/css/tables.css">
     <link rel="stylesheet" href="/static/css/flash_popup.css">
+    <link rel="stylesheet" href="/static/css/print.css">
     <!-- https://package.elm-lang.org/packages/1602/elm-feather/1.0.0/FeatherIcons#crosshair -->
 
 </head>
@@ -29,7 +30,7 @@
 
         <div class="app-container">
         <!-- SIDE BAR MENU-->
-        <div class="switch-mode-container">
+        <div class="switch-mode-container no-print">
             <p>
                 <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
                 <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
@@ -41,7 +42,7 @@
         </div>
         {% if user.is_authenticated %}
         
-        <div class="sidebar">
+        <div class="sidebar no-print ">
 
                 {% if project %}
                 <ul class="sidebar-list">
