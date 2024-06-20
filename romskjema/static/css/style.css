@@ -359,7 +359,7 @@ body {
 }
 .building-selector-container {
   float: left;
-  margin: 10px;
+  margin: 20px;
 }
 .system-summary {
   max-width: 250px;
@@ -435,6 +435,7 @@ body {
   position: fixed;
   margin-top: 100px;
   margin-right: 50px;
+  overflow: auto;
 }
 .text-container {
   
@@ -466,6 +467,7 @@ body {
   float: left;
   margin-right: 50px;
   font-size: 14px;
+  margin-left: 20px;
 }
 .split-container-left {
   float: left;
@@ -505,7 +507,7 @@ a {
 }
 
 .table-description-dropdown {
-  position: relative;
+  
   display: inline-block;
 }
 

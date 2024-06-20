@@ -13,32 +13,32 @@
   
 {% block content %}
   {% if specification %}
-    <div class="table-header-container">
-      <table id="roomsTable" class="table-wrapper">
+    <div class="table-wrapper">
+      <table id="roomsTable" class="fl-table">
           <thead>
-            <tr class="table-header">
-              <th class="table-cell table-cell-long">
+            <tr>
+              <th>
                 Romtype
               </th>
-              <th class="table-cell">
+              <th>
                 Luft per person
               </th>   
-              <th class="table-cell">
+              <th>
                 Emisjon
               </th>
-              <th class="table-cell">
+              <th>
                 Prosess
               </th>
-              <th class="table-cell">
+              <th>
                 Luft minimum
               </th>
-              <th class="table-cell">
+              <th>
                 Vent. prinsipp
               </th>
-              <th class="table-cell table-cell-medium">
+              <th>
                 Gjenvinner
               </th>
-              <th class="table-cell">
+              <th>
                 <div class="table-description-dropdown">Styring
                   <div class="table-description-dropdown-content">
                     V = VAV <br>
@@ -50,68 +50,63 @@
                   </div>  
                 
               </th>
-              <th class="table-cell table-cell-long">
+              <th>
                 Presiseringer
               </th>
-              <th class="table-cell">
+              <th>
                   dB teknisk
               </th>
-              <th class="table-cell">
+              <th>
                   dB naborom
               </th>
-              <th class="table-cell">
+              <th>
                   dB korridor
               </th>
-              <th class="table-cell table-cell-long">
+              <th>
                   Kommentar
               </th>
             </tr>
           </thead>
-        </table>
-      </div>
-      
-      <div class="table-container">
-        <table id="roomsTable" class="table-wrapper">
           <tbody>
               {% for data in specification_data %}
-            <tr class="table-row">
-              <td class="table-cell table-cell-long">
+            <tr>
+              <td>
                 {{data.name}}
               </td>
-              <td class="table-cell">
+              <td>
                 {{data.air_per_person}} m3/pers
               </td>
-              <td class="table-cell">
+              <td>
                 {{data.air_emission}} m3/m2
               </td>
-              <td class="table-cell">
+              <td>
                 {{data.air_process}} m3/h
               </td>
-              <td class="table-cell">
+              <td>
                   {{data.air_minimum}} m3/h
                 </td>
-              <td class="table-cell">
+              <td>
                 {{data.ventilation_principle}}
               </td>
-              <td class="table-cell table-cell-medium">  
+              <td>  
                 {{data.heat_exchange}}
               </td>
               <td class="table-cell">
                   {{data.room_control}}
               </td>
-              <td class="table-cell table-cell-long">
+              <td>
                   {{data.notes}}
               </td>
-              <td class="table-cell">
+              <td>
                   {{data.db_technical}}
               </td>
-              <td class="table-cell">
+              <td>
                   {{data.db_neighbour}}
               </td>
-              <td class="table-cell">
+              <td>
                   {{data.db_corridor}}
               </td>
-              <td class="table-cell table-cell-long">
+              <td>
                   {{data.comments}}
               </td>
             </tr>

@@ -43,84 +43,79 @@
   </div>
     <!-- End new room form -->
 
-  <div class="table-header-container">
-    <table class="table-wrapper tableView">
+  <div class="table-wrapper">
+    <table class="fl-table" id="roomsTable">
       <thead>
-        <tr class="table-header">
+        <tr>
           <th class="table-id-cell ">
           </th>
-          <th class="table-cell ">
+          <th>
             Bygg
           </th>
           
-          <th class="table-cell ">
+          <th>
             Etasje
           </th>
                   
-          <th class="table-cell ">
+          <th>
             Romnr
           </th>
 
-          <th class="table-cell ">
+          <th>
             Romtype
           </th>
           
-          <th class="table-cell ">
+          <th>
             Romnavn
           </th>
           
-          <th class="table-cell ">
-            Areal
+          <th>
+            Areal m<sup>2</sup>
           </th>
           
-          <th class="table-cell ">
-            Personer
+          <th>
+            Personer (stk)
           </th>
 
-          <th class="table-cell table-cell-very-long">
+          <th>
             Kommentarer
           </th>
-          <th class="table-cell ">
+          <th>
             
           </th>
         </tr>
       </thead>
-    </table>
-  </div>
-
-  <div class="table-container">
-    <table id="roomsTable" class="table-wrapper">
       <tbody>
         {% for room in project_rooms %}
-        <tr class="table-row">
+        <tr>
           <td hidden-data-column="room_id" class="table-id-cell">
             <span class="hidden-text">{{room.id}}</span>
           </td>
-          <td class="table-cell">
+          <td>
             {{room.building.BuildingName}}
           </td>
-          <td class="table-cell">
+          <td>
             {{room.Floor}}
           </td>
-          <td data-column="room_number" class="table-cell">
+          <td data-column="room_number">
             {{room.RoomNumber}}
           </td>
-          <td data-column="room_name" class="table-cell">
+          <td data-column="room_name">
             {{room.room_type.name}}
           </td>
-          <td data-column="room_name" class="table-cell">
+          <td data-column="room_name">
             {{room.RoomName}}
           </td>
-          <td data-column="area" class="table-cell">
-            {{room.Area}} m<sup>2</sup>
+          <td data-column="area">
+            {{room.Area}}
           </td>
-          <td data-column="population" class="table-cell">
-            {{room.RoomPopulation}} stk.
+          <td data-column="population">
+            {{room.RoomPopulation}}
           </td>
-          <td data-column="comments" class="table-cell table-cell-very-long">
+          <td data-column="comments">
             {{room.Comments}}
           </td>
-          <td id="delete" class="table-cell no-print">
+          <td id="delete">
             <form><button class="table-button" onclick="deleteRoom(event)">Slett rom</button></form>
           </td>
           </tr>

@@ -96,7 +96,7 @@ def udpate_room(project_id):
                
         area = escape(data["area"].strip())
         area_float = pattern_float(area)
-        
+                
         population = escape(data["population"].strip())
         population_int = pattern_int(population)
         

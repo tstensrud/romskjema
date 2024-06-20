@@ -7,65 +7,73 @@
 {%block content %}
 
 <input type="text" name="project_id" id="project_id" value="{{project.id}}" hidden readonly>
-    <div class="ventilation-system-sorting-container">
-      <div class="building-selector-container no-print">
-        <form id="project_building" method="POST">
-          <select name="project_building" id="building_select" onchange="showBuildings()">
-            {% if building %}
-              <option value="{{building.id}}">{{building.BuildingName}}</option>
-            {% else %}
-              <option value="none">- Velg bygg -</option>
-            {% endif %}
-            {% for project_building in project_buildings %}
-              {% if project_building.BuildingName != building.BuildingName %}
-              <option value="{{project_building.id}}">{{project_building.BuildingName}}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
-        </form>
-          {% if heatloss %}
-            <p>
-            <table>
-              <tr class="table-row">
-                <td class="room-data-cell">{{building.BuildingName}} oppsummert</td>
-              </tr>
-              <tr  class="table-row">
-                <td class="room-data-cell">Beregnet varmetap</td>
-                <td class="room-data-cell">{{(heatloss[0]) | round(1)}} W</td>
-              </tr>
-              <tr  class="table-row">
-                <td class="room-data-cell">Prosjektert varme</td>
-                <td class="room-data-cell">
-                  <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{(heatloss[1]) | round(1)}} W</span>   
-                </td>
-              </tr>
-            </table>
-            </p>
-            <p>
-              NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
-            </p>
-          {% else %}
-            <table>
-              <tr class="table-row">
-                <td class="room-data-cell">Varmetap oppsummert</td>
-              </tr>
-              <tr  class="table-row">
-                <td class="room-data-cell">Beregnet varmetap</td>
-                {% if summary[0] %}
-                <td class="room-data-cell"> {{ (summary[0] / 1000) | round(2)}} kW</td>
-                
-              </tr>
-              <tr  class="table-row">
-                <td class="room-data-cell">Prosjektert varme</td>
-                <td class="room-data-cell">
+          <div class="summaries-wrapper">
+            <div class="summaries-table">
+              <div class="summaries-row header blue">
+                <div class="summaries-cell white">
+                  {% if heatloss %}
+                  {{building.BuildingName}} oppsummert
+                  {% else %}
+                  Varmetap oppsummert
+                  {% endif %}
+                </div>
+                <div class="summaries-cell">
+                  <form id="project_building" method="POST">
+                    <select name="project_building" id="building_select" onchange="showBuildings()">
+                      {% if building %}
+                        <option value="{{building.id}}">{{building.BuildingName}}</option>
+                      {% else %}
+                        <option value="none">- Velg bygg -</option>
+                      {% endif %}
+                      {% for project_building in project_buildings %}
+                        {% if project_building.BuildingName != building.BuildingName %}
+                        <option value="{{project_building.id}}">{{project_building.BuildingName}}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </form>
+                </div>
+              </div>
+              <div class="summaries-row">
+                <div class="summaries-cell">
+                  Beregnet varmetap
+                </div>
+                <div class="summaries-cell">
+                  {% if heatloss %}
+                  {{(heatloss[0]) | round(0)}} W
+                  {% else %}
+
+                  {% if summary[0] %}
+                  {{ (summary[0] / 1000) | round(1)}} kW
+                  {% endif %}
+                  {% endif %}
+                  
+                </div>
+              </div>
+              <div class="summaries-row">
+                <div class="summaries-cell">
+                  Prosjektert varme
+                </div>
+                <div class="summaries-cell">
+                  {% if heatloss %}
+                  <span {% if heatloss[1] < heatloss[0] %}class="extract-text"{% endif %}>{{(heatloss[1]) | round(0)}} W</span>
+                  {% else %}
+                  {% if summary[0] %}
                   <span {% if summary[1] < summary[0] %}class="extract-text"{% endif %}>{{ (summary[1] / 1000) | round(2)}} kW</span>
-                </td>
-                {% endif %}
-              </tr>
-              </table>
-            {% endif %}
-      </div>
-    </div>
+                  {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="summaries-row">
+                <div class="summaries-cell">
+                  NB! Alle verdier under MÅ sjekkes opp mot RIBFY sin rapport for hvert bygg.
+                </div>
+                <div class="summaries-cell">
+                  
+                </div>
+              </div>
+            </div>
+          </div>
 
     <div class="ventilation-system-sorting-container no-print">
       <div class="heating-settings">
@@ -102,68 +110,69 @@
         Tillegg (%)<br> <input name="safety" id="safety" placeholder="10" class="input-heating" value="{{heating.Safety}}"{% if not building %} disabled {% endif %}>
         <br>
         <p>
-          <button class="table-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
+          <button class="form-button" type="submit" {% if not building %} disabled {% endif %}>Oppdater</button>
           </form>
         </p>
       </div>
     </div>
-    
-<div class="table-header-container">
-  <table class="table-wrapper tableView">
+
+
+<div class="table-wrapper">
+  <table class="fl-table" id="heatingTable">
     <thead>
-      <tr class="table-header">
+      <tr>
         <th class="table-id-cell">
           
         </th>        
-        <th class="table-cell table-cell-small">
+        <th>
           Etasje
         </th>
                 
-        <th class="table-cell table-cell-medium">
+        <th>
           Romnr
         </th>
         
-        <th class="table-cell">
+        <th>
           Romnavn
         </th>
 
-        <th class="table-cell">
+        <th>
           Høyde
         </th>
 
-        <th class="table-cell">
+        <th>
             Yttervegg m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
             Innervegg m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
             Vindu/dør m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
             Tak m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
             Gulv grunn m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
           Gulv luft m<sup>2</sup>
         </th>
 
-        <th class="table-cell">
+        <th>
             Vent. m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th>
           &#8721; varmetap
         </th>
 
-        <th class="table-cell">
+        <th>
           <div class="table-description-dropdown">Valgt varme (W)
             <div class="table-description-dropdown-content">
                  Mengden varme som tas ut for rommet.
@@ -171,81 +180,76 @@
             </div>
         </th>
 
-        <th class="table-cell">
+        <th>
           Varme/m2
         </th>
 
-        <th class="table-cell">
+        <th>
           Varmekilde
         </th>
-        <th class="table-cell table-cell-long">
+        <th>
             Kommentarer
         </th>
       </tr>
     </thead>
-  </table>
-</div>
-
-<div class="table-container">
-  <table id="heatingTable" class="table-wrapper tableView">
     <tbody>
       {% if rooms|length >= 1 %}
         {% for room in rooms %}
         {% if room.ventilation_properties.room.SpecialSystem != "Ja" %}
-        <tr class="table-row">
+        <tr>
           <td class="table-id-cell" hidden-data-column="vent_data_id">
             <span class="hidden-text">{{room.id}}</span>
           </td>
-          <td class="table-cell table-cell-small">
+          <td>
             {{room.Floor}}
           </td>
-          <td class="table-cell table-cell-medium">
+          <td>
             {{room.RoomNumber}}
           </td>
-          <td class="table-cell">
+          <td>
             {{room.RoomName}}
           </td>
-          <td class="table-cell" data-column="room_height">
+          <td data-column="room_height">
             {{room.energy_properties.RoomHeight}}
           </td>
-          <td class="table-cell" data-column="outer_wall_area">
+          <td data-column="outer_wall_area">
             {{room.energy_properties.OuterWallArea}}
           </td>
-          <td class="table-cell" data-column="inner_wall_area">
+          <td data-column="inner_wall_area">
             {{room.energy_properties.InnerWallArea}}
           </td>
-          <td class="table-cell" data-column="window_door_area">
+          <td data-column="window_door_area">
             {{room.energy_properties.WindowDoorArea}}
           </td>
-          <td class="table-cell" data-column="roof_area">
-            {{room.energy_properties.RoofArea}} m<sup>2</sup>
+          <td data-column="roof_area">
+            {{room.energy_properties.RoofArea}}
           </td>
-          <td class="table-cell" data-column="floor_ground_area">         
+          <td data-column="floor_ground_area">         
             {{room.energy_properties.FloorGroundArea}}
           </td>
-          <td class="table-cell" data-column="floor_air_area">
+          <td data-column="floor_air_area">
             {{room.energy_properties.FloorAirArea}}
           </td>
-          <td class="table-cell">
+          <td>
             {{room.ventilation_properties.AirSupply}}
           </td>
-          <td class="table-cell">
+          <td>
             {{room.energy_properties.HeatLossSum}}
           </td>
-          <td class="table-cell" data-column="chosen_heating">
+          <td data-column="chosen_heating">
             {{room.energy_properties.ChosenHeating}}
           </td>
-          <td class="table-cell">
+          <td>
             {% if room.energy_properties.ChosenHeating != 0 %}
             {{(room.energy_properties.ChosenHeating / room.Area) | round(1)}}
             {% else %}
             0
             {% endif %}
           </td>
-          <td class="table-cell" data-column="heat_source">
+          <td data-column="heat_source">
             {{room.energy_properties.HeatSource}}
           </td>
-          <td class="table-cell table-cell-long" data-column="comment">
+          <td data-column="comment">
             {% if room.energy_properties.ChosenHeating < room.energy_properties.HeatLossSum %}
             Valgt varme under krav. 
             {% endif %}

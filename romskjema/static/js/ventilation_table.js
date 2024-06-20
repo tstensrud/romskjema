@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const input = document.createElement("input");
         input.type = "text";
         input.value = originalText;
-        input.classList.add("table-input-ventilation");
+        input.classList.add("table-input");
         this.innerHTML = "";
         this.appendChild(input);
         input.focus();

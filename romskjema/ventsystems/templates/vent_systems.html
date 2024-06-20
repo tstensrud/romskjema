@@ -50,25 +50,25 @@
     </div>
 
   <div class="split-container-right">
-    <div class="table-header-container">
-        <table class="table-wrapper tableView">
+    <div class="table-wrapper">
+        <table class="fl-table" id="systemsTableVentilation">
           <thead>
-            <tr class="table-header">
+            <tr>
               <th class="table-id-cell">
               </th>
-              <th class="table-cell ">
+              <th>
                 Systemnr
               </th>
-              <th class="table-cell table-cell-long">
+              <th>
                 Plassering
               </th>   
-              <th class="table-cell table-cell-long">
+              <th>
                 Betjeningsområde
               </th>
-              <th class="table-cell ">
-                Viftekapasitet
+              <th>
+                Viftekapasitet m<sup>2</sup>/h
               </th>
-              <th class="table-cell ">
+              <th>
                 
                 <div class="table-description-dropdown">Gjenvinner
                   <div class="table-description-dropdown-content">
@@ -78,64 +78,58 @@
                     </div>
                   </div>
               </th>
-              <th class="table-cell ">
-                Tilluft
+              <th>
+                Tilluft m<sup>2</sup>/h
               </th>
-              <th class="table-cell ">
-                Avtrekk
+              <th>
+                Avtrekk m<sup>2</sup>/h
               </th>
-              <th class="table-cell table-cell-long">
+              <th>
                 Spesialsystem
               </th>
-              <th class="table-cell table-cell-long">
+              <th>
                 Kommentar
               </th>
-              <th class="table-cell no-print">
+              <th>
               </th>
             </tr>
           </thead>
-        </table>
-      </div>
-    
-
-      <div class="table-container">
-        <table id="systemsTableVentilation" class="table-wrapper">
           <tbody>
             {% for system in systems %}
               {% if system.SpecialSystem == "" %}
-              <tr class="table-row">
-                <td hidden-data-column="system_id" class="table-id-cell">
+              <tr>
+                <td hidden-data-column="system_id">
                   <span class="hidden-text">{{system.id}}</span>
                 </td>
-                <td class="table-cell" data-column="system_number">
+                <td data-column="system_number">
                   {{system.SystemName}}
                 </td>
-                <td class="table-cell table-cell-long" data-column="system_location">
+                <td data-column="system_location">
                   {{system.Location}}
                 </td>
-                <td class="table-cell table-cell-long" data-column="service_area">
+                <td data-column="service_area">
                   {{system.ServiceArea}}
                 </td>
-                <td class="table-cell" data-column="airflow">
-                  {{system.AirFlow}} m3/h
+                <td data-column="airflow">
+                  {{system.AirFlow}}
                 </td>
-                <td class="table-cell" data-column="system_hx">
+                <td data-column="system_hx">
                   {% if system.HeatExchange == None %}
                   
                   {% else %}
                   {{system.HeatExchange}}
                   {% endif %}
                 </td>
-                <td class="table-cell">
-                  {{system.AirFlowSupply}} m3/h
+                <td>
+                  {{system.AirFlowSupply}}
                 </td>
-                <td class="table-cell">
-                  {{system.AirFlowExtract}} m3/h
+                <td>
+                  {{system.AirFlowExtract}}
                 </td>
-                <td class="table-cell table-cell-long">
+                <td>
                   {{system.SpecialSystem}}
                 </td>
-                <td class="table-cell table-cell-long">
+                <td>
                   {% if system.AirFlowSupply != None %}
                     {% if system.AirFlowSupply > system.AirFlow %}
                       Prosjektert m3 > aggregat.
@@ -144,71 +138,74 @@
                     {% endif %}
                   {% endif %}
                 </td>
-                <td id="delete" class="table-cell no-print">
+                <td id="delete">
                   <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
                 </td>
                 </tr>
                 {% endif %}
               {% endfor %}
 
-                  <tr class="table-row">
+                  <tr>
                     <td>
                       <br>
                     </td>
                   </tr>
-                <tr class="table-row">
-                  <td class="table-id-cell">
+                <tr>
+                  <td>
 
                   </td>
-                  <td class="table-cell">
+                  <th>
                     Spesialsystemer
+                  </th>
+                  {% for i in range(1,10) %}
+                  <td>
+
                   </td>
+                  {% endfor %}
                 </tr>
 
               {% for system in systems %}
               {% if system.SpecialSystem == "Ja" %}
-              <tr class="table-row">
-                <td hidden-data-column="system_id" class="table-id-cell">
+              <tr>
+                <td hidden-data-column="system_id">
                   <span class="hidden-text">{{system.id}}</span>
                 </td>
-                <td class="table-cell" data-column="system_number">
+                <td data-column="system_number">
                   {{system.SystemName}}
                 </td>
-                <td class="table-cell table-cell-long" data-column="system_location">
+                <td data-column="system_location">
                   {{system.Location}}
                 </td>
-                <td class="table-cell table-cell-long" data-column="service_area">
+                <td data-column="service_area">
                   {{system.ServiceArea}}
                 </td>
-                <td class="table-cell" data-column="airflow">
-                  {{system.AirFlow}} m3/h
+                <td data-column="airflow">
+                  {{system.AirFlow}}
                 </td>
-                <td class="table-cell" data-column="system_hx">
+                <td data-column="system_hx">
                 </td>
-                <td class="table-cell">
-                  {{system.AirFlowSupply}} m3/h
+                <td>
+                  {{system.AirFlowSupply}}
                 </td>
-                <td class="table-cell">
-                  {{system.AirFlowExtract}} m3/h
+                <td>
+                  {{system.AirFlowExtract}}
                 </td>
-                <td class="table-cell table-cell-long">
+                <td>
                   {{system.SpecialSystem}}
                 </td>
-                <td class="table-cell table-cell-long">
+                <td>
                   {% if system.AirFlowSupply %}
                   {% if system.AirFlowSupply > system.AirFlow or system.AirFlowExtract > system.AirFlow %}
                       Prosjektert m3 > system.
                   {% endif %}
                   {% endif %}
                 </td>
-                <td id="delete" class="table-cell no-print">
+                <td id="delete">
                   <form><button class="table-button" onclick="deleteSystem(event)">Slett system</button></form>
                 </td>
                 </tr>
                 {% endif %}
               {% endfor %}
-
-
             </tbody>
           </table>
       

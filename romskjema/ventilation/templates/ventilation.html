@@ -34,71 +34,91 @@ Luftmengdetabell
     {% endif %}
     <input type="text" name="project_id" id="project_id" value="{{project_id}}" hidden readonly>
     <!-- End new room form -->
-    <p>
-      {% if building %}
-      {% if summaries %}
-      <table>
-        <tr class="table-row">
-          <td class="room-data-cell"> {{building.BuildingName}} - oppsummering</td>
-        </tr>
-        <tr class="table-row">
-          <td class="room-data-cell">Dimensjonert luftmengde</td>
-          <td class="room-data-cell">{{summaries[0]}} m<sup>3</sup>/h</td>
-        </tr>
-        
-        <tr  class="table-row">
-          <td class="room-data-cell">Prosjektert tilluft</td>
-          <td class="room-data-cell"> {{summaries[1]}} m<sup>3</sup>/h</td>
-        </tr>
-        <tr  class="table-row">
-          <td class="room-data-cell">Prosjektert avtrekk</td>
-          <td class="room-data-cell">{{summaries[2]}} m<sup>3</sup>/h</td>
-        </tr>
-      </table>
-      {% endif %}
-      {% endif %}
-      </p>
     
-<div class="table-header-container">
-  <table class="table-wrapper tableView">
+  {% if building %}
+    {% if summaries %}
+    <div class="summaries-wrapper">
+      <div class="summaries-table">
+        <div class="summaries-row header blue">
+          <div class="summaries-cell white">
+            {{building.BuildingName}} - oppsummering
+          </div>
+          <div class="summaries-cell">
+            
+          </div>
+        </div>
+
+        <div class="summaries-row">
+          <div class="summaries-cell">
+            Dimensjonert luftmengde
+          </div>
+          <div class="summaries-cell">
+            {{summaries[0]}} m<sup>3</sup>/h
+          </div>
+        </div>
+
+        <div class="summaries-row">
+          <div class="summaries-cell">
+            Prosjektert tilluft
+          </div>
+          <div class="summaries-cell">
+            {{summaries[1]}} m<sup>3</sup>/h
+          </div>
+        </div>
+
+        <div class="summaries-row">
+          <div class="summaries-cell">
+            Prosjektert avtrekk
+          </div>
+          <div class="summaries-cell">
+            {{summaries[2]}} m<sup>3</sup>/h
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endif %}
+    
+<div class="table-wrapper">
+  <table class="fl-table" id="roomsTableVentilation">
     <thead>
-      <tr class="table-header">
-        <th class="table-id-cell no-print">
+      <tr>
+        <th>
         
         </th>
-        <th class="table-cell table-cell-medium">
+        <th>
           Bygg
         </th>
         
-        <th class="table-cell table-cell-small">
+        <th>
           Etasje
         </th>
                 
-        <th class="table-cell table-cell-medium">
+        <th>
           Romnr
         </th>
         
-        <th class="table-cell">
+        <th>
           Romnavn
         </th>
 
-        <th class="table-cell">
+        <th>
             Sum personer m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th>
             Sum emisjon m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th>
             Prosess m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th>
           Minimum m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell">
+        <th>
           <div class="table-description-dropdown">Dimensjonert
           <div class="table-description-dropdown-content">
               Sum personer + emisjon + prosess
@@ -106,80 +126,77 @@ Luftmengdetabell
           </div>
         </th>
 
-        <th class="table-cell table-cell-medium">
+        <th>
             Tilluft m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell table-cell-medium">
+        <th>
             Avtrekk m<sup>3</sup>/h
         </th>
 
-        <th class="table-cell table-cell-medium">
+        <th>
             m<sup>3</sup>/m<sup>2</sup>
         </th>
-        <th class="table-cell">
+        <th>
           Min m<sup>3</sup>/h
       </th>
 
-        <th class="table-cell">
+        <th>
             System
         </th>
-        <th class="table-cell table-cell-long no-print">
+        <th>
             Kommentarer
         </th>
 
       </tr>
     </thead>
-  </table>
-</div>
-<div class="table-container">
-  <table id="roomsTableVentilation" class="table-wrapper tableView">
+
     <tbody>
       {% for data in ventilation_data %}
-      <tr class="table-row">
-        <td class="table-id-cell no-print" hidden-data-column="vent_data_id">
+      <tr>
+        <td hidden-data-column="vent_data_id">
           <span class="hidden-text">{{data.id}}</span>
         </td>
-        <td class="table-cell table-cell-medium">
+        <td>
           {{data.room_ventilation.building.BuildingName}}
         </td>
-        <td class="table-cell table-cell-small">
+        <td>
           {{data.room_ventilation.Floor}}
         </td>
-        <td class="table-cell table-cell-medium">
+        <td>
           <a href="{{ url_for('ventilation.ventilation', building_id=data.room_ventilation.building.id, room_id=data.room_ventilation.id, project_id=project_id)}}">{{data.room_ventilation.RoomNumber}} </a>
         </td>
-        <td class="table-cell">
+        <td>
           {{data.room_ventilation.RoomName}}
         </td>
-        <td class="table-cell">
+        <td>
           {{data.AirPersonSum}}
         </td>
-        <td class="table-cell">
+        <td>
           {{data.AirEmissionSum}}
         </td>
-        <td class="table-cell">
+        <td>
             {{data.AirProcess}}
         </td>
-        <td class="table-cell">
+        <td>
           {{data.AirMinimum}}
         </td>
-        <td class="table-cell">
+        <td>
             {{data.AirDemand}}
         </td>
-        <td class="table-cell supplyCell table-cell-medium" data-column="supply_air">
+        <td class="supplyCell" data-column="supply_air">
             {{data.AirSupply}}
         </td>
-        <td class="table-cell extractCell table-cell-medium" data-column="extract_air">
+        <td class="extractCell" data-column="extract_air">
             {{data.AirExtract}}
         </td>
-        <td class="table-cell table-cell-medium">
+        <td>
             {{data.AirChosen}}
         </td>
-        <td class="table-cell">
+        <td>
           {{data.AirMinimum * data.room_ventilation.Area }}
       </td>
-        <td class="table-cell" data-column="system_id">         
+        <td data-column="system_id">         
           
           <form id="system" method="POST">  
             <select class="table-select" name="system_id" id="system_id">
@@ -198,15 +215,17 @@ Luftmengdetabell
           </form>
 
         </td>
-        <td class="table-cell table-cell-long no-print" data-column="comment">
+        <td data-column="comment">
           {% if data.room.SpecialSystem != "Ja" %} 
             
             {% if data.AirSupply < data.AirDemand %}
               Tilluft under krav. 
             {% endif %}
             
-            {% if data.AirSupply != data.AirExtract %}
-              Ubalanse i rom. 
+            {% if data.AirSupply > data.AirExtract %}
+              Ubalanse i rom: + {{data.AirSupply - data.AirExtract}}
+            {% elif data.AirSupply < data.AirExtract %}
+              Ubalanse i rom: {{data.AirSupply - data.AirExtract}}
             {% endif %}
             
             {% if data.SystemId != None %}

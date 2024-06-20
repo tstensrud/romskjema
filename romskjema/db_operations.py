@@ -207,7 +207,10 @@ def initial_ventilation_calculations(room_id: int) -> bool:
     vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess),1)
     vent_properties_room.AirSupply = round((math.ceil(vent_properties_room.AirDemand / 10) * 10), 1)
     vent_properties_room.AirExtract = vent_properties_room.AirSupply
-    vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
+    if room.Area > 0:
+        vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
+    else:
+        vent_properties_room.AirChosen = 0.0
     try:
         db.session.commit()
         return True
@@ -223,7 +226,10 @@ def update_ventilation_calculations(room_id: int) -> bool:
     vent_properties_room.AirPersonSum = round((room.RoomPopulation * vent_properties_room.AirPerPerson),1)
     vent_properties_room.AirEmissionSum = round((room.Area * vent_properties_room.AirEmission), 1)
     vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess),1)
-    vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
+    if room.Area > 0:
+        vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
+    else:
+        vent_properties_room.AirChosen = 0.0
     try:
         db.session.commit()
         return True
@@ -239,7 +245,10 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
     room = vent_properties_room.room_ventilation
     vent_properties_room.AirSupply = new_supply
     vent_properties_room.AirExtract = new_extract
-    vent_properties_room.AirChosen = round((new_supply / room.Area), 1)
+    if room.Area > 0:
+        vent_properties_room.AirChosen = round((new_supply / room.Area), 1)
+    else:
+        vent_properties_room.AirChosen = 0.0
     if system is not None:
         vent_properties_room.System = system
     if comment is not None:

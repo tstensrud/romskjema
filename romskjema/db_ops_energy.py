@@ -129,12 +129,12 @@ def update_room_heating_data(energy_room_id: int, data) -> bool:
 @login_required
 def infiltration_loss(delta_t_inside_outside: float, room_volume: float, air_change_per_hour: float) -> float:
     infiltration_loss = 0.28 * 1.2 * delta_t_inside_outside * room_volume * air_change_per_hour
-    return round(infiltration_loss, 1)
+    return infiltration_loss
 
 @login_required
 def ventilation_loss(air_flow_per_area: float, room_area: float, indoor_temp: float, vent_air_temp: float) -> float:
     ventilation_loss = 0.35 * air_flow_per_area * room_area * (indoor_temp - vent_air_temp)
-    return round(ventilation_loss, 1)
+    return ventilation_loss
 
 @login_required
 def calculate_total_heat_loss_for_room(energy_room_id: int) -> bool:
