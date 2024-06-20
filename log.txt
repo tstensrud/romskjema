@@ -1,24 +1,2 @@
 
 
-- 2024-06-17 21:40:10.011935: update_ventilation_table: 'Rooms' object has no attribute 'heating_properties'
-
-- 2024-06-20 13:04:18.152735: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:04:18.158738: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:05:21.249729: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:05:21.252647: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:05:31.933085: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:05:31.937084: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:08:33.343956: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:08:33.347984: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:08:38.590361: calcualte total heat loss: float division by zero
-
-- 2024-06-20 13:08:38.594361: calcualte total heat loss: float division by zero
-
