@@ -20,8 +20,10 @@
 
 .fl-table td, .fl-table th {
   text-align: center;
+  position: relative;
   padding-top: 3px;
   padding-bottom: 3px;
+  box-sizing: border-box;
 }
 
 .fl-table td {
@@ -135,7 +137,7 @@
   width: 100%;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   display: table;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .summaries-row {
@@ -150,12 +152,17 @@
 .summaries-row.header {
   font-weight: 500;
   color: #ffffff;
-  background: #ea6153;
+  background: #3e6272;
 }
 
 .summaries-row.blue {
   background: #324960;
 }
+
+.summaries-row.green {
+  background: #27ae60;
+}
+
 
 .summaries-cell {
   padding: 6px 12px;

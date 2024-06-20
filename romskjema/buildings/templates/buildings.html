@@ -7,6 +7,7 @@
 {%block page_subtitle %}Bygg{% endblock %}
 {%block content %}
     <div class="text-container">
+      <div class="summaries-wrapper">
         <h1  class="app-content-Text">Legg til bygg i prosjekt</h1>
         <p>
             <form class="custom-form profile-form" method="POST" role="form">
@@ -16,7 +17,7 @@
                     </button>
             </form>
         </p>
-    
+      </div>
     {% if not project_buildings %}
         <p class="p-description">Ingen bygg lagt inn for {{ project.ProjectName }}</p>
     {%else %}

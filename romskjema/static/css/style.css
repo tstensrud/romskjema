@@ -283,7 +283,7 @@ body {
 }
 .app-content-Text {
   color: var(--app-content-main-color);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 0px;
   margin: 0;
 }
@@ -464,6 +464,7 @@ body {
 }
 
 .heating-settings {
+/*  background: var(--sidebar-hover-link);*/
   float: left;
   margin-right: 50px;
   font-size: 14px;

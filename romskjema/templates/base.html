@@ -220,7 +220,7 @@
               <p>  
                     {% if user.is_authenticated %}
                         {% if project %}
-                            {{project.ProjectName}}
+                            {{project.ProjectName}} - {{project.ProjectNumber}}
                         {% else %}
                             {% block pagetitle %}{%endblock%}
                         {% endif %}

@@ -46,80 +46,80 @@ function deleteRoom(event) {
 document.addEventListener("DOMContentLoaded", function() {
   const table = document.getElementById("roomsTable");
   const cells = table.getElementsByTagName("td");
-  const lockedCells = [0,1,2,4,9]
+  const lockedCells = [0, 1, 2, 4, 9];
   const projectId = document.getElementById("project_id").value;
 
   for (let cell of cells) {
-    cell.addEventListener("click", function() {
-      if (lockedCells.includes(this.cellIndex)) return;
-      if (this.querySelector("input")) return;
+      cell.addEventListener("click", function() {
+          if (lockedCells.includes(this.cellIndex)) return;
+          if (this.querySelector("input")) return;
 
-      const originalText = this.innerText;
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = originalText;
-      input.classList.add("table-input");
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
+          const originalText = this.innerText;
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = originalText;
+          input.classList.add("table-input");
+          this.innerHTML = "";
+          this.appendChild(input);
+          input.focus();
 
-      const saveData = () => {
-        const newValue = input.value;
-        if (newValue === originalText) {
-          this.textContent = originalText;
-          return;
-        } 
+          const saveData = async () => {
+              const newValue = input.value;
+              if (newValue === originalText) {
+                  this.textContent = originalText;
+                  return;
+              }
 
-        this.innerText = newValue;
+              this.innerText = newValue;
 
-        const row = this.parentElement;
-        const rowData = {};
-        const cells = row.getElementsByTagName("td");
+              const row = this.parentElement;
+              const rowData = {};
+              const cells = row.getElementsByTagName("td");
 
-        for (let cell of cells) {
-          const columnName = cell.getAttribute("data-column");
-          const hiddenColumnName = cell.getAttribute("hidden-data-column")
-          
-          if (columnName) {
-            rowData[columnName] = cell.innerText;
-          }
+              for (let cell of cells) {
+                  const columnName = cell.getAttribute("data-column");
+                  const hiddenColumnName = cell.getAttribute("hidden-data-column");
 
-          if (hiddenColumnName) {
-            rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
-          }
-          rowData["project_id"] = projectId;
-        }
+                  if (columnName) {
+                      rowData[columnName] = cell.innerText;
+                  }
 
-        fetch(`/${projectId}/rooms/update_room`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(rowData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            window.location.href = data.redirect;
-          } else {
-            console.error("Update failed");
-          }
-        })
-        .catch(error => {
-          console.error("Error:", error);
-        });
-      };
+                  if (hiddenColumnName) {
+                      rowData[hiddenColumnName] = cell.querySelector(".hidden-text").textContent;
+                  }
+                  rowData["project_id"] = projectId;
+              }
 
-      input.addEventListener("blur", saveData);
-      input.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-          saveData();
-          input.blur();
-        }
+              try {
+                  const response = await fetch(`/${projectId}/rooms/update_room`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(rowData)
+                  });
+                  const data = await response.json();
+                  if (data.success) {
+                      window.location.href = data.redirect;
+                  } else {
+                      console.error("Update failed");
+                  }
+              } catch (error) {
+                  console.error("Error:", error);
+              }
+          };
+
+          input.addEventListener("blur", saveData);
+          input.addEventListener("keypress", function(event) {
+              if (event.key === "Enter") {
+                  saveData();
+                  input.blur();
+              }
+          });
       });
-    });
   }
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
   var form = document.getElementById('new_room');

@@ -26,55 +26,50 @@ Legg til ny bruker
 <p>
     Brukere
 </p>
-    <div class="table-header-container">
-        <table class="table-wrapper tableView">
+    <div class="table-wrapper">
+        <table class="fl-table">
             <thead>
-                <tr class="table-header">
-                <th class="table-cell">
+                <tr>
+                <th>
                     Bruker-ID
                 </th>
                 
-                <th class="table-cell table-cell-long">
+                <th>
                     Bruker-epost
                 </th>
                         
-                <th class="table-cell table-cell-long">
+                <th>
                     Navn på bruker
                 </th>
 
-                <th class="table-cell table-cell-long">
+                <th>
                     Administrator
                 </th>
                 
-                <th class="table-cell table-cell-long">
+                <th>
                     Kontostatus
                 </th>
-                <th class="table-cell table-cell-long">
+                <th>
                     Innlogget
                 </th>
                 </tr>
             </thead>
-        </table>
-    </div>
-
-  <div class="table-container">
-    <table id="roomsTable" class="table-wrapper">
       <tbody>
         {% for user in users %}
-        <tr class="table-row">
-          <td class="table-cell">
+        <tr>
+          <td>
             {{user.id}}
           </td>
-          <td class="table-cell table-cell-long">
+          <td>
             {{user.email}}
           </td>
-          <td class="table-cell table-cell-long">
+          <td>
             {{user.name}}
           </td>
-          <td class="table-cell table-cell-long">
+          <td>
             {{user.admin}}
           </td>
-          <td class="table-cell table-cell-long">
+          <td>
             {% if not user.admin %}
             <form id="a{{user.id}}" method="POST">
               <input type="text" name="user_id" value="{{user.id}}" hidden>
@@ -90,7 +85,7 @@ Legg til ny bruker
             </form>
             {% endif %}
           </td>
-          <td class="table-cell table-cell-long">
+          <td>
             {{user.logged_in}}
           </td>
           {% endfor %}
