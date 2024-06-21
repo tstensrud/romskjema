@@ -120,7 +120,7 @@ def update_ventilation(project_id):
         comment = escape(data["comment"].strip())
         
 
-        if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, system_id, comment):
+        if dbo.update_ventilation_table(vent_prop_id, new_supply, new_extract, system_id):
             if dbo.update_system_airflows(system_id):
                 dboh.calculate_total_heat_loss_for_room(dbo.get_room_vent_prop(vent_prop_id).room_ventilation.energy_properties.id)
                 dboh.calculate_total_cooling_for_room(dbo.get_room_vent_prop(vent_prop_id).room_ventilation.energy_properties.id)

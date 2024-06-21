@@ -201,11 +201,12 @@ def get_room_vent_prop(vent_prop_id: int) -> models.RoomVentilationProperties:
 def initial_ventilation_calculations(room_id: int) -> bool:
     vent_properties_room = db.session.query(models.RoomVentilationProperties).filter(models.RoomVentilationProperties.RoomId == room_id).first()
     room = get_room(room_id)
-    print(room.RoomPopulation)
     vent_properties_room.AirPersonSum = round((room.RoomPopulation * vent_properties_room.AirPerPerson),1)
     vent_properties_room.AirEmissionSum = round((room.Area * vent_properties_room.AirEmission), 1)
-    vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess),1)
+    vent_properties_room.AirDemand = round((vent_properties_room.AirPersonSum + vent_properties_room.AirEmissionSum + vent_properties_room.AirProcess), 1)
+    print(f"AIR DEMAND: {vent_properties_room.AirDemand}")
     vent_properties_room.AirSupply = round((math.ceil(vent_properties_room.AirDemand / 10) * 10), 1)
+    print(f"AIR SUPPLY: {vent_properties_room.AirSupply}")
     vent_properties_room.AirExtract = vent_properties_room.AirSupply
     if room.Area > 0:
         vent_properties_room.AirChosen = round((vent_properties_room.AirSupply / room.Area), 1)
@@ -239,7 +240,7 @@ def update_ventilation_calculations(room_id: int) -> bool:
         return False
 
 @login_required
-def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: float, system=None, comment=None) -> bool:
+def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: float, system=None) -> bool:
     print(f"System id for update ventilation table: {system}")
     vent_properties_room = get_room_vent_prop(vent_prop_id)
     room = vent_properties_room.room_ventilation
@@ -251,8 +252,6 @@ def update_ventilation_table(vent_prop_id: int, new_supply: float, new_extract: 
         vent_properties_room.AirChosen = 0.0
     if system is not None:
         vent_properties_room.System = system
-    if comment is not None:
-        vent_properties_room.Comments = comment
     try:
         db.session.commit()
         if system is not None:
@@ -504,9 +503,9 @@ def get_specification_room_data(specification_name: str):
 def new_specification_room_type(specification_id: int, data) -> bool:
     room_control = ""
     if data["control_vav"] == "1":
-        room_control = room_control + "V, "
+        room_control = room_control + "VAV, "
     else:
-        room_control = room_control + "C, "
+        room_control = room_control + "CAV, "
     if data["control_co2"] == "True":
         room_control = room_control + "CO2, "
     if data["control_temp"] == "True":

@@ -217,22 +217,39 @@ Luftmengdetabell
         </td>
         <td data-column="comment">
           {% if data.room.SpecialSystem != "Ja" %} 
-            
-            {% if data.AirSupply < data.AirDemand %}
-              Tilluft under krav. 
-            {% endif %}
-            
-            {% if data.AirSupply > data.AirExtract %}
-              Ubalanse i rom: + {{data.AirSupply - data.AirExtract}}
-            {% elif data.AirSupply < data.AirExtract %}
-              Ubalanse i rom: {{data.AirSupply - data.AirExtract}}
-            {% endif %}
-            
-            {% if data.SystemId != None %}
-              {% if data.room.HeatExchange not in data.HeatExchange %}
-                Systemgjenvinner ulikt romkrav.
+
+            {% if "CAV" in data.RoomControl %}
+              {% if data.AirSupply > data.AirExtract%}
+                Tilluft > Avtrekk. 
+              {% elif data.AirExtract > data.AirSupply %}
+                Avtrekk > Tilluft. 
+              {% endif %}
+              {% if data.AirSupple or data.AirExtract < data.AirDemand %}
+                Luftmengde mindre enn krav. 
               {% endif %}
             {% endif %}
+
+            {% if "CAV" not in data.RoomControl %}
+              
+              {% if data.AirSupply < data.AirDemand %}
+                  Tilluft under krav. 
+                {% endif %}
+                
+                
+                {% if data.AirSupply > data.AirExtract %}
+                    Ubalanse i rom: + {{data.AirSupply - data.AirExtract}}
+                  {% elif data.AirSupply < data.AirExtract %}
+                    Ubalanse i rom: {{data.AirSupply - data.AirExtract}}
+                  {% endif %}
+                {% endif %}
+
+                {% if data.SystemId != None %}
+                  {% if data.room.HeatExchange not in data.HeatExchange %}
+                    Systemgjenvinner ulikt romkrav.
+                {% endif %}
+            
+            {% endif %}
+            
 
           {% endif %}
         </td>

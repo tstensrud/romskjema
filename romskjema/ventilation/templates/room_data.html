@@ -228,7 +228,45 @@
             Kommentarer
           </div>
           <div class="summaries-cell">
-            {{ventilation_data.Comments}}
+                       
+            {% if ventilation_data.room.SpecialSystem != "Ja" %} 
+
+            {% if "CAV" in ventilation_data.RoomControl %}
+              {% if ventilation_data.AirSupply > ventilation_data.AirExtract%}
+                Tilluft > Avtrekk. 
+              {% elif ventilation_data.AirExtract > ventilation_data.AirSupply %}
+                Avtrekk > Tilluft. 
+              {% endif %}
+              {% if ventilation_data.AirSupple or ventilation_data.AirExtract < ventilation_data.AirDemand %}
+                Luftmengde mindre enn krav. 
+              {% endif %}
+            {% endif %}
+
+            {% if "CAV" not in ventilation_data.RoomControl %}
+              
+              {% if ventilation_data.AirSupply < ventilation_data.AirDemand %}
+                  Tilluft under krav. 
+                {% endif %}
+                
+                
+                {% if ventilation_data.AirSupply > ventilation_data.AirExtract %}
+                    Ubalanse i rom: + {{ventilation_data.AirSupply - ventilation_data.AirExtract}}
+                  {% elif ventilation_data.AirSupply < ventilation_data.AirExtract %}
+                    Ubalanse i rom: {{ventilation_data.AirSupply - ventilation_data.AirExtract}}
+                  {% endif %}
+                {% endif %}
+
+                {% if ventilation_data.SystemId != None %}
+                  {% if ventilation_data.room.HeatExchange not in ventilation_data.HeatExchange %}
+                    Systemgjenvinner ulikt romkrav.
+                {% endif %}
+            
+            {% endif %}
+            
+
+          {% endif %}
+
+
           </div>
         </div>
 
