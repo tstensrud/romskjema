@@ -1,11 +1,12 @@
-from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, session, request
+from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from .. import db_ops_energy as dboh
-from ..globals import get_project, pattern_float, pattern_int, replace_and_convert_to_float
+from ..globals import pattern_float, replace_and_convert_to_float, blueprint_setup
 from markupsafe import escape
 
 heating_bp = Blueprint('heating', __name__, static_folder="static", template_folder="templates")
+blueprint_setup(heating_bp)
 
 
 @heating_bp.route('/', defaults={'building': None}, methods=['GET', 'POST'])

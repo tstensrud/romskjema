@@ -3,10 +3,11 @@ from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from .. import db_ops_energy as dboh
-from ..globals import get_project
+from .. import globals
 from markupsafe import escape
 
 buildings_bp = Blueprint('buildings', __name__, static_folder='static', template_folder='templates')
+globals.blueprint_setup(buildings_bp)
 
 @buildings_bp.route('/', methods=['POST', 'GET'])
 @login_required

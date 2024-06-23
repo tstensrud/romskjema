@@ -10,9 +10,11 @@
     <p>
         <select name="project_id">
             <option value="none">-  Velg prosjekt -</option>
+            {% if projects %}
             {% for project in projects %}
             <option value="{{project.id}}">{{project.ProjectName}}</option>
             {% endfor %}
+            {% endif %}
         </select>
     </p>
         <p>

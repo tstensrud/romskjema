@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/form.css">
     <link rel="stylesheet" href="/static/css/tables.css">
-    <link rel="stylesheet" href="/static/css/flash_popup.css">
+    <link rel="stylesheet" href="/static/css/popups.css">
     <link rel="stylesheet" href="/static/css/print.css">
     <!-- https://package.elm-lang.org/packages/1602/elm-feather/1.0.0/FeatherIcons#crosshair -->
 
@@ -28,22 +28,23 @@
     {% endwith %}
 
 
+
         <div class="app-container">
-        <!-- SIDE BAR MENU-->
+
+       <!-- Dark/light mode -->
         <div class="switch-mode-container no-print">
-            <p>
-                <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
-                <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
-                <defs></defs>
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-                </svg>
-                </button>
-            </p>
+            <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
+            <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+            <defs></defs>
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+            </svg>
+            </button>
         </div>
+
+         <!-- SIDE BAR MENU-->
         {% if user.is_authenticated %}
         
-        <div class="sidebar no-print ">
-
+        <div class="sidebar no-print">
                 {% if project %}
                 <ul class="sidebar-list">
                     {% if endpoint == "project.project" %}
@@ -154,7 +155,7 @@
                     </a>
                 </li>
                 <li class="sidebar-list-item">
-                    <a href="#">
+                    <a href="{{ url_for('user.user_profile', username=current_user.name )}}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg> 
                     <span>Brukerkonto</span>
                     </a>
@@ -192,10 +193,25 @@
                     <span>Kravspesifikasjoner</span>
                     </a>
                 </li>
+                
+                {% if endpoint == "user.user_profile" %}
+                <li class="sidebar-list-item active">
+                {% else %}
+                <li class="sidebar-list-item">
+                {% endif %}
+                    <a href="{{ url_for('user.user_profile', username=current_user.name )}}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg> 
+                    <span>Brukerkonto</span>
+                    </a>
+                </li>
 
                 {% endif %}
                 {% if current_user.admin == True %}
+                {% if endpoint == "admin.admin" %}
+                <li class="sidebar-list-item active">
+                {% else %}
                 <li class="sidebar-list-item">
+                {% endif %}
                     <a href="{{ url_for('admin.admin') }}">
                         Admin
                     </a>
@@ -232,13 +248,62 @@
 <!-- START SITE CONTENT -->
     
 <div class="text-div">
+    {% if project %}
+    <!-- TODO-list -->
+    <div id="todo-popup" class="todo-popup">
+        
+        <div class="todo-popup-header">
+            <span class="todo-close-btn">&times;</span>
+            <br>
+            Huskeliste
+        </div>
+
+        <div class="todo-popup-item-container" id="todo-popup-item-container">
+            
+            <form id="todoItem">
+                <input type="text" id="project_id" value="{{project.id}}" hidden readonly>
+                <input type="text" id="user_id" value="{{user.id}}" hidden readonly>
+            <div class="todo-popup-listitem-form ">    
+                <input type="text" id="todo_content" class="todo-input" placeholder="Nytt huskepunkt">
+            </div>
+            <div class="todo-popup-listitem">    
+                <button class="table-button" id="submitTodoButton">Legg til</button>
+            </div>
+            </form>
+
+
+            {% if todo_list %}
+                {% for item in todo_list %}
+                    <div key="{{item.id}}" class="todo-popup-listitem" id="todo-popup-listitem">
+                        <input type="text" class="item-id" id="item-id" value="{{item.id}}" hidden readonly>
+                        <p>{{item.date}} - {{item.author_id}}</p>
+                        <p>{{item.content}}</p>
+                        <p><button class="todo-list-button" id="todo-completed">Utført</button></p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="todo-popup-listitem">
+                    <p>Ingen huskepunkter</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="todo-container">
+        <a class="todo-link" href="#" id="todo-openPopup">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg> 
+        </a>
+    </div>
+    {% endif %}
+
+
     <div class="subtitle-header-container">
       <h1 class="app-content-subTitleheaderText">
         {% block page_subtitle %}
         {% endblock %}
     </h1>
 </div>
-
         {% block content %}
 
         {% endblock %}

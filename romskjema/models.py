@@ -2,9 +2,6 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
-'''
-User table
-'''
 class User(db.Model, UserMixin):
     __tablename__ = 'Users'
     id = db.Column(db.Integer, primary_key=True, autoincrement = True)
@@ -15,9 +12,23 @@ class User(db.Model, UserMixin):
     admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
 
+    todo_item = db.relationship('TodoItem', backref='user', uselist=False, lazy=True)
+
+
 '''
-Project-specific tables
+# TODO-items
 '''
+class TodoItem(db.Model):
+    __tablename__ = "TodoItem"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Projects.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    date = db.Column(db.String(10), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    completed = db.Column(db.Boolean, default=False)
+    date_completed = db.Column(db.String(10))
+    completed_by = db.Column(db.String(100))
+
 class Projects(db.Model):
     __tablename__ = "Projects"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -26,6 +37,7 @@ class Projects(db.Model):
     ProjectDescription = db.Column(db.Text)
     Specification = db.Column(db.String(50))
 
+    todo_item = db.relationship('TodoItem', backref='project', uselist=False, lazy=True)
     buildings = db.relationship('Buildings', backref='project_buildings', uselist=False, lazy=True)
     ventilation_systems = db.relationship('VentilationSystems', backref='project_ventilation_systems', uselist=False, lazy=True)
     
@@ -185,4 +197,4 @@ class RoomTypes(db.Model):
     db_neighbour = db.Column(db.String(50))
     db_corridor = db.Column(db.String(50))
     comments = db.Column(db.String(20))
-
+    

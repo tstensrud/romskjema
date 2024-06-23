@@ -2,10 +2,11 @@ from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import login_required, current_user
 from .. import models, db
 from .. import db_ops_admin as dboa
+from .. import globals
 from werkzeug.security import generate_password_hash
 from functools import wraps
 from markupsafe import escape
-import smtplib
+from ..import db_ops_users as dbou
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -15,7 +16,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.admin:
-            print("Unauthorized attempt")
+            globals.log(f"Unauthorized attempt to access admin page by {current_user.name}")
         return f(*args, **kwargs)
     return decorated_function
 
@@ -27,33 +28,24 @@ def send_user_email(subject: str, body: str, to_email: str) -> bool:
 
     return True
         
-@login_required
-@admin_required
-def get_users():
-    users = db.session.query(models.User).all()
-    return users
-
-@login_required
-@admin_required
-def get_user(user_id: int) -> models.User:
-    user = db.session.query(models.User).filter(models.User.id == user_id).first()
-    return user
 
 @login_required
 @admin_required
 @admin_bp.route('/', methods=['GET', 'POST'])
 def admin():
+    endpoint = request.endpoint
     if request.method == "GET":
-        users = get_users()
+        users = dbou.get_users()
         return render_template("admin.html",
                             user=current_user,
-                            users=users)
+                            users=users,
+                            endpoint=endpoint)
     elif request.method == "POST":
         user_id = escape(request.form.get("user_id"))
         print(user_id)
         if user_id == "1":
             return redirect(url_for("admin.admin"))    
-        user = get_user(int(user_id))
+        user = dbou.get_user(int(user_id))
         user.is_active = not user.is_active
         db.session.commit()
         return redirect(url_for("admin.admin"))

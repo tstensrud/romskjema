@@ -496,11 +496,11 @@ body {
   position: fixed;
   top: 0;
   right: 0;
-  width: 200px; 
   height: 100px;
   background-color: transparent;
   padding: 10px; /* Padding inside the div */ 
 }
+
 
 a {
   text-decoration: none;

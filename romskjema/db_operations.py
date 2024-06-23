@@ -1,8 +1,10 @@
+import math
+import datetime
+
 from sqlalchemy import func, and_
 from . import models, db
 from . import db_ops_energy as dboh
 from flask_login import login_required
-import math
 from . import globals
 
 '''
@@ -44,6 +46,56 @@ def check_for_existing_project_number(project_number: str) -> bool:
     else:
         return False
 
+'''
+TODO-list
+'''
+@login_required
+def new_todo_item(project_id: int, author_id: int, content: str) -> bool:
+    date = datetime.datetime.now()
+    date = date.strftime("%Y-%m-%d")
+
+    new_item = models.TodoItem(project_id=project_id,
+                               author_id=author_id,
+                               date=date,
+                               content=content,
+                               date_completed=0,
+                               completed_by="")
+    try:
+        db.session.add(new_item)
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"new todo item: {e}")
+        db.session.rollback()
+        return False
+@login_required
+def get_todo_item(item_id: int) -> models.TodoItem:
+    item = db.session.query(models.TodoItem).filter(models.TodoItem.id == item_id).first()
+    return item
+
+@login_required
+def get_project_todo_items(project_id: int) -> dict:
+    todo_list = db.session.query(models.TodoItem).filter(and_(models.TodoItem.project_id == project_id, models.TodoItem.completed == False)).order_by(models.TodoItem.date).all()
+    todo_dict = [{"id": item.id, "project_id": item.project_id, "author_id": item.user.name, "date": item.date,
+                    "content": item.content, "completed": item.completed, "date_completed": item.date_completed,
+                    "completed_by": item.completed_by} for item in todo_list]
+    return todo_dict
+
+@login_required
+def set_todo_item_completed(item_id: int, user_id: int) -> bool:
+    date = datetime.datetime.now()
+    date = date.strftime("%Y-%m-%d")
+    item = get_todo_item(item_id)
+    item.completed = True
+    item.date_completed = date
+    item.completed_by = user_id
+    try:
+        db.session.commit()
+        return True
+    except Exception as e:
+        globals.log(f"Set todo item complete: {e}")
+        db.session.rollback()
+        return False
 
 '''
 Building methods
@@ -146,13 +198,13 @@ def check_if_roomnumber_exists(project_id, building_id, room_number) -> bool:
         return False
 
 @login_required
-def update_room_data(room_id: int, new_room_number: str, new_room_name: str, new_area: float, new_pop: int, new_comment: str) -> bool:
+def update_room_data(room_id: int, new_data) -> bool:
     room = get_room(room_id)
-    room.Area = new_area
-    room.RoomPopulation = new_pop
-    room.RoomNumber = new_room_number
-    room.RoomName = new_room_name
-    room.Comments = new_comment
+    room.Area = new_data["area"]
+    room.RoomPopulation = new_data["population"]
+    room.RoomNumber = new_data["room_number"]
+    room.RoomName = new_data["room_name"]
+    room.Comments = new_data["comments"]
     try:
         db.session.commit()
         return True

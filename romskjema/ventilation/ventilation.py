@@ -2,10 +2,11 @@ from flask import Blueprint, redirect, url_for, render_template, flash, jsonify,
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from .. import db_ops_energy as dboh
-from ..globals import get_project, pattern_float
+from ..globals import get_project, pattern_float, blueprint_setup
 from markupsafe import escape
 
 ventilation_bp = Blueprint('ventilation', __name__, static_folder='static', template_folder='templates')
+blueprint_setup(ventilation_bp)
 
 @ventilation_bp.route('/', defaults={'building_id': None, 'room_id': None}, methods=['GET', 'POST'])
 @ventilation_bp.route('/<building_id>', defaults={'room_id': None}, methods=['GET', 'POST'])

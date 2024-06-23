@@ -27,10 +27,12 @@ def create_app():
     from .specifications import specifications
     from .heating import heating
     from .cooling import cooling
+    from .userprofile import user
     
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(user.user_bp, url_prefix='/user/<username>')
     app.register_blueprint(admin.admin_bp, url_prefix='/admin')
     app.register_blueprint(projects.projects_bp, url_prefix='/projects')
     app.register_blueprint(specifications.specifications_bp, url_prefix='/specifications')
@@ -42,8 +44,6 @@ def create_app():
     app.register_blueprint(heating.heating_bp, url_prefix='/<project_id>/heating')
     app.register_blueprint(cooling.cooling_bp, url_prefix='/<project_id>/cooling')
 
-    #app.jinja_env.globals['flash'] = disable_flash
-
     from .models import User
     create_db(app)
 
@@ -54,7 +54,7 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
-
+    
     return app
 
 def create_db(app):
@@ -62,7 +62,6 @@ def create_db(app):
         with app.app_context():
             db.create_all()
 
-#def disable_flash(message, category='message'):
-#    pass
+
 
     

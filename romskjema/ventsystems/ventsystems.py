@@ -2,10 +2,11 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, jsonify, request
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
-from ..globals import pattern_int, pattern_float
+from ..globals import pattern_int, pattern_float, blueprint_setup
 from markupsafe import escape
 
 ventsystems_bp = Blueprint('ventsystems', __name__, static_folder='static', template_folder='templates')
+blueprint_setup(ventsystems_bp)
 
 @login_required
 @ventsystems_bp.route('/', methods=['GET', 'POST'])

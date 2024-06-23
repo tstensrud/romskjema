@@ -1,21 +1,25 @@
 import os
 import json
 from werkzeug.security import generate_password_hash
-from flask import Blueprint, render_template, redirect, url_for
-from flask_login import login_user, current_user
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from flask_login import login_user, current_user, login_required
 from . import models, db
-from . import db_operations as dbo
 
 views = Blueprint("views", __name__)
 
 '''
 Views
 '''
+
 @views.route('/')
 def index():
-    return render_template("index.html", 
-                           user=current_user, 
-                           project=None)
+        if current_user.is_authenticated:
+            return redirect(url_for('projects.projects'))
+        else:
+            return render_template("index.html", 
+                                user=current_user, 
+                                project=None)
+
 @views.route('/initialize', methods=['GET'])
 def initialize():
         

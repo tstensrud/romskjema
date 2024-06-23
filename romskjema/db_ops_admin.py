@@ -1,7 +1,6 @@
 from sqlalchemy import func, and_
 from . import models, db
 from flask_login import login_required
-import math
 from . import globals
 
 @login_required

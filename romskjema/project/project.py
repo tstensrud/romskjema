@@ -1,10 +1,12 @@
-from flask import Blueprint, redirect, url_for, render_template, flash, request, session
+from flask import Blueprint, redirect, url_for, render_template, jsonify, flash, g, request
 from flask_login import login_required, current_user
 from .. import models, db
 from .. import db_operations as dbo
+from .. import globals
 from markupsafe import escape
 
 project_bp = Blueprint('project', __name__, static_folder='static', template_folder='templates')
+globals.blueprint_setup(project_bp)
 
 @project_bp.route('/', methods=['GET', 'POST'])
 @login_required
@@ -56,8 +58,8 @@ def settings(project_id):
         db.session.commit()
         return redirect(url_for('project.project', project_id=project_id))
 
-@login_required
 @project_bp.route('/reports', methods=['GET'])
+@login_required
 def reports(project_id):
     project = dbo.get_project(project_id)
     endpoint = request.endpoint
@@ -66,3 +68,38 @@ def reports(project_id):
                            project=project,
                            endpoint=endpoint,
                            project_id=project_id)
+
+
+@project_bp.route('/new_todo_item', methods=['POST'])
+@login_required
+def new_todo_item(project_id):
+    if request.method == "POST":
+        return_endpoint = request.referrer
+        if return_endpoint:
+            if request.is_json:
+                data = request.get_json()
+                user_id = escape(data["user_id"])
+                content = escape(data["todo_content"])
+                if dbo.new_todo_item(project_id, user_id, content):
+                    response = {"success": True, "redirect": return_endpoint}
+                else:
+                    flash("Kunne ikke opprette punkt for huskeliste", category="error")
+                    response = {"success": False, "redirect": return_endpoint}
+        return jsonify(response)
+
+
+@project_bp.route('/todo_item_complete', methods=['POST'])
+@login_required
+def todo_item_complete(project_id):
+    if request.method == "POST":
+        return_endpoint = request.referrer
+        if return_endpoint:
+            if request.is_json:
+                data = request.get_json()
+                if dbo.set_todo_item_completed(escape(data["item_id"]), escape(data["user_id"])):
+                    response = {"success": True, "redirect": return_endpoint}
+                else:
+                    flash("Kunne ikke markere punkt som utført", category="error")
+                    response = {"success": False, "redirect": return_endpoint}
+            
+    return jsonify(response)

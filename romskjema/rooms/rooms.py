@@ -2,10 +2,11 @@ from flask import Blueprint, redirect, url_for, render_template, flash, jsonify,
 from flask_login import login_required, current_user
 from .. import db_operations as dbo
 from .. import db_ops_energy as dboh
-from ..globals import pattern_float, pattern_int
+from ..globals import pattern_float, pattern_int, blueprint_setup
 from markupsafe import escape
 
 rooms_bp = Blueprint('rooms', __name__, static_folder='static', template_folder='templates')
+blueprint_setup(rooms_bp)
 
 @rooms_bp.route('/', methods=['GET', 'POST'])
 @login_required
@@ -91,23 +92,19 @@ def udpate_room(project_id):
         data = request.get_json()
         project_id = escape(data["project_id"])
         room_id = escape(data["room_id"])
-        room_number = escape(data["room_number"].strip())
-        room_name = escape(data["room_name"].strip())
-               
-        area = escape(data["area"].strip())
-        area_float = pattern_float(area)
-                
-        population = escape(data["population"].strip())
-        population_int = pattern_int(population)
+        processed_data = {}
+
+        for key, value in data.items():
+            if key == "population":
+                processed_data[key] = pattern_int(escape(value).strip())
+            elif key == "area":
+                processed_data[key] = pattern_float(escape(value).strip())
+            else:
+                processed_data[key] = escape(value.strip())
         
-        comments = escape(data["comments"].strip())
-        
-        #print(f"ID: {room_id}. rnm: {room_number}. area:{area_float}. rmnm {room_name}, pop: {population_int}, comment: {comments}")
-        
-        if dbo.update_room_data(room_id, room_number, room_name, area_float, population_int, comments):
+        if dbo.update_room_data(room_id, processed_data):
             if dbo.update_ventilation_calculations(room_id):
                 dboh.calculate_total_cooling_for_room(dbo.get_room(room_id).energy_properties.id)
-                flash(f"Romdata oppdatert for {room_number}", category="success")
                 response = {"success": True, "redirect": url_for("rooms.rooms", project_id = project_id)}
         else:
             flash("Kunne ikke oppdatere romdata", category="error")
