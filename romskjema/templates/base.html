@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,195 +14,306 @@
     <!-- https://package.elm-lang.org/packages/1602/elm-feather/1.0.0/FeatherIcons#crosshair -->
 
 </head>
+
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-                {% for category, message in messages %}
-                    {% if category == 'error' %}
-                    <div id="popup" class="popup">
-                        <span class="close" onclick="closePopup()">×</span>
-                        <p>{{category}}: {{ message }}</p>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == 'error' %}
+    <div id="popup" class="popup">
+        <span class="close" onclick="closePopup()">×</span>
+        <p>{{category}}: {{ message }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
 
 
-        <div class="app-container">
+    <div class="app-container">
 
-       <!-- Dark/light mode -->
+        <!-- Dark/light mode -->
         <div class="switch-mode-container no-print">
             <button class="mode-switch" title="Endre tema">Endre mørk/lyst &nbsp;&nbsp;&nbsp;
-            <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
-            <defs></defs>
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-            </svg>
+                <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+                    <defs></defs>
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                </svg>
             </button>
         </div>
 
-         <!-- SIDE BAR MENU-->
+        <!-- SIDE BAR MENU-->
         {% if user.is_authenticated %}
-        
+
         <div class="sidebar no-print">
-                {% if project %}
-                <ul class="sidebar-list">
-                    {% if endpoint == "project.project" %}
-                    <li class="sidebar-list-item active">
+            {% if project %}
+            <ul class="sidebar-list">
+                {% if endpoint == "project.project" %}
+                <li class="sidebar-list-item active">
                     {%else %}
-                    <li class="sidebar-list-item">
+                <li class="sidebar-list-item">
                     {% endif %}
                     <a href="{{ url_for('project.project', project_id=project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> 
-                    <span>Prosjektoversikt</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span>Prosjektoversikt</span>
                     </a>
                 </li>
                 {% if endpoint == "buildings.buildings" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('buildings.buildings', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"></path><polyline points="2.32 6.16 12 11 21.68 6.16"></polyline><line x1="12" y1="22.76" x2="12" y2="11"></line></svg> 
-                    <span>Bygg</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path
+                                d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z">
+                            </path>
+                            <polyline points="2.32 6.16 12 11 21.68 6.16"></polyline>
+                            <line x1="12" y1="22.76" x2="12" y2="11"></line>
+                        </svg>
+                        <span>Bygg</span>
                     </a>
                 </li>
                 {% if endpoint == "rooms.rooms" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('rooms.rooms', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3" y2="6"></line><line x1="3" y1="12" x2="3" y2="12"></line><line x1="3" y1="18" x2="3" y2="18"></line></svg> 
-                    <span>Romliste</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3" y2="6"></line>
+                            <line x1="3" y1="12" x2="3" y2="12"></line>
+                            <line x1="3" y1="18" x2="3" y2="18"></line>
+                        </svg>
+                        <span>Romliste</span>
                     </a>
                 </li>
-                
+
                 {% if endpoint == "ventsystems.ventsystems" %}
                 <li class="sidebar-list-item active">
-                {% else %}
+                    {% else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('ventsystems.ventsystems', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg> 
-                    <span>Ventilasjonsystemer</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path
+                                d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2">
+                            </path>
+                        </svg>
+                        <span>Ventilasjonsystemer</span>
                     </a>
                 </li>
                 {% if endpoint == "ventilation.ventilation" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('ventilation.ventilation', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6" y2="6"></line><line x1="6" y1="18" x2="6" y2="18"></line></svg> 
-                    <span>Luftmengdetabell</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6" y2="6"></line>
+                            <line x1="6" y1="18" x2="6" y2="18"></line>
+                        </svg>
+                        <span>Luftmengdetabell</span>
                     </a>
                 </li>
                 {% if endpoint == "heating.heating" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('heating.heating', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> 
-                    <span>Varmeberegninger</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span>Varmeberegninger</span>
                     </a>
                 </li>
                 {% if endpoint == "cooling.cooling" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('cooling.cooling', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg> 
-                    <span>Kjøling</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                        </svg>
+                        <span>Kjøling</span>
                     </a>
                 </li>
                 <li class="sidebar-list-item">
                     <a href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><line x1="8" y1="19" x2="8" y2="21"></line><line x1="8" y1="13" x2="8" y2="15"></line><line x1="16" y1="19" x2="16" y2="21"></line><line x1="16" y1="13" x2="16" y2="15"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="12" y1="15" x2="12" y2="17"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg> 
-                    <span>Tappevann/SPV</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <line x1="8" y1="19" x2="8" y2="21"></line>
+                            <line x1="8" y1="13" x2="8" y2="15"></line>
+                            <line x1="16" y1="19" x2="16" y2="21"></line>
+                            <line x1="16" y1="13" x2="16" y2="15"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="12" y1="15" x2="12" y2="17"></line>
+                            <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
+                        </svg>
+                        <span>Tappevann/SPV</span>
                     </a>
                 </li>
                 {% if endpoint == "project.settings" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('project.settings', project_id = project.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 
-                    <span>Prosjektinnstillinger</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                        <span>Prosjektinnstillinger</span>
                     </a>
                 </li>
 
                 {% if endpoint == "project.reports" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
-                        <a href="{{ url_for('project.reports', project_id = project.id) }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> 
+                    {% endif %}
+                    <a href="{{ url_for('project.reports', project_id = project.id) }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                        </svg>
                         <span>Rapporter</span>
-                        </a>
-                    </li>
+                    </a>
+                </li>
 
 
                 <p class="p-menu-item">
-                <li class="sidebar-list-item">
-                    <a href="{{ url_for('projects.projects') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> 
-                    <span>Prosjekt dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-list-item">
-                    <a href="{{ url_for('user.user_profile', username=current_user.name )}}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg> 
-                    <span>Brukerkonto</span>
-                    </a>
-                </li>
+                    <li class="sidebar-list-item">
+                        <a href="{{ url_for('projects.projects') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-activity">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                </path>
+                            </svg>
+                            <span>Prosjekt dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="{{ url_for('user.user_profile', username=current_user.name )}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-activity">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <polyline points="17 11 19 13 23 9"></polyline>
+                            </svg>
+                            <span>Brukerkonto</span>
+                        </a>
+                    </li>
                 </p>
                 {% else %}
-                
+
                 {% if endpoint == "projects.projects" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('projects.projects') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> 
-                    <span>Prosjekter dashboard</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Prosjekter dashboard</span>
                     </a>
                 </li>
                 {% if endpoint == "projects.new_project" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('projects.new_project') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg> 
-                    <span>Nytt prosjekt</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        <span>Nytt prosjekt</span>
                     </a>
                 </li>
                 {% if endpoint == "specifications.specifications" or endpoint == "specifications.new_specification" %}
                 <li class="sidebar-list-item active">
-                {%else %}
+                    {%else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('specifications.specifications') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> 
-                    <span>Kravspesifikasjoner</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
+                        </svg>
+                        <span>Kravspesifikasjoner</span>
                     </a>
                 </li>
-                
+
                 {% if endpoint == "user.user_profile" %}
                 <li class="sidebar-list-item active">
-                {% else %}
+                    {% else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('user.user_profile', username=current_user.name )}}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg> 
-                    <span>Brukerkonto</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        <span>Brukerkonto</span>
                     </a>
                 </li>
 
@@ -209,9 +321,9 @@
                 {% if current_user.admin == True %}
                 {% if endpoint == "admin.admin" %}
                 <li class="sidebar-list-item active">
-                {% else %}
+                    {% else %}
                 <li class="sidebar-list-item">
-                {% endif %}
+                    {% endif %}
                     <a href="{{ url_for('admin.admin') }}">
                         Admin
                     </a>
@@ -223,109 +335,115 @@
                     </a>
                 </li>
             </ul>
-                  <div class="sidebar-bottom">
-                    Structor TS &copy; 2024
-                  </div>
+            <div class="sidebar-bottom">
+                Structor TS &copy; 2024
             </div>
+        </div>
         {% endif %}
         <!-- END SIDE BAR MENY-->
 
-    <div class="app-content">         
-        <div class="app-content-header">
-            <h1 class="app-content-headerText">
-              <p>  
-                    {% if user.is_authenticated %}
+        <div class="app-content">
+            <div class="app-content-header">
+                <h1 class="app-content-headerText">
+                    <p>
+                        {% if user.is_authenticated %}
                         {% if project %}
-                            {{project.ProjectName}} - {{project.ProjectNumber}}
+                        {{project.ProjectName}} - {{project.ProjectNumber}}
                         {% else %}
-                            {% block pagetitle %}{%endblock%}
+                        {% block pagetitle %}{%endblock%}
                         {% endif %}
-                    {% endif %}
-                </p>
-            </h1>
-        </div>
-    
-<!-- START SITE CONTENT -->
-    
-<div class="text-div">
-    {% if project %}
-    <!-- TODO-list -->
-    <div id="todo-popup" class="todo-popup">
-        
-        <div class="todo-popup-header">
-            <span class="todo-close-btn">&times;</span>
-            <br>
-            Huskeliste
-        </div>
-
-        <div class="todo-popup-item-container" id="todo-popup-item-container">
-            
-            <form id="todoItem">
-                <input type="text" id="project_id" value="{{project.id}}" hidden readonly>
-                <input type="text" id="user_id" value="{{user.id}}" hidden readonly>
-            <div class="todo-popup-listitem-form ">    
-                <input type="text" id="todo_content" class="todo-input" placeholder="Nytt huskepunkt">
+                        {% endif %}
+                    </p>
+                </h1>
             </div>
-            <div class="todo-popup-listitem">    
-                <button class="table-button" id="submitTodoButton">Legg til</button>
-            </div>
-            </form>
 
+            <!-- START SITE CONTENT -->
 
-            {% if todo_list %}
-                {% for item in todo_list %}
-                    <div key="{{item.id}}" class="todo-popup-listitem" id="todo-popup-listitem">
-                        <input type="text" class="item-id" id="item-id" value="{{item.id}}" hidden readonly>
-                        <p>{{item.date}} - {{item.author_id}}</p>
-                        <p>{{item.content}}</p>
-                        <p><button class="todo-list-button" id="todo-completed">Utført</button></p>
+            <div class="text-div">
+                {% if project %}
+                <!-- TODO-list -->
+                <div id="todo-popup" class="todo-popup">
+
+                    <div class="todo-popup-header">
+                        <span class="todo-close-btn">&times;</span>
+                        <br>
+                        Huskeliste
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="todo-popup-listitem">
-                    <p>Ingen huskepunkter</p>
+
+                    <div class="todo-popup-item-container" id="todo-popup-item-container">
+
+                        <form id="todoItem">
+                            <input type="text" id="project_id" value="{{project.id}}" hidden readonly>
+                            <input type="text" id="user_id" value="{{user.id}}" hidden readonly>
+                            <div class="todo-popup-listitem-form ">
+                                <input type="text" id="todo_content" class="todo-input" placeholder="Nytt huskepunkt">
+                            </div>
+                            <div class="todo-popup-listitem">
+                                <button class="table-button" id="submitTodoButton">Legg til</button>
+                            </div>
+                        </form>
+
+
+                        {% if todo_list %}
+                        {% for item in todo_list %}
+                        <div key="{{item.id}}" class="todo-popup-listitem" id="todo-popup-listitem">
+                            <input type="text" class="item-id" id="item-id" value="{{item.id}}" hidden readonly>
+                            <p>{{item.date}} - {{item.author_id}}</p>
+                            <p>{{item.content}}</p>
+                            <p><button class="todo-list-button" id="todo-completed">Utført</button></p>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="todo-popup-listitem">
+                            <p>Ingen huskepunkter</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
                 </div>
-            {% endif %}
 
-        </div>
-    </div>
+                <div class="todo-container">
+                    <a class="todo-link" href="#" id="todo-openPopup">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-activity">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" y1="22" x2="4" y2="15"></line>
+                        </svg>
+                    </a>
+                </div>
+                {% endif %}
 
-    <div class="todo-container">
-        <a class="todo-link" href="#" id="todo-openPopup">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg> 
-        </a>
-    </div>
-    {% endif %}
 
+                <div class="subtitle-header-container">
+                    <h1 class="app-content-subTitleheaderText">
+                        {% block page_subtitle %}
+                        {% endblock %}
+                    </h1>
+                </div>
+                {% block content %}
 
-    <div class="subtitle-header-container">
-      <h1 class="app-content-subTitleheaderText">
-        {% block page_subtitle %}
-        {% endblock %}
-    </h1>
-</div>
-        {% block content %}
+                {% endblock %}
+                <!-- END SITE CONTENT -->
+            </div>
+            <!-- scripts -->
+            <script>
+                document.addEventListener('DOMContentLoaded', (event) => {
+                    const popup = document.getElementById('popup');
+                    if (popup) {
+                        popup.classList.add('show');
+                    }
+                });
 
-        {% endblock %}
-<!-- END SITE CONTENT -->
-    </div>
-<!-- scripts -->
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const popup = document.getElementById('popup');
-        if (popup) {
-            popup.classList.add('show');
-        }
-    });
+                function closePopup() {
+                    const popup = document.getElementById('popup');
+                    if (popup) {
+                        popup.classList.remove('show');
+                    }
+                }
+            </script>
 
-    function closePopup() {
-        const popup = document.getElementById('popup');
-        if (popup) {
-            popup.classList.remove('show');
-        }
-    }
-</script>
-
-<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
+
 </html>
